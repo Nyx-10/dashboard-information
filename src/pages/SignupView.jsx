@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 export function SignupView({ onSignup, onSwitch }) {
   const { lang, setLang, t } = useContext(LanguageContext);
@@ -12,7 +13,9 @@ export function SignupView({ onSignup, onSwitch }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignup = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (password.length < 8) {
       setError(t ? (t('passwordShortError') || 'Password must be at least 8 characters') : 'Password must be at least 8 characters');
@@ -23,7 +26,33 @@ export function SignupView({ onSignup, onSwitch }) {
       return;
     }
     setError('');
-    onSignup({ email, name, role: 'user' });
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      // Usually after signup, user might need to verify email or gets logged in automatically.
+      // Assuming auto-login or redirect:
+      let role = 'user';
+      if (email === 'adampendek10@gmail.com') {
+        role = 'superadmin';
+      }
+      onSignup({ email, name, role });
+    } catch (err) {
+      setError(err.message || 'Signup failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,7 +107,9 @@ export function SignupView({ onSignup, onSwitch }) {
               </button>
             </div>
           </div>
-          <button type="submit" className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%' }}>{t ? t('signUpBtn') : 'Sign Up'}</button>
+          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
+            {loading ? (t ? t('loading') || 'Loading...' : 'Loading...') : (t ? t('signUpBtn') : 'Sign Up')}
+          </button>
         </form>
         
         <p style={{ marginTop: '1.5rem', color: 'var(--text-muted)' }}>
