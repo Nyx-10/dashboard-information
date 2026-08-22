@@ -1,9 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { MapPin, Calendar, MessageSquare } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
+import { supabase } from '../supabaseClient';
 
 export function ItemCard({ item }) {
   const { t } = useContext(LanguageContext);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id);
+    });
+  }, []);
+
   return (
     <div className="item-card">
       <div style={{ position: 'relative' }}>
@@ -27,7 +36,7 @@ export function ItemCard({ item }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Calendar size={16} /> {item.date}
           </div>
-          {item.type !== 'info' && (
+          {item.type !== 'info' && item.created_by !== currentUserId && (
             <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => alert('Sistem pemesejan dengan pemilik akan datang!')}>
               <MessageSquare size={16} /> {t ? t('contactReporter') : 'Contact Reporter'}
             </button>
