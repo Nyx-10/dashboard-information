@@ -1,21 +1,56 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Settings } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
-import { MOCK_ITEMS } from '../data/mockData';
+import { supabase } from '../supabaseClient';
 
 export function ProfileView() {
   const { lang, setLang, t } = useContext(LanguageContext);
   const [showSettings, setShowSettings] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userItems, setUserItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  async function fetchProfileData() {
+    try {
+      setLoading(true);
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (currentUser) {
+        setUser({
+          name: currentUser.user_metadata?.name || 'User',
+          email: currentUser.email
+        });
+
+        // Fetch items reported by this user
+        const { data, error } = await supabase
+          .from('items')
+          .select('*')
+          .eq('created_by', currentUser.id)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        if (data) setUserItems(data);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="page-bg-common bg-profile">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
-        <img src="https://ui-avatars.com/api/?name=User+Name&background=4F46E5&color=fff&size=120" alt="User" style={{ borderRadius: '50%' }} />
+        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff&size=120`} alt="User" style={{ borderRadius: '50%' }} />
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>John Doe</h1>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Computer Science Student • Member since 2024</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{user?.name || 'User Name'}</h1>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{user?.email || 'Email'}</p>
           <div style={{ display: 'flex', gap: '1rem', position: 'relative', zIndex: 20 }}>
             <button className="btn-primary" style={{ background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border)' }} onClick={() => setShowSettings(!showSettings)}>
               <Settings size={18} /> {t('languageSettings')}
@@ -44,10 +79,18 @@ export function ProfileView() {
       </div>
 
       <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>{t('myReports')}</h2>
-      <div className="grid-cards">
-        <ItemCardCompact item={MOCK_ITEMS[0]} />
-        <ItemCardCompact item={MOCK_ITEMS[2]} />
-      </div>
+      
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>Loading reports...</p>
+      ) : userItems.length === 0 ? (
+        <p style={{ color: 'var(--text-muted)' }}>You haven't reported any items yet.</p>
+      ) : (
+        <div className="grid-cards">
+          {userItems.map(item => (
+            <ItemCardCompact key={item.id} item={item} />
+          ))}
+        </div>
+      )}
     </div>
     </div>
   );
