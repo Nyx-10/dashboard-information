@@ -41,8 +41,13 @@ export function SignupView({ onSignup, onSwitch }) {
 
       if (error) throw error;
       
-      // Usually after signup, user might need to verify email or gets logged in automatically.
-      // Assuming auto-login or redirect:
+      // Check if session exists (if email confirmation is required, session will be null)
+      if (!data.session) {
+        alert('Sila semak e-mel anda dan klik pautan pengesahan (verification link) sebelum mendaftar masuk. ATAU matikan "Confirm Email" di Supabase.');
+        setLoading(false);
+        return; // Do not let them into the dashboard yet
+      }
+
       let role = 'user';
       if (email === 'adampendek10@gmail.com') {
         role = 'superadmin';
