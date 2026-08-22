@@ -1,0 +1,62 @@
+import React, { useState, useContext } from 'react';
+import { Search } from 'lucide-react';
+import { LanguageContext } from '../context/LanguageContext';
+import { ItemCard } from '../components/ItemCard';
+import { MOCK_ITEMS } from '../data/mockData';
+
+export function SearchView({ query, setQuery }) {
+  const { t } = useContext(LanguageContext);
+  const [filter, setFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('');
+
+  const filtered = MOCK_ITEMS.filter(item => {
+    const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
+    
+    let typeMatches = false;
+    if (filter === 'all') typeMatches = true;
+    else if (filter === 'lost' && item.type === 'lost') typeMatches = true;
+    else if (filter === 'found' && item.type === 'found') typeMatches = true;
+    else if (filter === 'info' && item.type === 'info') typeMatches = true;
+
+    let dateMatches = false;
+    if (!dateFilter) dateMatches = true;
+    else if (item.date === dateFilter) dateMatches = true;
+    
+    return matchesQuery && typeMatches && dateMatches;
+  });
+
+  return (
+    <div className="page-bg-common bg-search">
+      <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1.5rem' }}>{t('searchResults')}</h1>
+      
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <button className="btn-primary" style={{ background: filter === 'lost' ? 'var(--primary)' : 'var(--surface)', color: filter === 'lost' ? '#fff' : 'var(--text-main)', border: filter === 'lost' ? '1px solid var(--primary)' : '1px solid var(--border)' }} onClick={() => setFilter('lost')}>{t('lostItems')}</button>
+        <button className="btn-primary" style={{ background: filter === 'found' ? 'var(--primary)' : 'var(--surface)', color: filter === 'found' ? '#fff' : 'var(--text-main)', border: filter === 'found' ? '1px solid var(--primary)' : '1px solid var(--border)' }} onClick={() => setFilter('found')}>{t('foundItems')}</button>
+        <button className="btn-primary" style={{ background: filter === 'info' ? 'var(--primary)' : 'var(--surface)', color: filter === 'info' ? '#fff' : 'var(--text-main)', border: filter === 'info' ? '1px solid var(--primary)' : '1px solid var(--border)' }} onClick={() => setFilter('info')}>{t('recentlyInfo')}</button>
+        {filter !== 'all' && (
+          <button className="btn-primary" style={{ background: 'transparent', color: '#EF4444', border: '1px solid #EF4444' }} onClick={() => setFilter('all')}>{t('all')}</button>
+        )}
+        
+        <input 
+          type="date"
+          value={dateFilter} 
+          onChange={(e) => setDateFilter(e.target.value)}
+          style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', marginLeft: 'auto', outline: 'none' }}
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+          <Search size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+          <h3>{t('noItemsFound')}</h3>
+        </div>
+      ) : (
+        <div className="grid-cards">
+          {filtered.map(item => (
+            <ItemCard key={item.id} item={item} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
