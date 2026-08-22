@@ -1,16 +1,40 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { ItemCard } from '../components/ItemCard';
-import { MOCK_ITEMS } from '../data/mockData';
+import { supabase } from '../supabaseClient';
 
 export function SearchView({ query, setQuery }) {
   const { t } = useContext(LanguageContext);
   const [filter, setFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK_ITEMS.filter(item => {
-    const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  async function fetchItems() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('items')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      if (data) setItems(data);
+    } catch (error) {
+      console.error('Error fetching items:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filtered = items.filter(item => {
+    const queryStr = query ? query.toLowerCase() : '';
+    const matchesQuery = item.title.toLowerCase().includes(queryStr) || item.description.toLowerCase().includes(queryStr);
     
     let typeMatches = false;
     if (filter === 'all') typeMatches = true;
@@ -45,7 +69,11 @@ export function SearchView({ query, setQuery }) {
         />
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+          <h3>Loading items from database...</h3>
+        </div>
+      ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
           <Search size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
           <h3>{t('noItemsFound')}</h3>

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
-import { MOCK_ITEMS } from '../data/mockData';
+import { supabase } from '../supabaseClient';
 
 export function AddItemView({ onSuccess }) {
   const { t } = useContext(LanguageContext);
@@ -10,8 +10,9 @@ export function AddItemView({ onSuccess }) {
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (type !== 'info') {
       if (!title || !date || !location) {
@@ -27,20 +28,36 @@ export function AddItemView({ onSuccess }) {
 
     const finalTitle = type === 'info' ? 'Maklumat (' + date + ')' : title;
     const finalLocation = type === 'info' ? 'Umum' : location;
+    
+    setLoading(true);
 
-    const newItem = {
-      id: Date.now(),
-      title: finalTitle,
-      type,
-      location: finalLocation,
-      date,
-      image: null,
-      description,
-      status: 'open'
-    };
+    try {
+      // Get current logged in user
+      const { data: { user } } = await supabase.auth.getUser();
 
-    MOCK_ITEMS.unshift(newItem);
-    if (onSuccess) onSuccess();
+      const { data, error } = await supabase
+        .from('items')
+        .insert([
+          { 
+            title: finalTitle,
+            type,
+            location: finalLocation,
+            date,
+            description,
+            status: 'open',
+            created_by: user ? user.id : null 
+          }
+        ]);
+
+      if (error) throw error;
+      
+      alert('Berjaya ditambah!');
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      alert('Gagal menambah data: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,8 +114,8 @@ export function AddItemView({ onSuccess }) {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}>
-            {t('submitReport')}
+          <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1rem', opacity: loading ? 0.7 : 1 }}>
+            {loading ? 'Sedang Menyimpan...' : t('submitReport')}
           </button>
         </form>
       </div>
