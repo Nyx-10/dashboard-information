@@ -15,31 +15,12 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
     e.preventDefault();
     setLoading(true);
     try {
-      // Allow hardcoded super admin bypass or normal Supabase login
-      let role = 'user';
-      let name = 'User';
-
-      if (email === 'adampendek10@gmail.com' && password === 'Adamdarwish10#') {
-        role = 'superadmin';
-        name = 'Super Admin';
-        onLogin({ email, role, name });
-        setLoading(false);
-        return;
-      }
-      
-      if (email === 'adam.darwish.it@gmail.com' && password === 'Adamdarwish11#') {
-        role = 'user';
-        name = 'Normal User';
-        onLogin({ email, role, name });
-        setLoading(false);
-        return;
-      }
-
       // Normal Supabase Authentication
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
-      name = data.user.user_metadata?.name || 'User';
+      let role = 'user';
+      let name = data.user.user_metadata?.name || 'User';
       
       if (email === 'adampendek10@gmail.com') {
         role = 'superadmin';
