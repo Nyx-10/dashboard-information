@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome }) {
   const { lang, setLang, t } = useContext(LanguageContext);
@@ -8,16 +9,57 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === 'admin@adtec.edu.my' && password === 'admin123') {
-      onLogin({ email, role: 'superadmin', name: 'Super Admin' });
-    } else if (email === 'normaladmin@adtec.edu.my' && password === 'admin123') {
-      onLogin({ email, role: 'admin', name: 'Normal Admin' });
-    } else if (email === 'student@adtec.edu.my' && password === 'student123') {
-      onLogin({ email, role: 'user', name: 'Student Normal' });
-    } else {
-      alert('Sila guna:\n- admin@adtec.edu.my (admin123)\n- normaladmin@adtec.edu.my (admin123)\n- student@adtec.edu.my (student123)');
+    setLoading(true);
+    try {
+      // Allow hardcoded super admin bypass or normal Supabase login
+      let role = 'user';
+      let name = 'User';
+
+      if (email === 'adampendek10@gmail.com' && password === 'Adamdarwish10#') {
+        role = 'superadmin';
+        name = 'Super Admin';
+        onLogin({ email, role, name });
+        setLoading(false);
+        return;
+      }
+      
+      if (email === 'adam.darwish.it@gmail.com' && password === 'Adamdarwish11#') {
+        role = 'user';
+        name = 'Normal User';
+        onLogin({ email, role, name });
+        setLoading(false);
+        return;
+      }
+
+      // Normal Supabase Authentication
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      
+      name = data.user.user_metadata?.name || 'User';
+      
+      if (email === 'adampendek10@gmail.com') {
+        role = 'superadmin';
+        name = 'Super Admin';
+      } else if (email === 'admin@adtec.edu.my') {
+        role = 'admin';
+        name = 'Normal Admin';
+      } else if (email === 'normaladmin@adtec.edu.my') {
+        role = 'admin';
+        name = 'Normal Admin';
+      } else if (email === 'adam.darwish.it@gmail.com') {
+        role = 'user';
+        name = 'Normal User';
+      }
+
+      onLogin({ email, role, name });
+    } catch (err) {
+      alert(err.message || 'Login failed. Sila pastikan email dan password betul.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,7 +106,9 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
               </button>
             </div>
           </div>
-          <button type="submit" className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%' }}>{t ? t('signInBtn') : 'Sign In'}</button>
+          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
+            {loading ? (t ? t('loading') || 'Loading...' : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
+          </button>
         </form>
         
         <p style={{ marginTop: '1.5rem', color: 'var(--text-muted)' }}>
