@@ -25,13 +25,10 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
       const normalizedEmail = email.trim().toLowerCase();
       if (normalizedEmail.includes('adam.darwish.it')) {
         role = 'superadmin';
-        name = 'Super admin';
-      } else if (normalizedEmail === 'admin@adtec.edu.my') {
+      } else if (normalizedEmail === 'admin@adtec.edu.my' || normalizedEmail === 'normaladmin@adtec.edu.my') {
         role = 'admin';
-        name = 'Normal Admin';
-      } else if (normalizedEmail === 'normaladmin@adtec.edu.my') {
-        role = 'admin';
-        name = 'Normal Admin';
+      } else {
+        role = 'user';
       }
 
       onLogin({ email, role, name });

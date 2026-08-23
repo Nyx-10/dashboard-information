@@ -209,7 +209,9 @@ export default function App() {
               <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{user?.name || 'User'}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user?.role || 'Student'}</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : 'Normal User'}
+                </span>
               </div>
             </div>
           </div>
