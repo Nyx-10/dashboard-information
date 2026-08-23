@@ -38,7 +38,7 @@ export function ItemCard({ item }) {
           </div>
           {item.type !== 'info' && item.created_by !== currentUserId && (
             <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => alert('Sistem pemesejan dengan pemilik akan datang!')}>
-              <MessageSquare size={16} /> {t ? t('contactReporter') : 'Contact Reporter'}
+              <MessageSquare size={16} /> {item.type === 'lost' ? 'Contact Owner' : 'Contact Finder'}
             </button>
           )}
         </div>
