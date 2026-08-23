@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
@@ -10,6 +11,91 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 5000;
+
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+// Simpan OTP sementara dalam memory
+const otpStore = new Map();
+
+app.post('/api/send-otp', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'E-mel diperlukan.' });
+  }
+
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore.set(email, { otp, expires: Date.now() + 10 * 60 * 1000 }); // 10 minit
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Adtec Melaka Dashboard" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Kod Pengesahan (OTP) Pendaftaran Anda",
+      text: `Kod OTP anda ialah: ${otp}. Kod ini sah selama 10 minit.`,
+      html: `<b>Kod OTP pendaftaran anda ialah:</b> <h2 style="letter-spacing: 5px; color: #4F46E5;">${otp}</h2><p>Kod ini sah selama 10 minit. Sila masukkan kod ini di laman pendaftaran.</p>`,
+    });
+
+    console.log("\n-----------------------------------------");
+    console.log("OTP berjaya dihantar kepada: %s", email);
+    console.log("OTP dihantar: %s", otp);
+    console.log("Mesej ID: %s", info.messageId);
+    console.log("-----------------------------------------\n");
+
+    res.status(200).json({ 
+      message: 'OTP telah dihantar ke peti masuk anda!'
+    });
+
+  } catch (error) {
+    console.error('Ralat menghantar e-mel:', error);
+    res.status(500).json({ message: 'Gagal menghantar OTP. Sila pastikan e-mel dan App Password betul.' });
+  }
+});
+
+app.post('/api/verify-otp', async (req, res) => {
+  const { email, otp, password, name } = req.body;
+  
+  if (!email || !otp || !password) {
+    return res.status(400).json({ message: 'Maklumat tidak lengkap.' });
+  }
+
+  const record = otpStore.get(email);
+  if (!record || record.otp !== otp) {
+    return res.status(400).json({ message: 'Kod OTP tidak sah.' });
+  }
+  if (record.expires < Date.now()) {
+    otpStore.delete(email);
+    return res.status(400).json({ message: 'Kod OTP telah luput.' });
+  }
+
+  try {
+    // Daftar pengguna dalam Supabase melalui Admin API
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name: name || '', plain_password: password }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    otpStore.delete(email);
+    res.status(200).json({ success: true, user: data.user, message: 'Pendaftaran berjaya disahkan.' });
+  } catch (error) {
+    console.error('Ralat pendaftaran Supabase:', error);
+    res.status(500).json({ message: error.message || 'Gagal mendaftar pengguna.' });
+  }
+});
 
 app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body;

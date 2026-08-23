@@ -19,21 +19,19 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
-      let role = 'user';
+      let role = data.user.user_metadata?.role || 'user';
       let name = data.user.user_metadata?.name || 'User';
       
-      if (email === 'adampendek10@gmail.com') {
+      const normalizedEmail = email.trim().toLowerCase();
+      if (normalizedEmail.includes('adam.darwish.it')) {
         role = 'superadmin';
-        name = 'Super Admin';
-      } else if (email === 'admin@adtec.edu.my') {
+        name = 'Super admin';
+      } else if (normalizedEmail === 'admin@adtec.edu.my') {
         role = 'admin';
         name = 'Normal Admin';
-      } else if (email === 'normaladmin@adtec.edu.my') {
+      } else if (normalizedEmail === 'normaladmin@adtec.edu.my') {
         role = 'admin';
         name = 'Normal Admin';
-      } else if (email === 'adam.darwish.it@gmail.com') {
-        role = 'user';
-        name = 'Normal User';
       }
 
       onLogin({ email, role, name });

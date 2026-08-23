@@ -19,6 +19,10 @@ export function SignupView({ onSignup, onSwitch }) {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (email === 'adam.darwish.it@gmail.com') {
+      setError('Akaun Super Admin tidak perlu mendaftar. Sila Log Masuk terus.');
+      return;
+    }
     if (password.length < 8) {
       setError(t ? (t('passwordShortError') || 'Password must be at least 8 characters') : 'Password must be at least 8 characters');
       return;
@@ -31,29 +35,19 @@ export function SignupView({ onSignup, onSwitch }) {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name
-          }
-        }
+      const response = await fetch('http://localhost:5000/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
       });
-
-      if (error) throw error;
       
-      // Check if session exists (if email confirmation is required, session will be null)
-      if (!data.session) {
-        setShowOtpInput(true);
-        alert('Sila semak e-mel anda untuk mendapatkan kod OTP (6 digit).');
-      } else {
-        let role = 'user';
-        if (email === 'adampendek10@gmail.com') {
-          role = 'superadmin';
-        }
-        onSignup({ email, name, role });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Gagal menghantar OTP.');
       }
+      
+      setShowOtpInput(true);
+      alert('Sila semak e-mel anda untuk mendapatkan kod OTP (6 digit).');
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {
@@ -66,18 +60,26 @@ export function SignupView({ onSignup, onSwitch }) {
     setLoading(true);
     setError('');
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
+      const response = await fetch('http://localhost:5000/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, password, name })
+      });
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Kod OTP tidak sah.');
+      }
+
+      // Log masuk pengguna selepas pendaftaran berjaya
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        token: otp,
-        type: 'signup'
+        password
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
 
       let role = 'user';
-      if (email === 'adampendek10@gmail.com') {
-        role = 'superadmin';
-      }
       onSignup({ email, name, role });
     } catch (err) {
       setError(err.message || 'Kod OTP tidak sah atau ralat berlaku.');
