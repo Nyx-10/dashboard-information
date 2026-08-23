@@ -114,8 +114,20 @@ app.post('/api/forgot-password', async (req, res) => {
       },
     });
 
-    const resetLink = `http://localhost:5173/reset-password?token=dummy-token-123`;
+    // Jana link sebenar dari Supabase
+    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: 'http://localhost:5173/reset-password'
+      }
+    });
 
+    if (linkError) {
+      throw new Error(linkError.message);
+    }
+
+    const resetLink = linkData.properties.action_link;
     // Hantar e-mel ke peti masuk (inbox) pengguna
     const info = await transporter.sendMail({
       from: `"Adtec Melaka Dashboard" <${process.env.EMAIL_USER}>`,

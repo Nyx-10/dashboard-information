@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { 
   Search, PlusCircle, Bell, User, LayoutDashboard, 
   MessageSquare, Settings, LogOut, MapPin, Calendar, CheckCircle,
@@ -18,7 +18,7 @@ import { ProfileView } from './pages/ProfileView';
 import { LoginView } from './pages/LoginView';
 import { SignupView } from './pages/SignupView';
 import { ForgotPasswordView } from './pages/ForgotPasswordView';
-
+import { ResetPasswordView } from './pages/ResetPasswordView';
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [lang, setLang] = useState('en');
@@ -32,6 +32,15 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Apabila pengguna klik link dari email, URL akan mempunyai /reset-password
+    if (window.location.pathname === '/reset-password') {
+      setShowLanding(false);
+      setIsAuthenticated(false);
+      setAuthMode('reset-password');
+    }
+  }, []);
 
   if (showLanding) {
     return (
@@ -49,6 +58,11 @@ export default function App() {
       authContent = <SignupView onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); }} onSwitch={() => setAuthMode('login')} />;
     } else if (authMode === 'forgot-password') {
       authContent = <ForgotPasswordView onSwitchBack={() => setAuthMode('login')} />;
+    } else if (authMode === 'reset-password') {
+      authContent = <ResetPasswordView onBackToLogin={() => {
+        window.history.pushState({}, '', '/');
+        setAuthMode('login');
+      }} />;
     }
     return (
       <LanguageContext.Provider value={{ lang, setLang, t }}>
