@@ -54,7 +54,7 @@ export function DashboardView({ onContact }) {
                 ))}
               </div>
             ) : (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Tiada pengumuman setakat ini.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('noInfoYet')}</p>
             )}
           </div>
 
@@ -66,7 +66,7 @@ export function DashboardView({ onContact }) {
               ))}
             </div>
           ) : (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Tiada laporan barang hilang/jumpa setakat ini.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('noReportsYet')}</p>
           )}
         </>
       )}

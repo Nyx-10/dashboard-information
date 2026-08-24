@@ -196,7 +196,7 @@ export default function App() {
                 <input 
                   type="text" 
                   className="input-field" 
-                  placeholder="Search anything..." 
+                  placeholder={t('searchAnything')} 
                   style={{ paddingLeft: '40px' }}
                   value={searchQuery}
                   onChange={(e) => {
@@ -215,22 +215,22 @@ export default function App() {
               </button>
               {showNotifications && (
                 <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '110%', width: '340px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
-                  <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>Notifications</div>
+                  <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>{t('notifications')}</div>
                   <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
                     {notifications.length > 0 ? (
                       notifications.map((item, idx) => (
                         <div key={item.id} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { setActiveTab('home'); setShowNotifications(false); }}>
                           {item.type === 'lost' ? <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} /> : item.type === 'found' ? <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} /> : <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />}
                           <div>
-                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>Laporan Baru: {item.type}</p>
+                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type}</p>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.title} - {item.location}</p>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Baru Sahaja</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('justNow')}</span>
                           </div>
                         </div>
                       ))
                     ) : (
                       <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                        Tiada notifikasi baru.
+                        {t('noNewNotifications')}
                       </div>
                     )}
                   </div>

@@ -71,7 +71,7 @@ export function SearchView({ query, setQuery, onContact }) {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-          <h3>Loading items from database...</h3>
+          <h3>{t('loadingReports')}</h3>
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>

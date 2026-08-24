@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
+import { LanguageContext } from '../context/LanguageContext';
 
 export function MessagesView({ initialChatUser }) {
+  const { t } = useContext(LanguageContext);
   const [showReportMenu, setShowReportMenu] = useState(false);
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherReason, setOtherReason] = useState('');
@@ -17,8 +19,8 @@ export function MessagesView({ initialChatUser }) {
           return [{
             id: initialChatUser.id,
             name: initialChatUser.name,
-            time: 'Just now',
-            preview: initialChatUser.preview || 'Start a conversation...',
+            time: t('justNow'),
+            preview: initialChatUser.preview || '...',
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`
           }, ...prev];
         }
@@ -26,7 +28,7 @@ export function MessagesView({ initialChatUser }) {
       });
       setActiveChat(initialChatUser.id);
     }
-  }, [initialChatUser]);
+  }, [initialChatUser, t]);
 
   const filteredChats = chats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const activeChatData = chats.find(c => c.id === activeChat);
@@ -37,13 +39,13 @@ export function MessagesView({ initialChatUser }) {
       {/* Sidebar */}
       <div style={{ width: '320px', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Messages</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>{t('messages')}</h2>
           <div style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
               className="input-field" 
-              placeholder="Search name..." 
+              placeholder={t('searchName')} 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ paddingLeft: '32px', fontSize: '0.875rem', padding: '0.5rem 0.5rem 0.5rem 32px' }} 
@@ -53,7 +55,7 @@ export function MessagesView({ initialChatUser }) {
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {filteredChats.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-              Tiada perbualan.
+              {t('noConversations')}
             </div>
           ) : (
             filteredChats.map(chat => (
@@ -87,7 +89,7 @@ export function MessagesView({ initialChatUser }) {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
         {!activeChatData ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-            <p>Pilih perbualan untuk mula mesej</p>
+            <p>{t('selectConversation')}</p>
           </div>
         ) : (
           <>
@@ -97,35 +99,35 @@ export function MessagesView({ initialChatUser }) {
                 <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>Online</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>{t('online')}</span>
                 </div>
               </div>
               <div style={{ position: 'relative' }}>
                 <button className="btn-primary" onClick={() => { setShowReportMenu(!showReportMenu); setShowOtherInput(false); setOtherReason(''); }} style={{ background: 'transparent', border: '1px solid #EF4444', color: '#EF4444', padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>
-                  <AlertCircle size={14} /> Report User
+                  <AlertCircle size={14} /> {t('reportUser')}
                 </button>
                 {showReportMenu && (
                   <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '120%', width: '200px', zIndex: 10, padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', boxShadow: 'var(--shadow-lg)' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', padding: '0.25rem 0.5rem', textTransform: 'uppercase' }}>Report Type</div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', padding: '0.25rem 0.5rem', textTransform: 'uppercase' }}>{t('reportType')}</div>
                     {!showOtherInput ? (
                       <>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert('Reported as Spam'); setShowReportMenu(false); }}>Spam</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert('Reported as Scammer'); setShowReportMenu(false); }}>Scammer</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert('Reported as Inappropriate'); setShowReportMenu(false); }}>Inappropriate Content</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert('Reported as Harassment'); setShowReportMenu(false); }}>Harassment</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => setShowOtherInput(true)}>Others</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('spam')}`); setShowReportMenu(false); }}>{t('spam')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('scammer')}`); setShowReportMenu(false); }}>{t('scammer')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('inappropriate')}`); setShowReportMenu(false); }}>{t('inappropriate')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('harassment')}`); setShowReportMenu(false); }}>{t('harassment')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => setShowOtherInput(true)}>{t('typeOthers')}</button>
                       </>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.25rem' }}>
                         <textarea 
-                          placeholder="Type reason..." 
+                          placeholder={t('typeReason')} 
                           style={{ width: '100%', padding: '0.5rem', fontSize: '0.75rem', borderRadius: '0.25rem', border: '1px solid var(--border)', background: 'var(--bg-main)', color: 'var(--text-main)', resize: 'vertical', minHeight: '60px' }}
                           value={otherReason}
                           onChange={(e) => setOtherReason(e.target.value)}
                         />
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-main)' }} onClick={() => { setShowOtherInput(false); setOtherReason(''); }}>Cancel</button>
-                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem' }} onClick={() => { if(otherReason.trim()){ alert(`Reported: ${otherReason}`); setShowReportMenu(false); setShowOtherInput(false); setOtherReason(''); } }}>Submit</button>
+                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-main)' }} onClick={() => { setShowOtherInput(false); setOtherReason(''); }}>{t('cancel')}</button>
+                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem' }} onClick={() => { if(otherReason.trim()){ alert(`Reported: ${otherReason}`); setShowReportMenu(false); setShowOtherInput(false); setOtherReason(''); } }}>{t('submit')}</button>
                         </div>
                       </div>
                     )}
@@ -146,7 +148,7 @@ export function MessagesView({ initialChatUser }) {
                   <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1rem', borderRadius: '0 1rem 1rem 1rem', color: 'var(--text-main)' }}>
                     {activeChatData.preview}
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>Just now</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>{t('justNow')}</span>
                 </div>
               </div>
               
@@ -156,7 +158,7 @@ export function MessagesView({ initialChatUser }) {
             <div style={{ padding: '1.25rem', background: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem' }}>
               <input type="text" className="input-field" placeholder="Type a message..." style={{ flex: 1, borderRadius: '2rem' }} />
               <button className="btn-primary" style={{ borderRadius: '2rem', padding: '0.5rem 1.5rem' }}>
-                Send
+                {t('send')}
               </button>
             </div>
           </>

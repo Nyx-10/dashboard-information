@@ -115,7 +115,7 @@ export function AddItemView({ onSuccess }) {
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1rem', opacity: loading ? 0.7 : 1 }}>
-            {loading ? 'Sedang Menyimpan...' : t('submitReport')}
+            {loading ? t('saving') : t('submitReport')}
           </button>
         </form>
       </div>

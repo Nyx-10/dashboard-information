@@ -23,7 +23,11 @@ export const dict = {
     // Forgot Password keys
     forgotTitle: 'Forgot Password', forgotDesc: 'Enter your email and we will send a link to reset your password.', sendLinkBtn: 'Send Link', linkSentTitle: 'Link Sent!', linkSentDesc: 'Please check your email inbox for further instructions.', backToLoginBtn: 'Back to Login',
     // Signup keys
-    signupTitle: 'Create Account', signupDesc: 'Join the Adtec Melaka network.', fullNameLabel: 'Full Name', alreadyAccount: 'Already have an account?', confirmPasswordLabel: 'Confirm Password', passwordMismatchError: 'Passwords do not match', backToHome: 'Back to Home', passwordShortError: 'Password must be at least 8 characters'
+    signupTitle: 'Create Account', signupDesc: 'Join the Adtec Melaka network.', fullNameLabel: 'Full Name', alreadyAccount: 'Already have an account?', confirmPasswordLabel: 'Confirm Password', passwordMismatchError: 'Passwords do not match', backToHome: 'Back to Home', passwordShortError: 'Password must be at least 8 characters',
+    // New keys
+    noConversations: 'No conversations.', selectConversation: 'Select a conversation to start messaging', online: 'Online', reportUser: 'Report User', reportType: 'Report Type', spam: 'Spam', scammer: 'Scammer', inappropriate: 'Inappropriate Content', harassment: 'Harassment', typeReason: 'Type reason...', submit: 'Submit', send: 'Send', justNow: 'Just now',
+    noInfoYet: 'No announcements yet.', noReportsYet: 'No lost/found reports yet.', newReport: 'New Report:', noNewNotifications: 'No new notifications.',
+    myProfile: 'My Profile', nameLabel: 'Name', roleLabel: 'Role', memberSince: 'Member since', loadingReports: 'Loading reports...', noReportsMade: 'You haven\'t reported any items yet.', saving: 'Saving...', messagingComingSoon: 'Messaging system coming soon!'
   },
   ms: {
     dashboard: 'Papan Pemuka', searchItems: 'Cari Barang', missingItem: 'Barang Hilang & Info Kolej', messages: 'Mesej',
@@ -46,7 +50,11 @@ export const dict = {
     // Forgot Password keys
     forgotTitle: 'Lupa Kata Laluan', forgotDesc: 'Masukkan e-mel anda dan kami akan menghantar pautan untuk menetapkan semula kata laluan.', sendLinkBtn: 'Hantar Pautan', linkSentTitle: 'Pautan telah dihantar!', linkSentDesc: 'Sila semak peti masuk e-mel anda untuk arahan selanjutnya.', backToLoginBtn: 'Kembali ke Log Masuk',
     // Signup keys
-    signupTitle: 'Cipta Akaun', signupDesc: 'Sertai rangkaian Adtec Melaka.', fullNameLabel: 'Nama Penuh', alreadyAccount: 'Sudah mempunyai akaun?', confirmPasswordLabel: 'Sahkan Kata Laluan', passwordMismatchError: 'Kata laluan tidak sepadan', backToHome: 'Kembali ke Laman Utama', passwordShortError: 'Kata laluan mestilah sekurang-kurangnya 8 aksara'
+    signupTitle: 'Cipta Akaun', signupDesc: 'Sertai rangkaian Adtec Melaka.', fullNameLabel: 'Nama Penuh', alreadyAccount: 'Sudah mempunyai akaun?', confirmPasswordLabel: 'Sahkan Kata Laluan', passwordMismatchError: 'Kata laluan tidak sepadan', backToHome: 'Kembali ke Laman Utama', passwordShortError: 'Kata laluan mestilah sekurang-kurangnya 8 aksara',
+    // New keys
+    noConversations: 'Tiada perbualan.', selectConversation: 'Pilih perbualan untuk mula mesej', online: 'Dalam talian', reportUser: 'Laporkan Pengguna', reportType: 'Jenis Laporan', spam: 'Spam', scammer: 'Penipu (Scammer)', inappropriate: 'Kandungan Tidak Sesuai', harassment: 'Gangguan', typeReason: 'Taip sebab...', submit: 'Hantar', send: 'Hantar', justNow: 'Baru sahaja',
+    noInfoYet: 'Tiada pengumuman setakat ini.', noReportsYet: 'Tiada laporan barang hilang/jumpa setakat ini.', newReport: 'Laporan Baru:', noNewNotifications: 'Tiada notifikasi baru.',
+    myProfile: 'Profil Saya', nameLabel: 'Nama', roleLabel: 'Peranan', memberSince: 'Ahli sejak', loadingReports: 'Sedang memuatkan laporan...', noReportsMade: 'Anda belum melaporkan sebarang item lagi.', saving: 'Sedang menyimpan...', messagingComingSoon: 'Sistem pemesejan dengan pemilik akan datang!'
   },
   zh: {
     dashboard: '仪表板', searchItems: '搜索物品', missingItem: '遗失物品与学院信息', messages: '消息',
@@ -69,7 +77,11 @@ export const dict = {
     // Forgot Password keys
     forgotTitle: '忘记密码', forgotDesc: '输入您的电子邮件，我们将发送重置密码的链接。', sendLinkBtn: '发送链接', linkSentTitle: '链接已发送！', linkSentDesc: '请检查您的电子邮件收件箱以获取进一步指示。', backToLoginBtn: '返回登录',
     // Signup keys
-    signupTitle: '创建账号', signupDesc: '加入马六甲 Adtec 网络。', fullNameLabel: '全名', alreadyAccount: '已有账号？', confirmPasswordLabel: '确认密码', passwordMismatchError: '密码不匹配', backToHome: '返回主页', passwordShortError: '密码必须至少为8个字符'
+    signupTitle: '创建账号', signupDesc: '加入马六甲 Adtec 网络。', fullNameLabel: '全名', alreadyAccount: '已有账号？', confirmPasswordLabel: '确认密码', passwordMismatchError: '密码不匹配', backToHome: '返回主页', passwordShortError: '密码必须至少为8个字符',
+    // New keys
+    noConversations: '没有对话。', selectConversation: '选择一个对话开始聊天', online: '在线', reportUser: '举报用户', reportType: '举报类型', spam: '垃圾信息', scammer: '骗子', inappropriate: '不当内容', harassment: '骚扰', typeReason: '输入原因...', submit: '提交', send: '发送', justNow: '刚刚',
+    noInfoYet: '暂无公告。', noReportsYet: '暂无失物招领报告。', newReport: '新报告：', noNewNotifications: '没有新通知。',
+    myProfile: '我的资料', nameLabel: '姓名', roleLabel: '角色', memberSince: '注册时间', loadingReports: '正在加载报告...', noReportsMade: '您还没有报告任何物品。', saving: '正在保存...', messagingComingSoon: '与所有者的消息系统即将推出！'
   },
   ta: {
     dashboard: 'டாஷ்போர்டு', searchItems: 'பொருட்களைத் தேடு', missingItem: 'காணாமல் போன பொருள் & கல்லூரி தகவல்', messages: 'செய்திகள்',
@@ -92,6 +104,10 @@ export const dict = {
     // Forgot Password keys
     forgotTitle: 'கடவுச்சொல் மறந்துவிட்டதா', forgotDesc: 'உங்கள் மின்னஞ்சலை உள்ளிடவும், கடவுச்சொல்லை மீட்டமைக்க நாங்கள் ஒரு இணைப்பை அனுப்புவோம்.', sendLinkBtn: 'இணைப்பை அனுப்பு', linkSentTitle: 'இணைப்பு அனுப்பப்பட்டது!', linkSentDesc: 'மேலும் அறிவுறுத்தல்களுக்கு உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்.', backToLoginBtn: 'உள்நுழைவுக்குத் திரும்பு',
     // Signup keys
-    signupTitle: 'கணக்கை உருவாக்கு', signupDesc: 'Adtec Melaka நெட்வொர்க்கில் சேரவும்.', fullNameLabel: 'முழு பெயர்', alreadyAccount: 'ஏற்கனவே கணக்கு உள்ளதா?', confirmPasswordLabel: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்', passwordMismatchError: 'கடவுச்சொற்கள் பொருந்தவில்லை', backToHome: 'முகப்புப்பக்கத்திற்குத் திரும்பு', passwordShortError: 'கடவுச்சொல் குறைந்தபட்சம் 8 எழுத்துக்கள் இருக்க வேண்டும்'
+    signupTitle: 'கணக்கை உருவாக்கு', signupDesc: 'Adtec Melaka நெட்வொர்க்கில் சேரவும்.', fullNameLabel: 'முழு பெயர்', alreadyAccount: 'ஏற்கனவே கணக்கு உள்ளதா?', confirmPasswordLabel: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்', passwordMismatchError: 'கடவுச்சொற்கள் பொருந்தவில்லை', backToHome: 'முகப்புப்பக்கத்திற்குத் திரும்பு', passwordShortError: 'கடவுச்சொல் குறைந்தபட்சம் 8 எழுத்துக்கள் இருக்க வேண்டும்',
+    // New keys
+    noConversations: 'உரையாடல்கள் இல்லை.', selectConversation: 'செய்தியனுப்ப உரையாடலைத் தேர்ந்தெடுக்கவும்', online: 'ஆன்லைன்', reportUser: 'பயனரைப் புகாரளி', reportType: 'புகார் வகை', spam: 'ஸ்பேம்', scammer: 'மோசடி', inappropriate: 'பொருத்தமற்ற உள்ளடக்கம்', harassment: 'துன்புறுத்தல்', typeReason: 'காரணத்தை தட்டச்சு செய்க...', submit: 'சமர்ப்பி', send: 'அனுப்பு', justNow: 'இப்போது',
+    noInfoYet: 'அறிவிப்புகள் எதுவும் இல்லை.', noReportsYet: 'காணாமல் போன/கிடைத்த பொருட்கள் எதுவும் இல்லை.', newReport: 'புதிய அறிக்கை:', noNewNotifications: 'புதிய அறிவிப்புகள் இல்லை.',
+    myProfile: 'எனது சுயவிவரம்', nameLabel: 'பெயர்', roleLabel: 'பங்கு', memberSince: 'உறுப்பினர் முதல்', loadingReports: 'அறிக்கைகளை ஏற்றுகிறது...', noReportsMade: 'நீங்கள் இன்னும் எந்தப் பொருளையும் புகாரளிக்கவில்லை.', saving: 'சேமிக்கிறது...', messagingComingSoon: 'உரிமையாளருடனான செய்தி அமைப்பு விரைவில் வரும்!'
   }
 };

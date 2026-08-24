@@ -81,9 +81,9 @@ export function ProfileView({ onContact }) {
       <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>{t('myReports')}</h2>
       
       {loading ? (
-        <p style={{ color: 'var(--text-muted)' }}>Loading reports...</p>
+        <p style={{ color: 'var(--text-muted)' }}>{t('loadingReports')}</p>
       ) : userItems.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)' }}>You haven't reported any items yet.</p>
+        <p style={{ color: 'var(--text-muted)' }}>{t('noReportsMade')}</p>
       ) : (
         <div className="grid-cards">
           {userItems.map(item => (
