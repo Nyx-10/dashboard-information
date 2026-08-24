@@ -43,6 +43,25 @@ export function ProfileView({ onContact, currentUser }) {
     }
   }
 
+  const handleDelete = async (itemId) => {
+    const confirmDelete = window.confirm(t ? t('logoutConfirm')?.replace('Log Out', 'Delete') || 'Are you sure you want to delete this report?' : 'Are you sure?');
+    if (!confirmDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .delete()
+        .eq('id', itemId);
+        
+      if (error) throw error;
+      
+      setUserItems(userItems.filter(item => item.id !== itemId));
+    } catch (error) {
+      console.error('Error deleting item:', error.message);
+      alert('Failed to delete item.');
+    }
+  };
+
   return (
     <div className="page-bg-common bg-profile">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -87,7 +106,7 @@ export function ProfileView({ onContact, currentUser }) {
       ) : (
         <div className="grid-cards">
           {userItems.map(item => (
-            <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
+            <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
           ))}
         </div>
       )}

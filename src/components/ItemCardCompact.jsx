@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { MapPin, Calendar } from 'lucide-react';
+import { MapPin, Calendar, Trash2 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
-export function ItemCardCompact({ item, onContact, currentUser }) {
+export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
   const { t } = useContext(LanguageContext);
   const currentUserId = currentUser ? currentUser.id : null;
 
@@ -27,10 +27,18 @@ export function ItemCardCompact({ item, onContact, currentUser }) {
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><MapPin size={10} /> {item.type === 'info' ? t('defaultLocation') : item.location}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Calendar size={10} /> {item.date}</span>
         </div>
+        
         {item.type !== 'info' && currentUserId && item.created_by !== currentUserId && (
             <button className="btn-primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => { if (onContact) onContact(item.created_by, item.title); else alert(t('messagingComingSoon')); }}>
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               {t('contactReporter')}
+            </button>
+        )}
+
+        {onDelete && currentUserId && item.created_by === currentUserId && (
+            <button className="btn-primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', background: '#fee2e2', color: '#ef4444', border: '1px solid #f87171', cursor: 'pointer', marginTop: '0.25rem' }} onClick={() => onDelete(item.id)}>
+              <Trash2 size={12} />
+              {t('deleteBtn')}
             </button>
         )}
       </div>
