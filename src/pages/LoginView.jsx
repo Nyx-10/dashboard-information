@@ -31,7 +31,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
         role = 'user';
       }
 
-      onLogin({ email, role, name });
+      onLogin({ id: data.user.id, email, role, name });
     } catch (err) {
       alert(err.message || 'Login failed. Sila pastikan email dan password betul.');
     } finally {

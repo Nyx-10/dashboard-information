@@ -72,7 +72,7 @@ export function SignupView({ onSignup, onSwitch }) {
       }
 
       // Log masuk pengguna selepas pendaftaran berjaya
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
@@ -80,7 +80,7 @@ export function SignupView({ onSignup, onSwitch }) {
       if (signInError) throw signInError;
 
       let role = 'user';
-      onSignup({ email, name, role });
+      onSignup({ id: data.user.id, email, name, role });
     } catch (err) {
       setError(err.message || 'Kod OTP tidak sah atau ralat berlaku.');
     } finally {
