@@ -41,7 +41,7 @@ export default function App() {
       fetchNotifications();
 
       const itemsChannel = supabase.channel('public:items')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, () => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
           fetchNotifications();
         })
         .subscribe();

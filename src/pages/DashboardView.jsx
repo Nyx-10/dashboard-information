@@ -11,6 +11,16 @@ export function DashboardView({ onContact, currentUser }) {
 
   useEffect(() => {
     fetchItems();
+
+    const channel = supabase.channel('dashboard_items_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
+        fetchItems();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchItems() {
