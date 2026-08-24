@@ -3,7 +3,7 @@ import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
 
-export function DashboardView() {
+export function DashboardView({ onContact }) {
   const { t } = useContext(LanguageContext);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ export function DashboardView() {
             {infoItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                 {infoItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} />
                 ))}
               </div>
             ) : (
@@ -62,7 +62,7 @@ export function DashboardView() {
           {reportItems.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
               {reportItems.map(item => (
-                <ItemCardCompact key={item.id} item={item} />
+                <ItemCardCompact key={item.id} item={item} onContact={onContact} />
               ))}
             </div>
           ) : (

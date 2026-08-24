@@ -4,7 +4,7 @@ import { LanguageContext } from '../context/LanguageContext';
 import { ItemCard } from '../components/ItemCard';
 import { supabase } from '../supabaseClient';
 
-export function SearchView({ query, setQuery }) {
+export function SearchView({ query, setQuery, onContact }) {
   const { t } = useContext(LanguageContext);
   const [filter, setFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
@@ -81,7 +81,7 @@ export function SearchView({ query, setQuery }) {
       ) : (
         <div className="grid-cards">
           {filtered.map(item => (
-            <ItemCard key={item.id} item={item} />
+            <ItemCard key={item.id} item={item} onContact={onContact} />
           ))}
         </div>
       )}

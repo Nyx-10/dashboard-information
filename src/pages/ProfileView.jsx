@@ -4,7 +4,7 @@ import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
 
-export function ProfileView() {
+export function ProfileView({ onContact }) {
   const { lang, setLang, t } = useContext(LanguageContext);
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
@@ -87,7 +87,7 @@ export function ProfileView() {
       ) : (
         <div className="grid-cards">
           {userItems.map(item => (
-            <ItemCardCompact key={item.id} item={item} />
+            <ItemCardCompact key={item.id} item={item} onContact={onContact} />
           ))}
         </div>
       )}

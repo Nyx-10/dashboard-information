@@ -3,7 +3,7 @@ import { MapPin, Calendar, MessageSquare } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
-export function ItemCard({ item }) {
+export function ItemCard({ item, onContact }) {
   const { t } = useContext(LanguageContext);
   const [currentUserId, setCurrentUserId] = useState(null);
 
@@ -37,7 +37,7 @@ export function ItemCard({ item }) {
             <Calendar size={16} /> {item.date}
           </div>
           {item.type !== 'info' && item.created_by !== currentUserId && (
-            <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => alert('Sistem pemesejan dengan pemilik akan datang!')}>
+            <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => { if (onContact) onContact(); else alert('Sistem pemesejan dengan pemilik akan datang!'); }}>
               <MessageSquare size={16} /> {item.type === 'lost' ? 'Contact Owner' : 'Contact Finder'}
             </button>
           )}

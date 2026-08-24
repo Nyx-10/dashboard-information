@@ -74,9 +74,9 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <DashboardView />;
+        return <DashboardView onContact={() => setActiveTab('messages')} />;
       case 'search':
-        return <SearchView query={searchQuery} setQuery={setSearchQuery} />;
+        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={() => setActiveTab('messages')} />;
       case 'admin-analytics':
         return <AdminAnalyticsView />;
       case 'admin-users':
@@ -90,9 +90,9 @@ export default function App() {
       case 'messages':
         return <MessagesView />;
       case 'profile':
-        return <ProfileView />;
+        return <ProfileView onContact={() => setActiveTab('messages')} />;
       default:
-        return <DashboardView />;
+        return <DashboardView onContact={() => setActiveTab('messages')} />;
     }
   };
 
@@ -206,9 +206,11 @@ export default function App() {
               <LogOut size={16} /> {t('logout')}
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => setActiveTab('profile')}>
-              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{user?.name || 'User'}</span>
+                <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                  {user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User')}
+                </span>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : 'Normal User'}
                 </span>
