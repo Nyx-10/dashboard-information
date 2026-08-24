@@ -29,7 +29,7 @@ export const dict = {
     noInfoYet: 'No announcements yet.', noReportsYet: 'No lost/found reports yet.', newReport: 'New Report:', noNewNotifications: 'No new notifications.',
     myProfile: 'My Profile', nameLabel: 'Name', roleLabel: 'Role', memberSince: 'Member since', loadingReports: 'Loading reports...', noReportsMade: 'You haven\'t reported any items yet.', saving: 'Saving...', messagingComingSoon: 'Messaging system coming soon!',
     alertFillRequired: 'Please fill in the required fields (Name, Date, Location).', alertFillInfo: 'Please fill in the date and description for this info.', defaultInfoTitle: 'Information', defaultLocation: 'General', alertSuccessAdd: 'Successfully added!', alertFailedAdd: 'Failed to add data: ',
-    badgeLost: 'Lost', badgeFound: 'Found', badgeInfo: 'Info', normalUser: 'Normal User', today: 'Today'
+    badgeLost: 'Lost', badgeFound: 'Found', badgeInfo: 'Info', normalUser: 'Normal User', today: 'Today', messageFrom: 'Message from'
   },
   ms: {
     dashboard: 'Papan Pemuka', searchItems: 'Cari Barang', missingItem: 'Barang Hilang & Info Kolej', messages: 'Mesej',
@@ -58,7 +58,7 @@ export const dict = {
     noInfoYet: 'Tiada pengumuman setakat ini.', noReportsYet: 'Tiada laporan barang hilang/jumpa setakat ini.', newReport: 'Laporan Baru:', noNewNotifications: 'Tiada notifikasi baru.',
     myProfile: 'Profil Saya', nameLabel: 'Nama', roleLabel: 'Peranan', memberSince: 'Ahli sejak', loadingReports: 'Sedang memuatkan laporan...', noReportsMade: 'Anda belum melaporkan sebarang item lagi.', saving: 'Sedang menyimpan...', messagingComingSoon: 'Sistem pemesejan dengan pemilik akan datang!',
     alertFillRequired: 'Sila isikan medan yang diwajibkan (Nama, Tarikh, Lokasi).', alertFillInfo: 'Sila isikan tarikh dan penerangan untuk maklumat ini.', defaultInfoTitle: 'Maklumat', defaultLocation: 'Umum', alertSuccessAdd: 'Berjaya ditambah!', alertFailedAdd: 'Gagal menambah data: ',
-    badgeLost: 'Hilang', badgeFound: 'Jumpa', badgeInfo: 'Info', normalUser: 'Pengguna Biasa', today: 'Hari ini'
+    badgeLost: 'Hilang', badgeFound: 'Jumpa', badgeInfo: 'Info', normalUser: 'Pengguna Biasa', today: 'Hari ini', messageFrom: 'Mesej dari'
   },
   zh: {
     dashboard: '仪表板', searchItems: '搜索物品', missingItem: '遗失物品与学院信息', messages: '消息',
@@ -87,7 +87,7 @@ export const dict = {
     noInfoYet: '暂无公告。', noReportsYet: '暂无失物招领报告。', newReport: '新报告：', noNewNotifications: '没有新通知。',
     myProfile: '我的资料', nameLabel: '姓名', roleLabel: '角色', memberSince: '注册时间', loadingReports: '正在加载报告...', noReportsMade: '您还没有报告任何物品。', saving: '正在保存...', messagingComingSoon: '与所有者的消息系统即将推出！',
     alertFillRequired: '请填写必填字段（名称，日期，位置）。', alertFillInfo: '请填写此信息的日期和描述。', defaultInfoTitle: '信息', defaultLocation: '一般', alertSuccessAdd: '添加成功！', alertFailedAdd: '添加数据失败：',
-    badgeLost: '丢失', badgeFound: '寻获', badgeInfo: '信息', normalUser: '普通用户', today: '今天'
+    badgeLost: '丢失', badgeFound: '寻获', badgeInfo: '信息', normalUser: '普通用户', today: '今天', messageFrom: '来自'
   },
   ta: {
     dashboard: 'டாஷ்போர்டு', searchItems: 'பொருட்களைத் தேடு', missingItem: 'காணாமல் போன பொருள் & கல்லூரி தகவல்', messages: 'செய்திகள்',
@@ -116,6 +116,6 @@ export const dict = {
     noInfoYet: 'அறிவிப்புகள் எதுவும் இல்லை.', noReportsYet: 'காணாமல் போன/கிடைத்த பொருட்கள் எதுவும் இல்லை.', newReport: 'புதிய அறிக்கை:', noNewNotifications: 'புதிய அறிவிப்புகள் இல்லை.',
     myProfile: 'எனது சுயவிவரம்', nameLabel: 'பெயர்', roleLabel: 'பங்கு', memberSince: 'உறுப்பினர் முதல்', loadingReports: 'அறிக்கைகளை ஏற்றுகிறது...', noReportsMade: 'நீங்கள் இன்னும் எந்தப் பொருளையும் புகாரளிக்கவில்லை.', saving: 'சேமிக்கிறது...', messagingComingSoon: 'உரிமையாளருடனான செய்தி அமைப்பு விரைவில் வரும்!',
     alertFillRequired: 'தேவையான தகவல்களைப் பூர்த்தி செய்யவும் (பெயர், தேதி, இடம்).', alertFillInfo: 'இந்த தகவலுக்கான தேதி மற்றும் விளக்கத்தைப் பூர்த்தி செய்யவும்.', defaultInfoTitle: 'தகவல்', defaultLocation: 'பொதுவானவை', alertSuccessAdd: 'வெற்றிகரமாக சேர்க்கப்பட்டது!', alertFailedAdd: 'தரவைச் சேர்க்க முடியவில்லை: ',
-    badgeLost: 'தொலைந்தவை', badgeFound: 'கிடைத்தவை', badgeInfo: 'தகவல்', normalUser: 'சாதாரண பயனர்', today: 'இன்று'
+    badgeLost: 'தொலைந்தவை', badgeFound: 'கிடைத்தவை', badgeInfo: 'தகவல்', normalUser: 'சாதாரண பயனர்', today: 'இன்று', messageFrom: 'இருந்து செய்தி'
   }
 };

@@ -37,22 +37,67 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.id) {
       fetchNotifications();
+
+      const itemsChannel = supabase.channel('public:items')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, () => {
+          fetchNotifications();
+        })
+        .subscribe();
+
+      const messagesChannel = supabase.channel('public:messages_notif')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+          if (payload.new && payload.new.receiver_id === user.id) {
+            fetchNotifications();
+          }
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(itemsChannel);
+        supabase.removeChannel(messagesChannel);
+      };
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   const fetchNotifications = async () => {
+    if (!user || !user.id) return;
     try {
-      const { data, error } = await supabase
+      const { data: itemsData } = await supabase
         .from('items')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(3);
       
-      if (!error && data) {
-        setNotifications(data);
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select(`
+          id, content, created_at, sender_id,
+          sender:profiles!messages_sender_id_fkey(username)
+        `)
+        .eq('receiver_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      let allNotifs = [];
+      if (itemsData) {
+        allNotifs = [...allNotifs, ...itemsData.map(item => ({ ...item, notifType: 'item' }))];
       }
+      if (messagesData) {
+        allNotifs = [...allNotifs, ...messagesData.map(msg => ({ 
+          id: msg.id, 
+          title: msg.sender?.username || 'User',
+          content: msg.content,
+          created_at: msg.created_at,
+          notifType: 'message',
+          sender_id: msg.sender_id,
+          sender_name: msg.sender?.username || 'User'
+        }))];
+      }
+
+      allNotifs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setNotifications(allNotifs.slice(0, 5));
     } catch (e) {
       console.error(e);
     }
@@ -222,13 +267,38 @@ export default function App() {
                   <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
                     {notifications.length > 0 ? (
                       notifications.map((item, idx) => (
-                        <div key={item.id} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { setActiveTab('home'); setShowNotifications(false); }}>
-                          {item.type === 'lost' ? <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} /> : item.type === 'found' ? <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} /> : <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />}
+                        <div key={`${item.notifType}-${item.id}`} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { 
+                          if (item.notifType === 'message') {
+                            setActiveChatUser({ id: item.sender_id, name: item.sender_name, preview: item.content });
+                            setActiveTab('messages');
+                          } else {
+                            setActiveTab('home'); 
+                          }
+                          setShowNotifications(false); 
+                        }}>
+                          {item.notifType === 'message' ? (
+                            <MessageSquare size={18} style={{ color: '#4F46E5', marginTop: '2px', flexShrink: 0 }} />
+                          ) : item.type === 'lost' ? (
+                            <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} />
+                          ) : item.type === 'found' ? (
+                            <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} />
+                          ) : (
+                            <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />
+                          )}
                           <div>
-                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                              {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title} - {item.type === 'info' ? t('defaultLocation') : item.location}
-                            </p>
+                            {item.notifType === 'message' ? (
+                              <>
+                                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>{t('messageFrom')} {item.sender_name}</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.content.substring(0, 40)}{item.content.length > 40 ? '...' : ''}</p>
+                              </>
+                            ) : (
+                              <>
+                                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                  {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title} - {item.type === 'info' ? t('defaultLocation') : item.location}
+                                </p>
+                              </>
+                            )}
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('justNow')}</span>
                           </div>
                         </div>
