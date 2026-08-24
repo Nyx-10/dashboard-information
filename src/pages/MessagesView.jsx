@@ -139,7 +139,7 @@ export function MessagesView({ initialChatUser }) {
             {/* Messages List */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ alignSelf: 'center', background: 'var(--border)', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Today
+                {t('today')}
               </div>
               
               <div style={{ display: 'flex', gap: '1rem', maxWidth: '80%' }}>

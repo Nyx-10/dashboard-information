@@ -16,18 +16,18 @@ export function AddItemView({ onSuccess }) {
     e.preventDefault();
     if (type !== 'info') {
       if (!title || !date || !location) {
-        alert('Sila isikan medan yang diwajibkan (Nama, Tarikh, Lokasi).');
+        alert(t('alertFillRequired'));
         return;
       }
     } else {
       if (!date || !description) {
-        alert('Sila isikan tarikh dan penerangan untuk maklumat ini.');
+        alert(t('alertFillInfo'));
         return;
       }
     }
 
-    const finalTitle = type === 'info' ? 'Maklumat (' + date + ')' : title;
-    const finalLocation = type === 'info' ? 'Umum' : location;
+    const finalTitle = type === 'info' ? t('defaultInfoTitle') + ' (' + date + ')' : title;
+    const finalLocation = type === 'info' ? t('defaultLocation') : location;
     
     setLoading(true);
 
@@ -35,7 +35,7 @@ export function AddItemView({ onSuccess }) {
       // Get current logged in user
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('items')
         .insert([
           { 
@@ -51,10 +51,10 @@ export function AddItemView({ onSuccess }) {
 
       if (error) throw error;
       
-      alert('Berjaya ditambah!');
+      alert(t('alertSuccessAdd'));
       if (onSuccess) onSuccess();
     } catch (error) {
-      alert('Gagal menambah data: ' + error.message);
+      alert(t('alertFailedAdd') + error.message);
     } finally {
       setLoading(false);
     }

@@ -222,7 +222,7 @@ export default function App() {
                         <div key={item.id} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { setActiveTab('home'); setShowNotifications(false); }}>
                           {item.type === 'lost' ? <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} /> : item.type === 'found' ? <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} /> : <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />}
                           <div>
-                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type}</p>
+                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.title} - {item.location}</p>
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('justNow')}</span>
                           </div>
@@ -247,7 +247,7 @@ export default function App() {
                   {user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User')}
                 </span>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : 'Normal User'}
+                  {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : t('normalUser')}
                 </span>
               </div>
             </div>

@@ -22,7 +22,7 @@ export function ItemCardCompact({ item, onContact }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem', marginBottom: '0.2rem' }}>
           <h3 style={{ fontSize: '0.8rem', fontWeight: 600, lineHeight: 1.2 }}>{item.title}</h3>
           <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`} style={{ fontSize: '0.6rem', padding: '0.1rem 0.3rem', flexShrink: 0 }}>
-            {item.type}
+            {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}
           </span>
         </div>
         <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem', lineHeight: 1.3 }}>

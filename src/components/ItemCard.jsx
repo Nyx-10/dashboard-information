@@ -21,7 +21,7 @@ export function ItemCard({ item, onContact }) {
         )}
         <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
           <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`}>
-            {item.type}
+            {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}
           </span>
         </div>
       </div>

@@ -42,7 +42,7 @@ export function DashboardView({ onContact }) {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading items from database...</div>
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>{t('loadingReports')}</div>
       ) : (
         <>
           <div style={{ marginBottom: '0.75rem' }}>
