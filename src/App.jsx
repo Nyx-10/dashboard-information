@@ -32,8 +32,31 @@ export default function App() {
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+    }
+  }, [isAuthenticated]);
+
+  const fetchNotifications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('items')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      if (!error && data) {
+        setNotifications(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleContact = async (userId, title) => {
     let name = `User ${userId.substring(0, 5)}`;
@@ -188,36 +211,28 @@ export default function App() {
             <div style={{ position: 'relative' }}>
               <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => setShowNotifications(!showNotifications)}>
                 <Bell size={24} />
-                <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>
+                {notifications.length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
               </button>
               {showNotifications && (
                 <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '110%', width: '340px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
                   <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>Notifications</div>
                   <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                    <div style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }}>
-                      <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} />
-                      <div>
-                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Barang Hilang</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>MacBook Pro 14" dilaporkan hilang di Library 2nd Floor.</p>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>2 min lalu</span>
+                    {notifications.length > 0 ? (
+                      notifications.map((item, idx) => (
+                        <div key={item.id} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { setActiveTab('home'); setShowNotifications(false); }}>
+                          {item.type === 'lost' ? <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} /> : item.type === 'found' ? <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} /> : <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />}
+                          <div>
+                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>Laporan Baru: {item.type}</p>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.title} - {item.location}</p>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Baru Sahaja</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                        Tiada notifikasi baru.
                       </div>
-                    </div>
-                    <div style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }}>
-                      <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />
-                      <div>
-                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Information Only</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Peringatan keselamatan baru telah dikeluarkan oleh pihak pentadbiran.</p>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>1 jam lalu</span>
-                      </div>
-                    </div>
-                    <div style={{ padding: '0.875rem 1.25rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }}>
-                      <MessageSquare size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} />
-                      <div>
-                        <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Mesej Baru</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Alex Smith menghantar mesej: "Is this your MacBook?"</p>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>3 jam lalu</span>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}
