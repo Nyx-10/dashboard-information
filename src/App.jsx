@@ -67,6 +67,7 @@ export default function App() {
       const { data: itemsData } = await supabase
         .from('items')
         .select('*')
+        .neq('status', 'deleted')
         .order('created_at', { ascending: false })
         .limit(3);
       

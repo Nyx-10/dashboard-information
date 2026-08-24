@@ -31,6 +31,7 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
       const { data, error } = await supabase
         .from('items')
         .select('*')
+        .neq('status', 'deleted')
         .order('created_at', { ascending: false });
         
       if (error) throw error;

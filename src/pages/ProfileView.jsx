@@ -31,6 +31,7 @@ export function ProfileView({ onContact, currentUser }) {
           .from('items')
           .select('*')
           .eq('created_by', supabaseUser.id)
+          .neq('status', 'deleted')
           .order('created_at', { ascending: false });
           
         if (error) throw error;
@@ -48,9 +49,10 @@ export function ProfileView({ onContact, currentUser }) {
     if (!confirmDelete) return;
 
     try {
+      // Soft delete: set status to 'deleted'
       const { error } = await supabase
         .from('items')
-        .delete()
+        .update({ status: 'deleted' })
         .eq('id', itemId);
         
       if (error) throw error;
