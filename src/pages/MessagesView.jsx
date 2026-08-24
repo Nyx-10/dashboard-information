@@ -1,18 +1,37 @@
 import React, { useState } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
 
-export function MessagesView() {
-  const [activeChat, setActiveChat] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+export function MessagesView({ initialChatUser }) {
   const [showReportMenu, setShowReportMenu] = useState(false);
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherReason, setOtherReason] = useState('');
 
-  const chats = [
+  const [chats, setChats] = useState([
     { id: 1, name: 'Alex Smith', time: '10:42 AM', preview: 'Is this your MacBook?', avatar: 'https://ui-avatars.com/api/?name=Alex+Smith&background=10B981&color=fff' },
     { id: 2, name: 'Siti Nurhaliza', time: 'Yesterday', preview: 'Saya jumpa kad pelajar awak di dewan', avatar: 'https://ui-avatars.com/api/?name=Siti+N&background=F59E0B&color=fff' },
     { id: 3, name: 'Admin Kolej', time: 'Mon', preview: 'Sila tuntut barang anda di pejabat.', avatar: 'https://ui-avatars.com/api/?name=Admin+K&background=EF4444&color=fff' },
-  ];
+  ]);
+
+  const [activeChat, setActiveChat] = useState(initialChatUser ? initialChatUser.id : 1);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    if (initialChatUser) {
+      setChats(prev => {
+        if (!prev.find(c => c.id === initialChatUser.id)) {
+          return [{
+            id: initialChatUser.id,
+            name: initialChatUser.name,
+            time: 'Just now',
+            preview: initialChatUser.preview || 'Start a conversation...',
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`
+          }, ...prev];
+        }
+        return prev;
+      });
+      setActiveChat(initialChatUser.id);
+    }
+  }, [initialChatUser]);
 
   const filteredChats = chats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 

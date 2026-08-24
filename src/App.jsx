@@ -19,6 +19,7 @@ import { LoginView } from './pages/LoginView';
 import { SignupView } from './pages/SignupView';
 import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
+import { supabase } from './supabaseClient';
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [lang, setLang] = useState('en');
@@ -28,10 +29,29 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   const [activeTab, setActiveTab] = useState('home');
+  const [activeChatUser, setActiveChatUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const handleContact = async (userId, title) => {
+    let name = `User ${userId.substring(0, 5)}`;
+    try {
+      const { data, error } = await supabase.from('profiles').select('name').eq('id', userId).single();
+      if (!error && data?.name) {
+        name = data.name;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setActiveChatUser({
+      id: userId,
+      name: name,
+      preview: `Item: ${title}`
+    });
+    setActiveTab('messages');
+  };
 
   useEffect(() => {
     // Apabila pengguna klik link dari email, URL akan mempunyai /reset-password
@@ -74,9 +94,9 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <DashboardView onContact={() => setActiveTab('messages')} />;
+        return <DashboardView onContact={handleContact} />;
       case 'search':
-        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={() => setActiveTab('messages')} />;
+        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} />;
       case 'admin-analytics':
         return <AdminAnalyticsView />;
       case 'admin-users':
@@ -88,11 +108,11 @@ export default function App() {
       case 'add':
         return <AddItemView onSuccess={() => setActiveTab('home')} />;
       case 'messages':
-        return <MessagesView />;
+        return <MessagesView initialChatUser={activeChatUser} />;
       case 'profile':
-        return <ProfileView onContact={() => setActiveTab('messages')} />;
+        return <ProfileView onContact={handleContact} />;
       default:
-        return <DashboardView onContact={() => setActiveTab('messages')} />;
+        return <DashboardView onContact={handleContact} />;
     }
   };
 
