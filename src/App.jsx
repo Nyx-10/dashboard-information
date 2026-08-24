@@ -159,7 +159,10 @@ export default function App() {
             <button className={`nav-link w-full text-left ${activeTab === 'add' ? 'active' : ''}`} onClick={() => setActiveTab('add')}>
               <PlusCircle size={20} /> {t('missingItem')}
             </button>
-            <button className={`nav-link w-full text-left ${activeTab === 'messages' ? 'active' : ''}`} onClick={() => setActiveTab('messages')}>
+            <button 
+              className={`nav-link w-full text-left ${activeTab === 'messages' ? 'active' : ''}`} 
+              onClick={() => { setActiveTab('messages'); setActiveChatUser(null); }}
+            >
               <MessageSquare size={20} /> {t('messages')}
             </button>
             

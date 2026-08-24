@@ -81,6 +81,9 @@ export function MessagesView({ initialChatUser }) {
   useEffect(() => {
     if (initialChatUser && currentUserId) {
       setActiveChat(initialChatUser.id);
+      if (initialChatUser.preview && initialChatUser.preview !== '...') {
+        setNewMessage(`[ ${initialChatUser.preview} ] - `);
+      }
     }
   }, [initialChatUser, currentUserId]);
 
