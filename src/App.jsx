@@ -38,9 +38,9 @@ export default function App() {
   const handleContact = async (userId, title) => {
     let name = `User ${userId.substring(0, 5)}`;
     try {
-      const { data, error } = await supabase.from('profiles').select('name').eq('id', userId).single();
-      if (!error && data?.name) {
-        name = data.name;
+      const { data, error } = await supabase.from('profiles').select('username').eq('id', userId).single();
+      if (!error && data?.username) {
+        name = data.username;
       }
     } catch (e) {
       console.error(e);
