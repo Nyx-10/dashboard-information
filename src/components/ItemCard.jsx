@@ -26,12 +26,14 @@ export function ItemCard({ item, onContact }) {
         </div>
       </div>
       <div className="item-details">
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>{item.title}</h3>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+          {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title}
+        </h3>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem', flex: 1 }}>{item.description}</p>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <MapPin size={16} /> {item.location}
+            <MapPin size={16} /> {item.type === 'info' ? t('defaultLocation') : item.location}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Calendar size={16} /> {item.date}

@@ -34,7 +34,11 @@ export function SearchView({ query, setQuery, onContact }) {
 
   const filtered = items.filter(item => {
     const queryStr = query ? query.toLowerCase() : '';
-    const matchesQuery = item.title.toLowerCase().includes(queryStr) || item.description.toLowerCase().includes(queryStr);
+    const dynamicTitle = item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title;
+    const dynamicLocation = item.type === 'info' ? t('defaultLocation') : item.location;
+    const matchesQuery = dynamicTitle.toLowerCase().includes(queryStr) || 
+                         (item.description && item.description.toLowerCase().includes(queryStr)) ||
+                         (dynamicLocation && dynamicLocation.toLowerCase().includes(queryStr));
     
     let typeMatches = false;
     if (filter === 'all') typeMatches = true;

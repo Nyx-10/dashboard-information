@@ -20,7 +20,9 @@ export function ItemCardCompact({ item, onContact }) {
       )}
       <div style={{ padding: '0.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem', marginBottom: '0.2rem' }}>
-          <h3 style={{ fontSize: '0.8rem', fontWeight: 600, lineHeight: 1.2 }}>{item.title}</h3>
+          <h3 style={{ fontSize: '0.8rem', fontWeight: 600, lineHeight: 1.2 }}>
+            {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title}
+          </h3>
           <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`} style={{ fontSize: '0.6rem', padding: '0.1rem 0.3rem', flexShrink: 0 }}>
             {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}
           </span>
@@ -29,7 +31,7 @@ export function ItemCardCompact({ item, onContact }) {
           {item.description}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 'auto', marginBottom: '0.5rem' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><MapPin size={10} /> {item.location}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><MapPin size={10} /> {item.type === 'info' ? t('defaultLocation') : item.location}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Calendar size={10} /> {item.date}</span>
         </div>
         {item.type !== 'info' && item.created_by !== currentUserId && (

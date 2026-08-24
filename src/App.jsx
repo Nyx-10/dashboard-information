@@ -223,7 +223,9 @@ export default function App() {
                           {item.type === 'lost' ? <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} /> : item.type === 'found' ? <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} /> : <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />}
                           <div>
                             <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.title} - {item.location}</p>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title} - {item.type === 'info' ? t('defaultLocation') : item.location}
+                            </p>
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('justNow')}</span>
                           </div>
                         </div>
