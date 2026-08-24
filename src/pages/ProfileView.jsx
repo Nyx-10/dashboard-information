@@ -4,7 +4,7 @@ import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
 
-export function ProfileView({ onContact }) {
+export function ProfileView({ onContact, currentUser }) {
   const { lang, setLang, t } = useContext(LanguageContext);
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
@@ -18,19 +18,19 @@ export function ProfileView({ onContact }) {
   async function fetchProfileData() {
     try {
       setLoading(true);
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
       
-      if (currentUser) {
+      if (supabaseUser) {
         setUser({
-          name: currentUser.user_metadata?.name || 'User',
-          email: currentUser.email
+          name: supabaseUser.user_metadata?.name || 'User',
+          email: supabaseUser.email
         });
 
         // Fetch items reported by this user
         const { data, error } = await supabase
           .from('items')
           .select('*')
-          .eq('created_by', currentUser.id)
+          .eq('created_by', supabaseUser.id)
           .order('created_at', { ascending: false });
           
         if (error) throw error;
@@ -87,7 +87,7 @@ export function ProfileView({ onContact }) {
       ) : (
         <div className="grid-cards">
           {userItems.map(item => (
-            <ItemCardCompact key={item.id} item={item} onContact={onContact} />
+            <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
           ))}
         </div>
       )}

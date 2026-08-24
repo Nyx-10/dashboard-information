@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
+import { ItemCard } from '../components/ItemCard';
 import { supabase } from '../supabaseClient';
 
-export function DashboardView({ onContact }) {
+export function DashboardView({ onContact, currentUser }) {
   const { t } = useContext(LanguageContext);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,7 @@ export function DashboardView({ onContact }) {
             {infoItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                 {infoItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
                 ))}
               </div>
             ) : (
@@ -58,16 +59,18 @@ export function DashboardView({ onContact }) {
             )}
           </div>
 
-          <h2 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem' }}>{t('recentlyReported')}</h2>
-          {reportItems.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-              {reportItems.map(item => (
-                <ItemCardCompact key={item.id} item={item} onContact={onContact} />
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('noReportsYet')}</p>
-          )}
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-main)' }}>{t('recentlyReported')}</h2>
+            {reportItems.length > 0 ? (
+              <div className="grid-cards">
+                {reportItems.map(item => (
+                  <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: 'var(--text-muted)' }}>{t('noReportsYet')}</p>
+            )}
+          </div>
         </>
       )}
     </div>

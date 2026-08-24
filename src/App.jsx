@@ -117,9 +117,9 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <DashboardView onContact={handleContact} />;
+        return <DashboardView onContact={handleContact} currentUser={user} />;
       case 'search':
-        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} />;
+        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />;
       case 'admin-analytics':
         return <AdminAnalyticsView />;
       case 'admin-users':
@@ -133,9 +133,9 @@ export default function App() {
       case 'messages':
         return <MessagesView initialChatUser={activeChatUser} />;
       case 'profile':
-        return <ProfileView onContact={handleContact} />;
+        return <ProfileView onContact={handleContact} currentUser={user} />;
       default:
-        return <DashboardView onContact={handleContact} />;
+        return <DashboardView onContact={handleContact} currentUser={user} />;
     }
   };
 
