@@ -161,6 +161,7 @@ export function MessagesView({ initialChatUser }) {
             </div>
           </>
         )}
+      </div>
     </div>
     </div>
   );
