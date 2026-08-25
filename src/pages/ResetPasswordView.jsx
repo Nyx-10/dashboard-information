@@ -9,7 +9,27 @@ export function ResetPasswordView({ onBackToLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  
+  const [sessionValid, setSessionValid] = useState(true);
+
+  React.useEffect(() => {
+    // Check for errors in URL hash from Supabase (e.g. expired link)
+    const hash = window.location.hash;
+    if (hash && hash.includes('error_description=')) {
+      const params = new URLSearchParams(hash.substring(1));
+      setError(params.get('error_description')?.replace(/\+/g, ' ') || 'Pautan tidak sah atau telah luput.');
+      setSessionValid(false);
+      return;
+    }
+
+    // Check if session actually exists
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session && !hash.includes('access_token=')) {
+        setError('Sesi tidak dijumpai. Sila mohon pautan reset yang baru dari halaman log masuk.');
+        setSessionValid(false);
+      }
+    });
+  }, []);
+
   const handleReset = async (e) => {
     e.preventDefault();
     if (password.length < 8) {
@@ -40,9 +60,8 @@ export function ResetPasswordView({ onBackToLogin }) {
       <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', position: 'relative', zIndex: 10 }}>
         
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Jata_Malaysia_v6.svg/1200px-Jata_Malaysia_v6.svg.png" alt="Jata Negara" style={{ height: '60px', objectFit: 'contain' }} />
-            <img src="https://www.adtecmlk.gov.my/wp-content/uploads/2021/04/Logo-JTM-KSM-300x129.png" alt="JTM" style={{ height: '60px', objectFit: 'contain' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '60px', objectFit: 'contain' }} />
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Set Kata Laluan Baharu</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sila masukkan kata laluan baru anda di bawah.</p>
@@ -98,7 +117,7 @@ export function ResetPasswordView({ onBackToLogin }) {
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '1rem' }}>
+            <button type="submit" disabled={loading || !sessionValid} className="btn-primary" style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '1rem', opacity: (!sessionValid) ? 0.5 : 1 }}>
               {loading ? 'Menyimpan...' : 'Tukar Kata Laluan'}
             </button>
           </form>

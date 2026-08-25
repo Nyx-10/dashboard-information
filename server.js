@@ -82,7 +82,7 @@ app.post('/api/verify-otp', async (req, res) => {
       email,
       password,
       email_confirm: true,
-      user_metadata: { name: name || '', plain_password: password }
+      user_metadata: { name: name || '' }
     });
 
     if (error) {
