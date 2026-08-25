@@ -60,7 +60,7 @@ export function DashboardView({ onContact, currentUser }) {
           <div style={{ marginBottom: '0.75rem' }}>
             <h2 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('infoOnly')}</h2>
             {infoItems.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {infoItems.map(item => (
                   <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
                 ))}

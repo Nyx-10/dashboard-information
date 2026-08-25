@@ -9,18 +9,20 @@ export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
   return (
     <div className="item-card" style={{ flexDirection: 'row', borderRadius: '0.5rem', alignItems: 'stretch' }}>
       {item.image && (
-        <img src={item.image} alt={item.title} style={{ width: '80px', minHeight: '80px', objectFit: 'cover', flexShrink: 0 }} />
+        <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '120px', flexShrink: 0 }}>
+          <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }} />
+        </a>
       )}
-      <div style={{ padding: '0.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem', marginBottom: '0.2rem' }}>
-          <h3 style={{ fontSize: '0.8rem', fontWeight: 600, lineHeight: 1.2 }}>
+      <div style={{ padding: '0.75rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 600, lineHeight: 1.2 }}>
             {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title}
           </h3>
-          <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`} style={{ fontSize: '0.6rem', padding: '0.1rem 0.3rem', flexShrink: 0 }}>
+          <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem', flexShrink: 0 }}>
             {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}
           </span>
         </div>
-        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem', lineHeight: 1.3 }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', lineHeight: 1.4 }}>
           {item.description}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 'auto', marginBottom: '0.5rem' }}>

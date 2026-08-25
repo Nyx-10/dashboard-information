@@ -220,7 +220,7 @@ button {
 }
 
 .item-image {
-  height: 300px;
+  height: 220px;
   background-color: var(--border);
   width: 100%;
   object-fit: cover;
