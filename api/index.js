@@ -152,7 +152,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
   } catch (error) {
     console.error('Ralat menghantar e-mel:', error);
-    res.status(500).json({ message: 'Gagal menghantar e-mel. Sila pastikan e-mel dan App Password (kata laluan aplikasi) anda diisi dengan betul dalam fail .env.' });
+    res.status(500).json({ message: 'Ralat terperinci SMTP: ' + (error.message || 'Tidak diketahui') });
   }
 });
 
