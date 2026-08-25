@@ -10,7 +10,9 @@ export function ItemCard({ item, onContact, currentUser }) {
     <div className="item-card">
       <div style={{ position: 'relative' }}>
         {item.image && (
-          <img src={item.image} alt={item.title} className="item-image" />
+          <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+            <img src={item.image} alt={item.title} className="item-image" style={{ cursor: 'zoom-in' }} />
+          </a>
         )}
         <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
           <span className={`badge ${item.type === 'lost' ? 'badge-lost' : item.type === 'found' ? 'badge-found' : 'badge-info'}`}>

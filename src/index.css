@@ -220,10 +220,11 @@ button {
 }
 
 .item-image {
-  height: 200px;
+  height: 300px;
   background-color: var(--border);
   width: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .item-details {
