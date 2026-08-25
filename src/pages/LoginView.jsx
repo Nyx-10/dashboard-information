@@ -19,16 +19,33 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
-      let role = data.user.user_metadata?.role || 'user';
-      let name = data.user.user_metadata?.name || 'User';
+      // Fetch profile from database
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error("Profile fetch error:", profileError);
+      }
+
+      // Check if user is suspended
+      if (profile && profile.status === 'Suspended') {
+        await supabase.auth.signOut();
+        throw new Error("Akaun anda telah digantung oleh Admin.");
+      }
+      
+      let role = profile?.role || data.user.user_metadata?.role || 'user';
+      let name = profile?.username || data.user.user_metadata?.name || 'User';
       
       const normalizedEmail = email.trim().toLowerCase();
-      if (normalizedEmail.includes('adam.darwish.it')) {
-        role = 'superadmin';
-      } else if (normalizedEmail === 'admin@adtec.edu.my' || normalizedEmail === 'normaladmin@adtec.edu.my') {
-        role = 'admin';
-      } else {
-        role = 'user';
+      if (!profile?.role) {
+        if (normalizedEmail.includes('adam.darwish.it')) {
+          role = 'superadmin';
+        } else if (normalizedEmail === 'admin@adtec.edu.my' || normalizedEmail === 'normaladmin@adtec.edu.my') {
+          role = 'admin';
+        }
       }
 
       onLogin({ id: data.user.id, email, role, name });
