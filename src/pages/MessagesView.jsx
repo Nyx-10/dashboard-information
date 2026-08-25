@@ -30,7 +30,7 @@ export function MessagesView({ initialChatUser }) {
     const { data, error } = await supabase
       .from('messages')
       .select(`
-        sender_id, receiver_id, content, created_at,
+        sender_id, receiver_id, content, created_at, is_read,
         sender:profiles!messages_sender_id_fkey(username),
         receiver:profiles!messages_receiver_id_fkey(username)
       `)
@@ -43,6 +43,7 @@ export function MessagesView({ initialChatUser }) {
       data.forEach(msg => {
         const otherId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
         if (otherId === userId) return; // Prevent self-contact
+        
         if (!chatMap.has(otherId)) {
           const otherName = msg.sender_id === userId ? (msg.receiver?.username || 'User') : (msg.sender?.username || 'User');
           chatMap.set(otherId, {
@@ -50,8 +51,15 @@ export function MessagesView({ initialChatUser }) {
             name: otherName,
             time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             preview: msg.content,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(otherName)}&background=4F46E5&color=fff`
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(otherName)}&background=4F46E5&color=fff`,
+            unreadCount: 0
           });
+        }
+        
+        // Kira mesej unread
+        if (msg.receiver_id === userId && msg.is_read === false) {
+          const chat = chatMap.get(otherId);
+          chat.unreadCount += 1;
         }
       });
 
@@ -63,7 +71,8 @@ export function MessagesView({ initialChatUser }) {
           name: initialChatUser.name,
           time: t('justNow'),
           preview: initialChatUser.preview || '...',
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
+          unreadCount: 0
         }, ...chatList];
       }
 
@@ -74,7 +83,8 @@ export function MessagesView({ initialChatUser }) {
         name: initialChatUser.name,
         time: t('justNow'),
         preview: initialChatUser.preview || '...',
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
+        unreadCount: 0
       }]);
     }
   };
@@ -100,8 +110,15 @@ export function MessagesView({ initialChatUser }) {
             (newMsg.sender_id === currentUserId && newMsg.receiver_id === activeChat) ||
             (newMsg.sender_id === activeChat && newMsg.receiver_id === currentUserId)
           ) {
+            // Jika mesej masuk dari orang lain sewaktu chat sedang aktif, tanda sebagai 'read' terus
+            if (newMsg.sender_id === activeChat) {
+              supabase.from('messages').update({ is_read: true }).eq('id', newMsg.id).then();
+            }
             setMessages(prev => [...prev, newMsg]);
             scrollToBottom();
+          } else if (newMsg.receiver_id === currentUserId) {
+            // Mesej dari orang lain yang tiada di chat aktif, update unread count
+            setChats(prev => prev.map(c => c.id === newMsg.sender_id ? { ...c, unreadCount: (c.unreadCount || 0) + 1 } : c));
           }
         })
         .subscribe();
@@ -113,6 +130,17 @@ export function MessagesView({ initialChatUser }) {
   }, [activeChat, currentUserId]);
 
   const fetchMessages = async (userId, otherUserId) => {
+    // 1. Mark semue mesej dari otherUserId sebagai 'read'
+    await supabase.from('messages')
+      .update({ is_read: true })
+      .eq('sender_id', otherUserId)
+      .eq('receiver_id', userId)
+      .eq('is_read', false);
+
+    // 2. Clear unreadCount di sidebar untuk chat ini
+    setChats(prev => prev.map(c => c.id === otherUserId ? { ...c, unreadCount: 0 } : c));
+
+    // 3. Fetch mesej
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -278,13 +306,20 @@ export function MessagesView({ initialChatUser }) {
               >
                 <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', alignItems: 'center' }}>
                     <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{chat.name}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{chat.time}</span>
                   </div>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
-                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontSize: '0.875rem', color: chat.unreadCount > 0 ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: chat.unreadCount > 0 ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                      {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
+                    </p>
+                    {chat.unreadCount > 0 && (
+                      <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', marginLeft: '8px' }}>
+                        {chat.unreadCount}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
