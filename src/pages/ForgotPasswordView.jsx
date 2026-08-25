@@ -15,7 +15,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
     
     try {
       // PERHATIAN: Gantikan URL di bawah dengan URL API Backend anda yang sebenar
-      const response = await fetch('http://localhost:5000/api/forgot-password', {
+      const response = await fetch(`http://${window.location.hostname}:5000/api/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,8 +30,8 @@ export function ForgotPasswordView({ onSwitchBack }) {
       setSubmitted(true);
     } catch (err) {
       console.error('Ralat Forgot Password:', err);
-      if (err.message === 'Failed to fetch') {
-        setError('Tidak dapat menyambung ke pelayan (Server). Sila pastikan backend anda sedang berjalan.');
+      if (err.message === 'Failed to fetch' || err.message === 'Load failed') {
+        setError('Tidak dapat menyambung ke pelayan Backend (Port 5000). Sila pastikan Firewall komputer anda ditutup atau membenarkan port 5000.');
       } else {
         setError(err.message || 'Sistem mengalami ralat. Sila cuba lagi nanti.');
       }

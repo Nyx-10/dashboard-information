@@ -114,12 +114,15 @@ app.post('/api/forgot-password', async (req, res) => {
       },
     });
 
+    // Gunakan VITE_FRONTEND_URL dari .env jika ada, jika tidak guna IP Address local anda (untuk testing di telefon)
+    const frontendUrl = process.env.VITE_FRONTEND_URL || 'http://192.168.100.100:5173';
+    
     // Jana link sebenar dari Supabase
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: 'http://localhost:5173/reset-password'
+        redirectTo: `${frontendUrl}/reset-password`
       }
     });
 
