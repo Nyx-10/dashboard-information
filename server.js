@@ -143,6 +143,7 @@ app.post('/api/forgot-password', async (req, res) => {
     console.log("\n-----------------------------------------");
     console.log("Mesej e-mel berjaya dihantar kepada: %s", email);
     console.log("Mesej ID: %s", info.messageId);
+    console.log("Link dijana: %s", resetLink);
     console.log("-----------------------------------------\n");
 
     res.status(200).json({ 

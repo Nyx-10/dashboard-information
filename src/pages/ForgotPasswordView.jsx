@@ -15,7 +15,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
     
     try {
       // PERHATIAN: Gantikan URL di bawah dengan URL API Backend anda yang sebenar
-      const response = await fetch(`http://${window.location.hostname}:5000/api/forgot-password`, {
+      const response = await fetch('/api/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
