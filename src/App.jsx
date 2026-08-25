@@ -105,6 +105,10 @@ export default function App() {
   };
 
   const handleContact = async (userId, title) => {
+    if (user && user.id === userId) {
+      alert(t('cannotContactSelf') || "You cannot contact yourself.");
+      return;
+    }
     let name = `User ${userId.substring(0, 5)}`;
     try {
       const { data, error } = await supabase.from('profiles').select('username').eq('id', userId).single();

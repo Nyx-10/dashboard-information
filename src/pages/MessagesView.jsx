@@ -42,6 +42,7 @@ export function MessagesView({ initialChatUser }) {
 
       data.forEach(msg => {
         const otherId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+        if (otherId === userId) return; // Prevent self-contact
         if (!chatMap.has(otherId)) {
           const otherName = msg.sender_id === userId ? (msg.receiver?.username || 'User') : (msg.sender?.username || 'User');
           chatMap.set(otherId, {
@@ -56,7 +57,7 @@ export function MessagesView({ initialChatUser }) {
 
       let chatList = Array.from(chatMap.values());
       
-      if (initialChatUser && !chatMap.has(initialChatUser.id)) {
+      if (initialChatUser && initialChatUser.id !== userId && !chatMap.has(initialChatUser.id)) {
         chatList = [{
           id: initialChatUser.id,
           name: initialChatUser.name,
@@ -67,7 +68,7 @@ export function MessagesView({ initialChatUser }) {
       }
 
       setChats(chatList);
-    } else if (initialChatUser) {
+    } else if (initialChatUser && initialChatUser.id !== userId) {
       setChats([{
         id: initialChatUser.id,
         name: initialChatUser.name,
@@ -80,6 +81,7 @@ export function MessagesView({ initialChatUser }) {
 
   useEffect(() => {
     if (initialChatUser && currentUserId) {
+      if (initialChatUser.id === currentUserId) return;
       setActiveChat(initialChatUser.id);
       if (initialChatUser.preview && initialChatUser.preview !== '...') {
         setNewMessage(`[ ${initialChatUser.preview} ] - `);
