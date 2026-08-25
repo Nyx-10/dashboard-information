@@ -1,23 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, FileText, CheckCircle, Activity, Clock, User, Shield } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 export const AdminAnalyticsView = () => {
-  const stats = [
-    { label: 'Total Users', value: '1,245', icon: <Users size={24} color="#3B82F6" /> },
-    { label: 'Total Reports', value: '842', icon: <FileText size={24} color="#8B5CF6" /> },
-    { label: 'Resolution Rate', value: '94.2%', icon: <CheckCircle size={24} color="#10B981" /> },
-    { label: 'Active Sessions', value: '124', icon: <Activity size={24} color="#F59E0B" /> },
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalReports: 0,
+    resolutionRate: '0%',
+    activeUsers: 0
+  });
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      // Fetch Total Users
+      const { count: totalUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      
+      // Fetch Active Users (Not suspended)
+      const { count: activeUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'Active');
+      
+      // Fetch Total Reports
+      const { count: totalReports } = await supabase.from('user_reports').select('*', { count: 'exact', head: true });
+      
+      // Fetch Resolved Reports
+      const { count: resolvedReports } = await supabase.from('user_reports').select('*', { count: 'exact', head: true }).eq('status', 'Resolved');
+
+      let resolutionRate = '0%';
+      if (totalReports > 0 && resolvedReports > 0) {
+        resolutionRate = Math.round((resolvedReports / totalReports) * 100) + '%';
+      }
+
+      setStats({
+        totalUsers: totalUsers || 0,
+        totalReports: totalReports || 0,
+        resolutionRate,
+        activeUsers: activeUsers || 0
+      });
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  const statCards = [
+    { label: 'Jumlah Pengguna', value: stats.totalUsers, icon: <Users size={24} color="#3B82F6" /> },
+    { label: 'Jumlah Laporan', value: stats.totalReports, icon: <FileText size={24} color="#8B5CF6" /> },
+    { label: 'Kadar Selesai', value: stats.resolutionRate, icon: <CheckCircle size={24} color="#10B981" /> },
+    { label: 'Akaun Aktif', value: stats.activeUsers, icon: <Activity size={24} color="#F59E0B" /> },
   ];
 
   return (
     <div className="page-bg-common bg-admin-analytics">
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Analytics Overview</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Monitor your platform's key performance metrics.</p>
+        <p style={{ color: 'var(--text-muted)' }}>Pantau statistik sistem anda secara langsung dari pangkalan data.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <div key={index} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ padding: '1rem', background: 'var(--surface)', borderRadius: '0.75rem', boxShadow: 'var(--shadow-sm)' }}>
               {stat.icon}
@@ -29,49 +71,50 @@ export const AdminAnalyticsView = () => {
           </div>
         ))}
       </div>
-
-      <div className="glass-panel" style={{ padding: '2rem' }}>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Activity Summary</h3>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary)', flexShrink: 0 }}></span>
-            Number of Active Users: <span style={{ fontWeight: 700, color: 'var(--primary)' }}>124</span>
-          </p>
-        </div>
-        <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-          {[40, 70, 45, 90, 65, 85, 100].map((height, i) => (
-            <div key={i} style={{ flex: 1, backgroundColor: 'var(--primary)', height: `${height}%`, borderRadius: '4px 4px 0 0', opacity: 0.8, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '0.5rem', color: 'white', fontSize: '0.75rem', fontWeight: 600 }}>
-              {height}%
-            </div>
-          ))}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-        </div>
-      </div>
     </div>
   );
 };
 
 export const AdminAuditLogsView = () => {
-  const logs = [
-    { id: 1, action: 'User role updated to Admin', user: 'sarah.j@adtec.edu.my', timestamp: '2 mins ago', icon: <Shield size={16} /> },
-    { id: 2, action: 'System settings modified', user: 'admin@adtec.edu.my', timestamp: '1 hour ago', icon: <Activity size={16} /> },
-    { id: 3, action: 'Bulk report export downloaded', user: 'admin2@adtec.edu.my', timestamp: '3 hours ago', icon: <FileText size={16} /> },
-    { id: 4, action: 'New user account created', user: 'jane.doe@adtec.edu.my', timestamp: '5 hours ago', icon: <User size={16} /> },
-    { id: 5, action: 'Failed login attempt detected', user: 'unknown IP', timestamp: '1 day ago', icon: <Shield size={16} /> },
-  ];
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const fetchLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+        
+      if (error) {
+        if (error.code !== '42P01') { // Abaikan ralat table tak wujud
+          console.error(error);
+        }
+        return;
+      }
+      
+      if (data) {
+        setLogs(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="page-bg-common bg-admin-logs">
-      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>System Audit Logs</h2>
-          <p style={{ color: 'var(--text-muted)' }}>Track and monitor all administrative actions and system events.</p>
+          <p style={{ color: 'var(--text-muted)' }}>Rekod tindakan pentadbir dan sistem.</p>
         </div>
         <button className="btn-primary" onClick={() => {
           const csvHeader = 'Action Performed,User / Source,Timestamp\n';
-          const csvRows = logs.map(log => `"${log.action}","${log.user}","${log.timestamp}"`).join('\n');
+          const csvRows = logs.map(log => `"${log.action}","${log.user_email}","${new Date(log.created_at).toLocaleString()}"`).join('\n');
           const csvContent = csvHeader + csvRows;
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
@@ -89,22 +132,24 @@ export const AdminAuditLogsView = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Action Performed</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>User / Source</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Timestamp</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Tindakan (Action)</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>E-mel Pengguna</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Masa</th>
             </tr>
           </thead>
           <tbody>
-            {logs.map((log, index) => (
+            {logs.length === 0 ? (
+               <tr><td colSpan="3" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Tiada rekod log buat masa ini. (Sila tambah table 'audit_logs')</td></tr>
+            ) : logs.map((log, index) => (
               <tr key={log.id} style={{ borderBottom: index === logs.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)' }}>
-                  <div style={{ padding: '0.5rem', background: 'var(--surface)', borderRadius: '0.5rem', color: 'var(--text-muted)' }}>
-                    {log.icon}
-                  </div>
+                  <Shield size={16} color="var(--primary)" />
                   {log.action}
                 </td>
-                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-main)' }}>{log.user}</td>
-                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', textAlign: 'right' }}>{log.timestamp}</td>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{log.user_email}</td>
+                <td style={{ padding: '1rem 1.5rem', textAlign: 'right', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                  {new Date(log.created_at).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>
