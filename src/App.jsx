@@ -53,10 +53,27 @@ export default function App() {
           }
         })
         .subscribe();
+        
+      // Periodically check if the user has been suspended while logged in
+      const checkStatusInterval = setInterval(async () => {
+        try {
+          const { data, error } = await supabase.from('profiles').select('status').eq('id', user.id).single();
+          if (data && data.status === 'Suspended') {
+            alert('Akaun anda telah digantung oleh Admin.');
+            supabase.auth.signOut();
+            setIsAuthenticated(false);
+            setUser(null);
+            setShowLanding(true);
+          }
+        } catch(e) {
+          // ignore
+        }
+      }, 10000); // Semak setiap 10 saat
 
       return () => {
         supabase.removeChannel(itemsChannel);
         supabase.removeChannel(messagesChannel);
+        clearInterval(checkStatusInterval);
       };
     }
   }, [isAuthenticated, user]);
