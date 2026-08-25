@@ -35,7 +35,7 @@ const badgeStyle = (status) => {
   };
 };
 
-export const AdminUsersView = () => {
+export const AdminUsersView = ({ currentUser }) => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -83,7 +83,6 @@ export const AdminUsersView = () => {
   };
 
   const handleRoleChange = async (userId, newRole) => {
-    // Optimistic update
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
     try {
       let dbRole = newRole.toLowerCase();
@@ -113,7 +112,6 @@ export const AdminUsersView = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
-      // Note: Full deletion might require a backend edge function or delete permission on profiles
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
     } catch (e) {
@@ -129,6 +127,14 @@ export const AdminUsersView = () => {
     acc[role] = users.filter(u => (u.role && u.role.toLowerCase() === role.toLowerCase())).length;
     return acc;
   }, { 'Admin': 0, 'User': 0, 'Super Admin': 0 });
+
+  const canModifyUser = (targetUser) => {
+    if (!currentUser) return false;
+    if (currentUser.id === targetUser.id) return false; // Cannot modify self from here
+    if (currentUser.role === 'superadmin') return true;
+    if (currentUser.role === 'admin' && (targetUser.role === 'Admin' || targetUser.role === 'Super Admin')) return false;
+    return true;
+  };
 
   return (
     <div className="page-bg-common bg-admin-users">
@@ -171,18 +177,21 @@ export const AdminUsersView = () => {
           <tbody>
             {filteredUsers.length === 0 ? (
                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No users found.</td></tr>
-            ) : filteredUsers.map((user, index) => (
+            ) : filteredUsers.map((user, index) => {
+              const canEdit = canModifyUser(user);
+              return (
               <tr key={user.id} style={{ borderBottom: index === users.length - 1 ? 'none' : '1px solid var(--border)' }}>
-                <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{user.name}</td>
+                <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{user.name} {currentUser?.id === user.id && '(You)'}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{user.email}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-main)' }}>{user.role}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>
                   <span style={badgeStyle(user.status)}>{user.status}</span>
                 </td>
-                <td style={{ padding: '1rem 1.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <td style={{ padding: '1rem 1.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', opacity: canEdit ? 1 : 0.5 }}>
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                    disabled={!canEdit}
                     style={{
                       background: 'var(--surface)',
                       border: '1px solid var(--border)',
@@ -190,24 +199,24 @@ export const AdminUsersView = () => {
                       padding: '0.35rem 0.6rem',
                       borderRadius: '0.5rem',
                       fontSize: '0.8rem',
-                      cursor: 'pointer',
+                      cursor: canEdit ? 'pointer' : 'not-allowed',
                       outline: 'none',
                     }}
                     title="Change Role"
                   >
                     <option value="User">User</option>
                     <option value="Admin">Admin</option>
-                    <option value="Super Admin">Super Admin</option>
+                    {currentUser?.role === 'superadmin' && <option value="Super Admin">Super Admin</option>}
                   </select>
-                  <button onClick={() => handleToggleSuspend(user)} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: 'pointer' }} title={user.status === 'Suspended' ? 'Activate' : 'Suspend'}>
+                  <button onClick={() => handleToggleSuspend(user)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={user.status === 'Suspended' ? 'Activate' : 'Suspend'}>
                     {user.status === 'Suspended' ? <CheckCircle size={18} /> : <UserX size={18} />}
                   </button>
-                  <button onClick={() => handleDeleteUser(user.id)} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Delete">
+                  <button onClick={() => handleDeleteUser(user.id)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canEdit ? 'pointer' : 'not-allowed' }} title="Delete">
                     <Trash2 size={18} />
                   </button>
                 </td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       </div>

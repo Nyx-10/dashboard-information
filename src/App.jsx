@@ -173,7 +173,7 @@ export default function App() {
       case 'admin-analytics':
         return <AdminAnalyticsView />;
       case 'admin-users':
-        return <AdminUsersView />;
+        return <AdminUsersView currentUser={user} />;
       case 'admin-reports':
         return <AdminReportsView />;
       case 'admin-logs':
