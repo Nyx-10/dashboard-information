@@ -24,7 +24,8 @@ export function ForgotPasswordView({ onSwitchBack }) {
       });
 
       if (!response.ok) {
-        throw new Error('Gagal menghantar e-mel. Sila pastikan e-mel anda berdaftar.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Gagal menghantar e-mel. Sila pastikan e-mel anda berdaftar.');
       }
 
       setSubmitted(true);
