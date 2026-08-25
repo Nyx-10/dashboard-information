@@ -11,6 +11,46 @@ export function AddItemView({ onSuccess }) {
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Sila muat naik fail gambar sahaja / Please upload image files only.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Saiz gambar terlalu besar! Had maksimum ialah 5MB. / File size exceeds 5MB limit.');
+      return;
+    }
+    setPhoto(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,6 +75,26 @@ export function AddItemView({ onSuccess }) {
       // Get current logged in user
       const { data: { user } } = await supabase.auth.getUser();
 
+      let imageUrl = null;
+      if (photo) {
+        const fileExt = photo.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('item-images')
+          .upload(fileName, photo);
+
+        if (uploadError) {
+          throw new Error('Gagal memuat naik gambar: ' + uploadError.message);
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('item-images')
+          .getPublicUrl(fileName);
+          
+        imageUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from('items')
         .insert([
@@ -44,6 +104,7 @@ export function AddItemView({ onSuccess }) {
             location: finalLocation,
             date,
             description,
+            image: imageUrl,
             status: 'open',
             created_by: user ? user.id : null 
           }
@@ -109,8 +170,38 @@ export function AddItemView({ onSuccess }) {
           
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('photo')}</label>
-            <div style={{ border: '2px dashed var(--border)', borderRadius: '0.5rem', padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-               {t('photoUpload')}
+            <div 
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById('photo-upload').click()}
+              style={{ 
+                border: `2px dashed ${dragActive ? 'var(--primary)' : 'var(--border)'}`, 
+                borderRadius: '0.5rem', 
+                padding: '2rem', 
+                textAlign: 'center', 
+                color: dragActive ? 'var(--primary)' : 'var(--text-muted)',
+                backgroundColor: dragActive ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+               <input 
+                 id="photo-upload"
+                 type="file" 
+                 accept="image/*" 
+                 onChange={handleChange} 
+                 style={{ display: 'none' }} 
+               />
+               {photo ? (
+                 <div>
+                   <p style={{ fontWeight: 600, color: 'var(--text)' }}>{photo.name}</p>
+                   <p style={{ fontSize: '0.875rem' }}>{(photo.size / (1024 * 1024)).toFixed(2)} MB</p>
+                 </div>
+               ) : (
+                 t('photoUpload')
+               )}
             </div>
           </div>
 
