@@ -14,9 +14,6 @@ const PORT = 5000;
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// Simpan OTP sementara dalam memory
-const otpStore = new Map();
-
 app.post('/api/send-otp', async (req, res) => {
   const { email } = req.body;
 
@@ -26,7 +23,10 @@ app.post('/api/send-otp', async (req, res) => {
 
   try {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore.set(email, { otp, expires: Date.now() + 10 * 60 * 1000 }); // 10 minit
+    const expires = Date.now() + 10 * 60 * 1000; // 10 minit
+    
+    // Simpan OTP ke dalam database Supabase (supaya Vercel tak lupa)
+    await supabase.from('otps').upsert({ email, otp, expires_at: expires });
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -44,15 +44,7 @@ app.post('/api/send-otp', async (req, res) => {
       html: `<b>Kod OTP pendaftaran anda ialah:</b> <h2 style="letter-spacing: 5px; color: #4F46E5;">${otp}</h2><p>Kod ini sah selama 10 minit. Sila masukkan kod ini di laman pendaftaran.</p>`,
     });
 
-    console.log("\n-----------------------------------------");
-    console.log("OTP berjaya dihantar kepada: %s", email);
-    console.log("OTP dihantar: %s", otp);
-    console.log("Mesej ID: %s", info.messageId);
-    console.log("-----------------------------------------\n");
-
-    res.status(200).json({ 
-      message: 'OTP telah dihantar ke peti masuk anda!'
-    });
+    res.status(200).json({ message: 'OTP telah dihantar ke peti masuk anda!' });
 
   } catch (error) {
     console.error('Ralat menghantar e-mel:', error);
@@ -67,12 +59,15 @@ app.post('/api/verify-otp', async (req, res) => {
     return res.status(400).json({ message: 'Maklumat tidak lengkap.' });
   }
 
-  const record = otpStore.get(email);
-  if (!record || record.otp !== otp) {
+  // Dapatkan OTP dari Supabase
+  const { data: record, error: fetchError } = await supabase.from('otps').select('*').eq('email', email).single();
+  
+  if (fetchError || !record || record.otp !== otp) {
     return res.status(400).json({ message: 'Kod OTP tidak sah.' });
   }
-  if (record.expires < Date.now()) {
-    otpStore.delete(email);
+  
+  if (record.expires_at < Date.now()) {
+    await supabase.from('otps').delete().eq('email', email);
     return res.status(400).json({ message: 'Kod OTP telah luput.' });
   }
 
@@ -89,7 +84,9 @@ app.post('/api/verify-otp', async (req, res) => {
       throw error;
     }
 
-    otpStore.delete(email);
+    // Padam OTP selepas berjaya daftar
+    await supabase.from('otps').delete().eq('email', email);
+    
     res.status(200).json({ success: true, user: data.user, message: 'Pendaftaran berjaya disahkan.' });
   } catch (error) {
     console.error('Ralat pendaftaran Supabase:', error);
