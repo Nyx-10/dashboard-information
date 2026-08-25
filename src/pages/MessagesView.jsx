@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Search, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
@@ -123,10 +123,59 @@ export function MessagesView({ initialChatUser }) {
     }
   };
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const scrollToBottom = () => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !activeChat || !currentUserId) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert(t('alertInvalidFile') || 'Please upload image files only.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert(t('alertFileSize') || 'File size exceeds 5MB limit.');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `chat-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('item-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('item-images')
+        .getPublicUrl(fileName);
+        
+      const messageContent = `[IMAGE]${publicUrl}`;
+      
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
+          sender_id: currentUserId,
+          receiver_id: activeChat,
+          content: messageContent
+        }]);
+
+      if (error) throw error;
+    } catch (error) {
+      alert('Failed to upload image: ' + error.message);
+    } finally {
+      setUploadingImage(false);
+      e.target.value = null; // Reset input
+    }
   };
 
   const handleSendMessage = async (e) => {
@@ -210,7 +259,9 @@ export function MessagesView({ initialChatUser }) {
                     <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{chat.name}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{chat.time}</span>
                   </div>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.preview}</p>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
+                  </p>
                 </div>
               </div>
             ))
@@ -290,14 +341,21 @@ export function MessagesView({ initialChatUser }) {
                       <img src={isMe ? `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff` : activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
-                          background: isMe ? 'var(--primary)' : 'var(--surface)', 
+                          background: (isMe && !msg.content.startsWith('[IMAGE]')) ? 'var(--primary)' : 'var(--surface)', 
                           color: isMe ? '#fff' : 'var(--text-main)', 
-                          border: isMe ? 'none' : '1px solid var(--border)', 
-                          padding: '0.75rem 1rem', 
+                          border: isMe && !msg.content.startsWith('[IMAGE]') ? 'none' : '1px solid var(--border)', 
+                          padding: msg.content.startsWith('[IMAGE]') ? '0.25rem' : '0.75rem 1rem', 
                           borderRadius: isMe ? '1rem 0 1rem 1rem' : '0 1rem 1rem 1rem',
-                          wordBreak: 'break-word'
+                          wordBreak: 'break-word',
+                          overflow: 'hidden'
                         }}>
-                          {msg.content}
+                          {msg.content.startsWith('[IMAGE]') ? (
+                            <a href={msg.content.substring(7)} target="_blank" rel="noopener noreferrer">
+                              <img src={msg.content.substring(7)} alt="Sent image" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '0.75rem', display: 'block', cursor: 'zoom-in', objectFit: 'cover' }} />
+                            </a>
+                          ) : (
+                            msg.content
+                          )}
                         </div>
                         <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
                           {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -311,16 +369,34 @@ export function MessagesView({ initialChatUser }) {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSendMessage} style={{ padding: '1.25rem', background: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem' }}>
+            <form onSubmit={handleSendMessage} style={{ padding: '1.25rem', background: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  id="chat-image-upload" 
+                  style={{ display: 'none' }} 
+                  onChange={handleImageUpload} 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => document.getElementById('chat-image-upload').click()} 
+                  style={{ background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}
+                  disabled={uploadingImage}
+                >
+                  {uploadingImage ? <span className="spinner" style={{ width: '16px', height: '16px' }} /> : <ImageIcon size={20} />}
+                </button>
+              </div>
               <input 
                 type="text" 
                 className="input-field" 
-                placeholder="Type a message..." 
+                placeholder={uploadingImage ? "Uploading image..." : "Type a message..."}
                 style={{ flex: 1, borderRadius: '2rem' }} 
                 value={newMessage}
                 onChange={e => setNewMessage(e.target.value)}
+                disabled={uploadingImage}
               />
-              <button type="submit" className="btn-primary" style={{ borderRadius: '2rem', padding: '0.5rem 1.5rem' }} disabled={!newMessage.trim()}>
+              <button type="submit" className="btn-primary" style={{ borderRadius: '2rem', padding: '0.5rem 1.5rem' }} disabled={!newMessage.trim() || uploadingImage}>
                 {t('send')}
               </button>
             </form>
