@@ -156,7 +156,13 @@ app.post('/api/forgot-password', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Backend Server sedang berjalan di http://localhost:${PORT}`);
-  console.log(`Menunggu permintaan API untuk menghantar e-mel sebenar...`);
-});
+// Untuk Local Development (Bukan di Vercel)
+if (process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`✅ Backend Server sedang berjalan di http://localhost:${PORT}`);
+    console.log(`Menunggu permintaan API untuk menghantar e-mel sebenar...`);
+  });
+}
+
+// Untuk Vercel Serverless Function
+export default app;
