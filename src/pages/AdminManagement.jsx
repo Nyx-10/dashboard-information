@@ -36,22 +36,87 @@ const badgeStyle = (status) => {
 };
 
 export const AdminUsersView = () => {
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleRoleChange = (userId, newRole) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
-    );
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('username', { ascending: true });
+        
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        setUsers(mockUsers);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        setUsers(data.map(u => ({
+          id: u.id,
+          name: u.username || 'Unknown',
+          email: u.email || 'No Email',
+          role: u.role || 'User',
+          status: u.status || 'Active'
+        })));
+      } else {
+        setUsers(mockUsers); // Fallback to mock data if empty
+      }
+    } catch (e) {
+      console.error('Exception fetching profiles:', e);
+      setUsers(mockUsers);
+    }
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    // Optimistic update
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
+    try {
+      const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+      if (error) throw error;
+    } catch (e) {
+      alert("Failed to update role: " + e.message);
+      fetchUsers(); // revert
+    }
+  };
+
+  const handleToggleSuspend = async (user) => {
+    const newStatus = user.status === 'Active' ? 'Suspended' : 'Active';
+    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: newStatus } : u)));
+    try {
+      const { error } = await supabase.from('profiles').update({ status: newStatus }).eq('id', user.id);
+      if (error) throw error;
+    } catch (e) {
+      alert("Failed to suspend/activate user: " + e.message);
+      fetchUsers(); // revert
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    try {
+      // Note: Full deletion might require a backend edge function or delete permission on profiles
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) throw error;
+    } catch (e) {
+      alert("Failed to delete user: " + e.message);
+      fetchUsers(); // revert
+    }
   };
 
   const filteredUsers = users.filter((u) => u.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const roles = ['Admin', 'User', 'Super Admin'];
   const roleCounts = roles.reduce((acc, role) => {
-    acc[role] = users.filter(u => u.role === role).length;
+    acc[role] = users.filter(u => (u.role && u.role.toLowerCase() === role.toLowerCase())).length;
     return acc;
-  }, {});
+  }, { 'Admin': 0, 'User': 0, 'Super Admin': 0 });
 
   return (
     <div className="page-bg-common bg-admin-users">
@@ -92,7 +157,9 @@ export const AdminUsersView = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user, index) => (
+            {filteredUsers.length === 0 ? (
+               <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No users found.</td></tr>
+            ) : filteredUsers.map((user, index) => (
               <tr key={user.id} style={{ borderBottom: index === users.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{user.name}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{user.email}</td>
@@ -120,10 +187,10 @@ export const AdminUsersView = () => {
                     <option value="Admin">Admin</option>
                     <option value="Super Admin">Super Admin</option>
                   </select>
-                  <button style={{ background: 'none', border: 'none', color: '#F59E0B', cursor: 'pointer' }} title="Suspend">
-                    <UserX size={18} />
+                  <button onClick={() => handleToggleSuspend(user)} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: 'pointer' }} title={user.status === 'Suspended' ? 'Activate' : 'Suspend'}>
+                    {user.status === 'Suspended' ? <CheckCircle size={18} /> : <UserX size={18} />}
                   </button>
-                  <button style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Delete">
+                  <button onClick={() => handleDeleteUser(user.id)} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Delete">
                     <Trash2 size={18} />
                   </button>
                 </td>
