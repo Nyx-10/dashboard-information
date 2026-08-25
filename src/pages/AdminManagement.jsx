@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search } from 'lucide-react';
-
+import { supabase } from '../supabaseClient';
 const mockUsers = [
   { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'Admin', status: 'Active' },
   { id: 2, name: 'Bob Jones', email: 'bob@example.com', role: 'User', status: 'Active' },
@@ -137,6 +137,50 @@ export const AdminUsersView = () => {
 };
 
 export const AdminReportsView = () => {
+  const [reports, setReports] = useState([]);
+  
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const fetchReports = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_reports')
+        .select(`
+          id, report_type, reason_text, status, created_at,
+          reporter:profiles!user_reports_reporter_id_fkey(username),
+          reported:profiles!user_reports_reported_id_fkey(username)
+        `)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      if (data) {
+        setReports(data.map(r => ({
+          id: r.id,
+          itemName: `Report on ${r.reported?.username || 'Unknown'} by ${r.reporter?.username || 'Unknown'}`,
+          type: r.report_type === 'Others' ? `Others (${r.reason_text})` : r.report_type,
+          status: r.status || 'Pending'
+        })));
+      }
+    } catch (e) {
+      console.error('Error fetching reports:', e);
+    }
+  };
+
+  const updateReportStatus = async (id, newStatus) => {
+    try {
+      const { error } = await supabase
+        .from('user_reports')
+        .update({ status: newStatus })
+        .eq('id', id);
+      if (error) throw error;
+      fetchReports();
+    } catch (e) {
+      alert("Failed to update status: " + e.message);
+    }
+  };
+
   return (
     <div className="page-bg-common bg-admin-reports">
       <div style={{ marginBottom: '2rem' }}>
@@ -148,28 +192,27 @@ export const AdminReportsView = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Item Name</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Report Details</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Report Type</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Status</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {mockReports.map((report, index) => (
-              <tr key={report.id} style={{ borderBottom: index === mockReports.length - 1 ? 'none' : '1px solid var(--border)' }}>
+            {reports.length === 0 ? (
+               <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No reports found.</td></tr>
+            ) : reports.map((report, index) => (
+              <tr key={report.id} style={{ borderBottom: index === reports.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{report.itemName}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{report.type}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>
                   <span style={badgeStyle(report.status)}>{report.status}</span>
                 </td>
                 <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                  <button style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', marginRight: '1rem' }} title="Approve">
+                  <button onClick={() => updateReportStatus(report.id, 'Resolved')} style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', marginRight: '1rem' }} title="Resolve">
                     <CheckCircle size={18} />
                   </button>
-                  <button style={{ background: 'none', border: 'none', color: '#F59E0B', cursor: 'pointer', marginRight: '1rem' }} title="Resolve">
-                    <AlertTriangle size={18} />
-                  </button>
-                  <button style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Reject">
+                  <button onClick={() => updateReportStatus(report.id, 'Rejected')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Reject">
                     <XCircle size={18} />
                   </button>
                 </td>

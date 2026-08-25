@@ -133,6 +133,27 @@ export function MessagesView({ initialChatUser }) {
     }, 100);
   };
 
+  const handleReportUser = async (reportType, customReason = '') => {
+    if (!currentUserId || !activeChatData) return;
+    try {
+      const { error } = await supabase.from('user_reports').insert([{
+        reporter_id: currentUserId,
+        reported_id: activeChatData.id,
+        report_type: reportType,
+        reason_text: customReason,
+        status: 'Pending'
+      }]);
+      if (error) throw error;
+      alert(t('alertSuccessAdd') || 'Report submitted successfully.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to submit report: ' + err.message);
+    }
+    setShowReportMenu(false);
+    setShowOtherInput(false);
+    setOtherReason('');
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !activeChat || !currentUserId) return;
@@ -297,10 +318,10 @@ export function MessagesView({ initialChatUser }) {
                     <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', padding: '0.25rem 0.5rem', textTransform: 'uppercase' }}>{t('reportType')}</div>
                     {!showOtherInput ? (
                       <>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('spam')}`); setShowReportMenu(false); }}>{t('spam')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('scammer')}`); setShowReportMenu(false); }}>{t('scammer')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('inappropriate')}`); setShowReportMenu(false); }}>{t('inappropriate')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => { alert(`Reported as ${t('harassment')}`); setShowReportMenu(false); }}>{t('harassment')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Spam')}>{t('spam')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Scammer')}>{t('scammer')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Inappropriate')}>{t('inappropriate')}</button>
+                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Harassment')}>{t('harassment')}</button>
                         <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => setShowOtherInput(true)}>{t('typeOthers')}</button>
                       </>
                     ) : (
@@ -313,7 +334,7 @@ export function MessagesView({ initialChatUser }) {
                         />
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-main)' }} onClick={() => { setShowOtherInput(false); setOtherReason(''); }}>{t('cancel')}</button>
-                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem' }} onClick={() => { if(otherReason.trim()){ alert(`Reported: ${otherReason}`); setShowReportMenu(false); setShowOtherInput(false); setOtherReason(''); } }}>{t('submit')}</button>
+                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem' }} onClick={() => { if(otherReason.trim()){ handleReportUser('Others', otherReason); } }}>{t('submit')}</button>
                         </div>
                       </div>
                     )}
