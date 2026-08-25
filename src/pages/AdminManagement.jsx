@@ -82,6 +82,18 @@ export const AdminUsersView = ({ currentUser }) => {
     }
   };
 
+  const logAction = async (actionText) => {
+    if (!currentUser?.email) return;
+    try {
+      await supabase.from('audit_logs').insert({
+        action: actionText,
+        user_email: currentUser.email
+      });
+    } catch (e) {
+      console.error('Failed to log action:', e);
+    }
+  };
+
   const handleRoleChange = async (userId, newRole) => {
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
     try {
@@ -90,6 +102,11 @@ export const AdminUsersView = ({ currentUser }) => {
       
       const { error } = await supabase.from('profiles').update({ role: dbRole }).eq('id', userId);
       if (error) throw error;
+      
+      const updatedUser = users.find(u => u.id === userId);
+      if (updatedUser) {
+        logAction(`Menukar pangkat pengguna (${updatedUser.email}) kepada ${newRole}`);
+      }
     } catch (e) {
       alert("Failed to update role: " + e.message);
       fetchUsers(); // revert
@@ -102,6 +119,8 @@ export const AdminUsersView = ({ currentUser }) => {
     try {
       const { error } = await supabase.from('profiles').update({ status: newStatus }).eq('id', user.id);
       if (error) throw error;
+      
+      logAction(`Menukar status pengguna (${user.email}) kepada ${newStatus}`);
     } catch (e) {
       alert("Failed to suspend/activate user: " + e.message);
       fetchUsers(); // revert
@@ -109,11 +128,16 @@ export const AdminUsersView = ({ currentUser }) => {
   };
 
   const handleDeleteUser = async (userId) => {
+    const userToDelete = users.find(u => u.id === userId);
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
+      
+      if (userToDelete) {
+        logAction(`Memadam pengguna (${userToDelete.email})`);
+      }
     } catch (e) {
       alert("Failed to delete user: " + e.message);
       fetchUsers(); // revert
@@ -224,7 +248,7 @@ export const AdminUsersView = ({ currentUser }) => {
   );
 };
 
-export const AdminReportsView = () => {
+export const AdminReportsView = ({ currentUser }) => {
   const [reports, setReports] = useState([]);
   
   useEffect(() => {
@@ -238,7 +262,7 @@ export const AdminReportsView = () => {
         .select(`
           id, report_type, reason_text, status, created_at,
           reporter:profiles!user_reports_reporter_id_fkey(username),
-          reported:profiles!user_reports_reported_id_fkey(username)
+          reported:profiles!user_reports_reported_id_fkey(username, email)
         `)
         .order('created_at', { ascending: false });
         
@@ -247,6 +271,7 @@ export const AdminReportsView = () => {
         setReports(data.map(r => ({
           id: r.id,
           itemName: `Report on ${r.reported?.username || 'Unknown'} by ${r.reporter?.username || 'Unknown'}`,
+          reportedEmail: r.reported?.email,
           type: r.report_type === 'Others' ? `Others (${r.reason_text})` : r.report_type,
           status: r.status || 'Pending'
         })));
@@ -263,6 +288,15 @@ export const AdminReportsView = () => {
         .update({ status: newStatus })
         .eq('id', id);
       if (error) throw error;
+      
+      const report = reports.find(r => r.id === id);
+      if (report && currentUser?.email) {
+        await supabase.from('audit_logs').insert({
+          action: `Menukar status laporan (${report.reportedEmail || id}) kepada ${newStatus}`,
+          user_email: currentUser.email
+        });
+      }
+      
       fetchReports();
     } catch (e) {
       alert("Failed to update status: " + e.message);

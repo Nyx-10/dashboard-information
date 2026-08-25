@@ -192,7 +192,7 @@ export default function App() {
       case 'admin-users':
         return <AdminUsersView currentUser={user} />;
       case 'admin-reports':
-        return <AdminReportsView />;
+        return <AdminReportsView currentUser={user} />;
       case 'admin-logs':
         return <AdminAuditLogsView />;
       case 'add':
