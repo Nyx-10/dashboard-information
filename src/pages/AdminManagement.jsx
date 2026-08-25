@@ -57,13 +57,22 @@ export const AdminUsersView = () => {
       }
       
       if (data && data.length > 0) {
-        setUsers(data.map(u => ({
-          id: u.id,
-          name: u.username || 'Unknown',
-          email: u.email || 'No Email',
-          role: u.role || 'User',
-          status: u.status || 'Active'
-        })));
+        setUsers(data.map(u => {
+          let normalizedRole = 'User';
+          if (u.role) {
+            const r = u.role.toLowerCase();
+            if (r === 'superadmin' || r === 'super admin') normalizedRole = 'Super Admin';
+            else if (r === 'admin') normalizedRole = 'Admin';
+          }
+          
+          return {
+            id: u.id,
+            name: u.username || 'Unknown',
+            email: u.email || 'No Email',
+            role: normalizedRole,
+            status: u.status || 'Active'
+          };
+        }));
       } else {
         setUsers(mockUsers); // Fallback to mock data if empty
       }
@@ -77,7 +86,10 @@ export const AdminUsersView = () => {
     // Optimistic update
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
     try {
-      const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+      let dbRole = newRole.toLowerCase();
+      if (dbRole === 'super admin') dbRole = 'superadmin';
+      
+      const { error } = await supabase.from('profiles').update({ role: dbRole }).eq('id', userId);
       if (error) throw error;
     } catch (e) {
       alert("Failed to update role: " + e.message);
