@@ -35,10 +35,12 @@ export default function App() {
   const [notifications, setNotifications] = useState([]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
       fetchNotifications();
+      fetchTotalUnreadMessages();
 
       const itemsChannel = supabase.channel('public:items')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
@@ -47,9 +49,10 @@ export default function App() {
         .subscribe();
 
       const messagesChannel = supabase.channel('public:messages_notif')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-          if (payload.new && payload.new.receiver_id === user.id) {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
+          if (payload.new && (payload.new.receiver_id === user.id || payload.new.sender_id === user.id)) {
             fetchNotifications();
+            fetchTotalUnreadMessages();
           }
         })
         .subscribe();
@@ -119,6 +122,20 @@ export default function App() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const fetchTotalUnreadMessages = async () => {
+    if (!user || !user.id) return;
+    try {
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', user.id)
+        .eq('is_read', false);
+      if (!error) {
+        setTotalUnreadMessages(count || 0);
+      }
+    } catch(e) {}
   };
 
   const handleContact = async (userId, title) => {
@@ -230,7 +247,13 @@ export default function App() {
               className={`nav-link w-full text-left ${activeTab === 'messages' ? 'active' : ''}`} 
               onClick={() => { setActiveTab('messages'); setActiveChatUser(null); }}
             >
-              <MessageSquare size={20} /> {t('messages')}
+              <MessageSquare size={20} /> 
+              <span style={{ flex: 1 }}>{t('messages')}</span>
+              {totalUnreadMessages > 0 && (
+                <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px' }}>
+                  {totalUnreadMessages}
+                </span>
+              )}
             </button>
             
             {(user?.role === 'superadmin' || user?.role === 'admin') && (
