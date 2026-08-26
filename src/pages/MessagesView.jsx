@@ -3,7 +3,7 @@ import { Search, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
-export function MessagesView({ initialChatUser }) {
+export function MessagesView({ initialChatUser, onMessagesRead }) {
   const { t } = useContext(LanguageContext);
   const [showReportMenu, setShowReportMenu] = useState(false);
   const [showOtherInput, setShowOtherInput] = useState(false);
@@ -150,6 +150,7 @@ export function MessagesView({ initialChatUser }) {
 
     // 2. Clear unreadCount di sidebar untuk chat ini
     setChats(prev => prev.map(c => c.id === otherUserId ? { ...c, unreadCount: 0 } : c));
+    if (onMessagesRead) onMessagesRead();
 
     // 3. Fetch mesej
     const { data, error } = await supabase
@@ -319,14 +320,14 @@ export function MessagesView({ initialChatUser }) {
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', alignItems: 'center' }}>
                     <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{chat.name}</span>
-                    <span style={{ fontSize: '0.75rem', color: chat.unreadCount > 0 && chat.id !== activeChat ? '#25D366' : 'var(--text-muted)' }}>{chat.time}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{chat.time}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <p style={{ fontSize: '0.875rem', color: chat.unreadCount > 0 && chat.id !== activeChat ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: chat.unreadCount > 0 && chat.id !== activeChat ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
                       {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
                     </p>
                     {chat.unreadCount > 0 && chat.id !== activeChat && (
-                      <span style={{ background: '#25D366', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '20px', height: '20px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', marginLeft: '8px' }}>
+                      <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', marginLeft: '8px' }}>
                         {chat.unreadCount}
                       </span>
                     )}
