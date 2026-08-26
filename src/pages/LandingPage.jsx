@@ -5,6 +5,7 @@ import {
   CheckCircle, Info, AlertTriangle
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
+import { supabase } from '../supabaseClient';
 import './LandingPage.css';
 
 export default function LandingPage({ onGetStarted }) {
@@ -13,6 +14,31 @@ export default function LandingPage({ onGetStarted }) {
   const [visibleSections, setVisibleSections] = useState(new Set());
   const [activeFeature, setActiveFeature] = useState(0);
   const [statAnimated, setStatAnimated] = useState(false);
+  const [dbStats, setDbStats] = useState({ returned: 0, users: 0, successRate: 0 });
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { count: usersCount } = await supabase.from('profiles').select('*', {count: 'exact', head: true});
+        const { count: totalItems } = await supabase.from('items').select('*', {count: 'exact', head: true});
+        const { count: returnedItems } = await supabase.from('items').select('*', {count: 'exact', head: true}).eq('status', 'deleted');
+        
+        let rate = 0;
+        if (totalItems && totalItems > 0) {
+          rate = Math.round(((returnedItems || 0) / totalItems) * 100);
+        }
+
+        setDbStats({
+          returned: returnedItems || 0,
+          users: usersCount || 0,
+          successRate: rate
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -77,9 +103,9 @@ export default function LandingPage({ onGetStarted }) {
   ];
 
   const stats = [
-    { value: 150, suffix: '+', label: 'Barang Dipulangkan', icon: <CheckCircle size={20} /> },
-    { value: 500, suffix: '+', label: 'Pengguna Aktif', icon: <Users size={20} /> },
-    { value: 98, suffix: '%', label: 'Kadar Kejayaan', icon: <Star size={20} /> },
+    { value: dbStats.returned, suffix: '', label: 'Barang Dipulangkan', icon: <CheckCircle size={20} /> },
+    { value: dbStats.users, suffix: '', label: 'Pengguna Aktif', icon: <Users size={20} /> },
+    { value: dbStats.successRate, suffix: '%', label: 'Kadar Kejayaan', icon: <Star size={20} /> },
     { value: 24, suffix: '/7', label: 'Sokongan Aktif', icon: <Clock size={20} /> },
   ];
 
