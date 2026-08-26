@@ -10,11 +10,21 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Handle remember me storage
+      if (!rememberMe) {
+        localStorage.setItem('rememberMe', 'false');
+        sessionStorage.setItem('tempSession', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+        sessionStorage.removeItem('tempSession');
+      }
+
       // Normal Supabase Authentication
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -99,7 +109,21 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
               </button>
             </div>
           </div>
-          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <input 
+              type="checkbox" 
+              id="rememberMe" 
+              checked={rememberMe} 
+              onChange={(e) => setRememberMe(e.target.checked)} 
+              style={{ cursor: 'pointer' }}
+            />
+            <label htmlFor="rememberMe" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              Kekal log masuk (Stay signed in)
+            </label>
+          </div>
+
+          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '0.5rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
             {loading ? (t ? t('loading') || 'Loading...' : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
           </button>
         </form>

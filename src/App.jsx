@@ -172,8 +172,19 @@ export default function App() {
   }, []);
 
   const checkUser = async () => {
+    const rememberMe = localStorage.getItem('rememberMe');
+    const tempSession = sessionStorage.getItem('tempSession');
+
     const { data: { session } } = await supabase.auth.getSession();
+    
     if (session?.user) {
+      if (rememberMe === 'false' && tempSession !== 'true') {
+        // User closed browser/tab, so we don't remember them
+        await supabase.auth.signOut();
+        localStorage.removeItem('rememberMe');
+        return;
+      }
+
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
       if (profile && profile.status === 'Suspended') {
         await supabase.auth.signOut();
