@@ -250,7 +250,7 @@ export default function App() {
               <MessageSquare size={20} /> 
               <span style={{ flex: 1 }}>{t('messages')}</span>
               {totalUnreadMessages > 0 && (
-                <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px' }}>
+                <span style={{ background: '#25D366', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '20px', height: '20px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px' }}>
                   {totalUnreadMessages}
                 </span>
               )}
