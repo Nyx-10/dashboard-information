@@ -166,8 +166,27 @@ export default function App() {
       setShowLanding(false);
       setIsAuthenticated(false);
       setAuthMode('reset-password');
+    } else {
+      checkUser();
     }
   }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      if (profile && profile.status === 'Suspended') {
+        await supabase.auth.signOut();
+        return;
+      }
+      let role = profile?.role || session.user.user_metadata?.role || 'user';
+      let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      
+      setUser({ id: session.user.id, email: session.user.email, role, name });
+      setIsAuthenticated(true);
+      setShowLanding(false);
+    }
+  };
 
   if (showLanding) {
     return (
