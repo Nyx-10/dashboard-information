@@ -129,6 +129,17 @@ export function MessagesView({ initialChatUser }) {
     }
   }, [activeChat, currentUserId]);
 
+  useEffect(() => {
+    if (activeChat) {
+      setChats(prev => {
+        if (prev.some(c => c.id === activeChat && c.unreadCount > 0)) {
+          return prev.map(c => c.id === activeChat ? { ...c, unreadCount: 0 } : c);
+        }
+        return prev;
+      });
+    }
+  }, [activeChat, chats]);
+
   const fetchMessages = async (userId, otherUserId) => {
     // 1. Mark semue mesej dari otherUserId sebagai 'read'
     await supabase.from('messages')
@@ -314,7 +325,7 @@ export function MessagesView({ initialChatUser }) {
                     <p style={{ fontSize: '0.875rem', color: chat.unreadCount > 0 ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: chat.unreadCount > 0 ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
                       {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
                     </p>
-                    {chat.unreadCount > 0 && (
+                    {chat.unreadCount > 0 && chat.id !== activeChat && (
                       <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', marginLeft: '8px' }}>
                         {chat.unreadCount}
                       </span>
