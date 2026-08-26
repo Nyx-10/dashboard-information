@@ -60,7 +60,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
 
       onLogin({ id: data.user.id, email, role, name });
     } catch (err) {
-      alert(err.message || 'Login failed. Sila pastikan email dan password betul.');
+      alert(err.message || (t ? t('loginFailed') : 'Login failed. Sila pastikan email dan password betul.'));
     } finally {
       setLoading(false);
     }
@@ -119,12 +119,12 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
               style={{ cursor: 'pointer' }}
             />
             <label htmlFor="rememberMe" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
-              Kekal log masuk (Stay signed in)
+              {t ? t('staySignedIn') : 'Stay signed in'}
             </label>
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '0.5rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
-            {loading ? (t ? t('loading') || 'Loading...' : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
+            {loading ? (t ? t('loading') : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
           </button>
         </form>
         

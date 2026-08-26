@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Users, FileText, CheckCircle, Activity, Clock, User, Shield } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-
+import { LanguageContext } from '../context/LanguageContext';
 export const AdminAnalyticsView = () => {
+  const { t } = useContext(LanguageContext);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalReports: 0,
@@ -45,17 +46,17 @@ export const AdminAnalyticsView = () => {
   };
 
   const statCards = [
-    { label: 'Jumlah Pengguna', value: stats.totalUsers, icon: <Users size={24} color="#3B82F6" /> },
-    { label: 'Jumlah Laporan', value: stats.totalReports, icon: <FileText size={24} color="#8B5CF6" /> },
-    { label: 'Kadar Selesai', value: stats.resolutionRate, icon: <CheckCircle size={24} color="#10B981" /> },
-    { label: 'Akaun Aktif', value: stats.activeUsers, icon: <Activity size={24} color="#F59E0B" /> },
+    { label: t('totalUsers'), value: stats.totalUsers, icon: <Users size={24} color="#3B82F6" /> },
+    { label: t('totalReports'), value: stats.totalReports, icon: <FileText size={24} color="#8B5CF6" /> },
+    { label: t('resolutionRate'), value: stats.resolutionRate, icon: <CheckCircle size={24} color="#10B981" /> },
+    { label: t('activeAccounts'), value: stats.activeUsers, icon: <Activity size={24} color="#F59E0B" /> },
   ];
 
   return (
     <div className="page-bg-common bg-admin-analytics">
       <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Analytics Overview</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Pantau statistik sistem anda secara langsung dari pangkalan data.</p>
+        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('analyticsOverview')}</h2>
+        <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats')}</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
@@ -76,6 +77,7 @@ export const AdminAnalyticsView = () => {
 };
 
 export const AdminAuditLogsView = () => {
+  const { t } = useContext(LanguageContext);
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
@@ -109,8 +111,8 @@ export const AdminAuditLogsView = () => {
     <div className="page-bg-common bg-admin-logs">
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>System Audit Logs</h2>
-          <p style={{ color: 'var(--text-muted)' }}>Rekod tindakan pentadbir dan sistem.</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('systemAuditLogs')}</h2>
+          <p style={{ color: 'var(--text-muted)' }}>{t('adminActionRecords')}</p>
         </div>
         <button className="btn-primary" onClick={() => {
           const csvHeader = 'Action Performed,User / Source,Timestamp\n';
@@ -125,21 +127,21 @@ export const AdminAuditLogsView = () => {
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
-        }}>Export Logs</button>
+        }}>{t('exportLogs')}</button>
       </div>
 
       <div className="glass-panel" style={{ overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Tindakan (Action)</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>E-mel Pengguna</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Masa</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('action')}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('userEmail')}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>{t('time')}</th>
             </tr>
           </thead>
           <tbody>
             {logs.length === 0 ? (
-               <tr><td colSpan="3" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Tiada rekod log buat masa ini. (Sila tambah table 'audit_logs')</td></tr>
+               <tr><td colSpan="3" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noLogRecords')}</td></tr>
             ) : logs.map((log, index) => (
               <tr key={log.id} style={{ borderBottom: index === logs.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)' }}>
