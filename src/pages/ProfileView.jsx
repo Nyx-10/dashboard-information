@@ -60,7 +60,7 @@ export function ProfileView({ onContact, currentUser }) {
       setUserItems(userItems.filter(item => item.id !== itemId));
     } catch (error) {
       console.error('Error deleting item:', error.message);
-      alert('Failed to delete item.');
+      alert(t('alertFailedDelete'));
     }
   };
 

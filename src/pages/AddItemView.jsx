@@ -42,11 +42,11 @@ export function AddItemView({ onSuccess }) {
 
   const handleFile = (file) => {
     if (!file.type.startsWith('image/')) {
-      alert('Sila muat naik fail gambar sahaja / Please upload image files only.');
+      alert(t('alertInvalidFile'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('Saiz gambar terlalu besar! Had maksimum ialah 5MB. / File size exceeds 5MB limit.');
+      alert(t('alertFileSize'));
       return;
     }
     setPhoto(file);

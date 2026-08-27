@@ -47,7 +47,7 @@ export function SignupView({ onSignup, onSwitch }) {
       }
       
       setShowOtpInput(true);
-      alert('Sila semak e-mel anda untuk mendapatkan kod OTP (6 digit).');
+      alert(t('alertOtpSent'));
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {

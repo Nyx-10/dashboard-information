@@ -43,7 +43,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
       // Check if user is suspended
       if (profile && profile.status === 'Suspended') {
         await supabase.auth.signOut();
-        throw new Error("Akaun anda telah digantung oleh Admin.");
+        throw new Error(t('accountSuspended'));
       }
       
       let role = profile?.role || data.user.user_metadata?.role || 'user';

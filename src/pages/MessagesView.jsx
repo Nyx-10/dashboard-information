@@ -190,7 +190,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
       alert(t('alertSuccessAdd') || 'Report submitted successfully.');
     } catch (err) {
       console.error(err);
-      alert('Failed to submit report: ' + err.message);
+      alert(t('alertFailedReport') + err.message);
     }
     setShowReportMenu(false);
     setShowOtherInput(false);
@@ -241,7 +241,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       if (error) throw error;
     } catch (error) {
-      alert('Failed to upload image: ' + error.message);
+      alert(t('alertFailedUpload') + error.message);
     } finally {
       setUploadingImage(false);
       e.target.value = null; // Reset input
@@ -282,7 +282,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
       
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message: ' + error.message);
+      alert(t('alertFailedSendMsg') + error.message);
     }
   };
 

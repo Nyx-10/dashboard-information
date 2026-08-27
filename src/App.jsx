@@ -86,7 +86,7 @@ export default function App() {
         try {
           const { data, error } = await supabase.from('profiles').select('status').eq('id', user.id).single();
           if (data && data.status === 'Suspended') {
-            alert('Akaun anda telah digantung oleh Admin.');
+            alert(t('accountSuspended'));
             supabase.auth.signOut();
             setIsAuthenticated(false);
             setUser(null);

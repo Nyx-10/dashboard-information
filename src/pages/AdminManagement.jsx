@@ -108,7 +108,7 @@ export const AdminUsersView = ({ currentUser }) => {
         logAction(`Menukar pangkat pengguna (${updatedUser.email}) kepada ${newRole}`);
       }
     } catch (e) {
-      alert("Failed to update role: " + e.message);
+      alert(t('alertFailedUpdateRole') + e.message);
       fetchUsers(); // revert
     }
   };
@@ -122,14 +122,14 @@ export const AdminUsersView = ({ currentUser }) => {
       
       logAction(`Menukar status pengguna (${user.email}) kepada ${newStatus}`);
     } catch (e) {
-      alert("Failed to suspend/activate user: " + e.message);
+      alert(t('alertFailedSuspend') + e.message);
       fetchUsers(); // revert
     }
   };
 
   const handleDeleteUser = async (userId) => {
     const userToDelete = users.find(u => u.id === userId);
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    if (!window.confirm(t('confirmDeleteUser'))) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
@@ -139,7 +139,7 @@ export const AdminUsersView = ({ currentUser }) => {
         logAction(`Memadam pengguna (${userToDelete.email})`);
       }
     } catch (e) {
-      alert("Failed to delete user: " + e.message);
+      alert(t('alertFailedDelete') + e.message);
       fetchUsers(); // revert
     }
   };
@@ -299,7 +299,7 @@ export const AdminReportsView = ({ currentUser }) => {
       
       fetchReports();
     } catch (e) {
-      alert("Failed to update status: " + e.message);
+      alert(t('alertFailedUpdateStatus') + e.message);
     }
   };
 
