@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { LanguageContext } from '../context/LanguageContext';
 const mockUsers = [
   { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'Admin', status: 'Active' },
   { id: 2, name: 'Bob Jones', email: 'bob@example.com', role: 'User', status: 'Active' },
@@ -36,6 +37,7 @@ const badgeStyle = (status) => {
 };
 
 export const AdminUsersView = ({ currentUser }) => {
+  const { t } = useContext(LanguageContext);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -163,14 +165,14 @@ export const AdminUsersView = ({ currentUser }) => {
   return (
     <div className="page-bg-common bg-admin-users">
       <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>User Management</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Manage registered users and their roles.</p>
+        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('userManagementTitle') || 'User Management'}</h2>
+        <p style={{ color: 'var(--text-muted)' }}>{t('userManagementDesc') || 'Manage registered users and their roles.'}</p>
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
         {roles.map(role => (
           <div key={role} className="glass-panel" style={{ flex: '1 1 200px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '0.75rem' }}>
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total {role}s</span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>{t('total') || 'Total'} {role}s</span>
             <span style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)' }}>{roleCounts[role]}</span>
           </div>
         ))}
@@ -180,7 +182,7 @@ export const AdminUsersView = ({ currentUser }) => {
         <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
         <input 
           type="text" 
-          placeholder="Search by name..." 
+          placeholder={t('searchByName') || 'Search by name...'} 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', outline: 'none' }}
@@ -191,16 +193,16 @@ export const AdminUsersView = ({ currentUser }) => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Name</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Email</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Role</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Status</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('nameLabel') || 'Name'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('email') || 'Email'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('roleLabel') || 'Role'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('status') || 'Status'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>{t('actions') || 'Actions'}</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.length === 0 ? (
-               <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No users found.</td></tr>
+               <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noUsersFound') || 'No users found.'}</td></tr>
             ) : filteredUsers.map((user, index) => {
               const canEdit = canModifyUser(user);
               return (
@@ -226,16 +228,16 @@ export const AdminUsersView = ({ currentUser }) => {
                       cursor: canEdit ? 'pointer' : 'not-allowed',
                       outline: 'none',
                     }}
-                    title="Change Role"
+                    title={t('changeRole') || 'Change Role'}
                   >
                     <option value="User">User</option>
                     <option value="Admin">Admin</option>
                     {currentUser?.role === 'superadmin' && <option value="Super Admin">Super Admin</option>}
                   </select>
-                  <button onClick={() => handleToggleSuspend(user)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={user.status === 'Suspended' ? 'Activate' : 'Suspend'}>
+                  <button onClick={() => handleToggleSuspend(user)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={user.status === 'Suspended' ? (t('activate') || 'Activate') : (t('suspend') || 'Suspend')}>
                     {user.status === 'Suspended' ? <CheckCircle size={18} /> : <UserX size={18} />}
                   </button>
-                  <button onClick={() => handleDeleteUser(user.id)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canEdit ? 'pointer' : 'not-allowed' }} title="Delete">
+                  <button onClick={() => handleDeleteUser(user.id)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={t('deleteBtn') || 'Delete'}>
                     <Trash2 size={18} />
                   </button>
                 </td>
@@ -249,6 +251,7 @@ export const AdminUsersView = ({ currentUser }) => {
 };
 
 export const AdminReportsView = ({ currentUser }) => {
+  const { t } = useContext(LanguageContext);
   const [reports, setReports] = useState([]);
   
   useEffect(() => {
@@ -306,23 +309,23 @@ export const AdminReportsView = ({ currentUser }) => {
   return (
     <div className="page-bg-common bg-admin-reports">
       <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Report Management</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Approve, reject, or resolve user reports.</p>
+        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('reportManagementTitle') || 'Report Management'}</h2>
+        <p style={{ color: 'var(--text-muted)' }}>{t('reportManagementDesc') || 'Approve, reject, or resolve user reports.'}</p>
       </div>
 
       <div className="glass-panel" style={{ overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Report Details</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Report Type</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>Status</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('reportDetails') || 'Report Details'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('reportType') || 'Report Type'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('status') || 'Status'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>{t('actions') || 'Actions'}</th>
             </tr>
           </thead>
           <tbody>
             {reports.length === 0 ? (
-               <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No reports found.</td></tr>
+               <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noReportsFound') || 'No reports found.'}</td></tr>
             ) : reports.map((report, index) => (
               <tr key={report.id} style={{ borderBottom: index === reports.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{report.itemName}</td>
@@ -331,10 +334,10 @@ export const AdminReportsView = ({ currentUser }) => {
                   <span style={badgeStyle(report.status)}>{report.status}</span>
                 </td>
                 <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                  <button onClick={() => updateReportStatus(report.id, 'Resolved')} style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', marginRight: '1rem' }} title="Resolve">
+                  <button onClick={() => updateReportStatus(report.id, 'Resolved')} style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', marginRight: '1rem' }} title={t('resolve') || 'Resolve'}>
                     <CheckCircle size={18} />
                   </button>
-                  <button onClick={() => updateReportStatus(report.id, 'Rejected')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title="Reject">
+                  <button onClick={() => updateReportStatus(report.id, 'Rejected')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }} title={t('reject') || 'Reject'}>
                     <XCircle size={18} />
                   </button>
                 </td>
