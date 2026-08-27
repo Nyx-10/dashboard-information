@@ -3,7 +3,7 @@ import { Search, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
-export function MessagesView({ initialChatUser, onMessagesRead }) {
+export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = new Set() }) {
   const { t } = useContext(LanguageContext);
   const [showReportMenu, setShowReportMenu] = useState(false);
   const [showOtherInput, setShowOtherInput] = useState(false);
@@ -316,7 +316,12 @@ export function MessagesView({ initialChatUser, onMessagesRead }) {
                   gap: '1rem'
                 }}
               >
-                <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                <div style={{ position: 'relative' }}>
+                  <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                  {onlineUsers.has(chat.id) && (
+                    <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#10B981', border: '2px solid var(--surface)', borderRadius: '50%' }}></span>
+                  )}
+                </div>
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', alignItems: 'center' }}>
                     <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{chat.name}</span>
@@ -353,7 +358,15 @@ export function MessagesView({ initialChatUser, onMessagesRead }) {
                 <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>{t('online')}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ 
+                      width: '8px', height: '8px', borderRadius: '50%', 
+                      background: onlineUsers.has(activeChatData.id) ? '#10B981' : '#9CA3AF' 
+                    }}></span>
+                    <span style={{ fontSize: '0.75rem', color: onlineUsers.has(activeChatData.id) ? '#10B981' : 'var(--text-muted)' }}>
+                      {onlineUsers.has(activeChatData.id) ? (t('online') === 'online' ? 'Online' : t('online')) : (t('offline') === 'offline' ? 'Offline' : t('offline'))}
+                    </span>
+                  </div>
                 </div>
               </div>
               <div style={{ position: 'relative' }}>

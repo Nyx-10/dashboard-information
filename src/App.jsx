@@ -36,6 +36,7 @@ export default function App() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
@@ -73,9 +74,29 @@ export default function App() {
         }
       }, 10000); // Semak setiap 10 saat
 
+      const presenceChannel = supabase.channel('online-users', {
+        config: {
+          presence: {
+            key: user.id,
+          },
+        },
+      });
+
+      presenceChannel
+        .on('presence', { event: 'sync' }, () => {
+          const state = presenceChannel.presenceState();
+          setOnlineUsers(new Set(Object.keys(state)));
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await presenceChannel.track({ online_at: new Date().toISOString() });
+          }
+        });
+
       return () => {
         supabase.removeChannel(itemsChannel);
         supabase.removeChannel(messagesChannel);
+        supabase.removeChannel(presenceChannel);
         clearInterval(checkStatusInterval);
       };
     }
@@ -245,7 +266,7 @@ export default function App() {
       case 'add':
         return <AddItemView onSuccess={() => setActiveTab('home')} />;
       case 'messages':
-        return <MessagesView initialChatUser={activeChatUser} onMessagesRead={fetchTotalUnreadMessages} />;
+        return <MessagesView initialChatUser={activeChatUser} onMessagesRead={fetchTotalUnreadMessages} onlineUsers={onlineUsers} />;
       case 'profile':
         return <ProfileView onContact={handleContact} currentUser={user} />;
       default:
