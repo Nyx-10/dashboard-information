@@ -10,7 +10,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
