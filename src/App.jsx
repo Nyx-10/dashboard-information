@@ -22,13 +22,21 @@ import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [lang, setLang] = useState('en');
   const t = (key) => dict[lang][key] || key;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [user, setUser] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('lastActiveTab') || 'home';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('lastActiveTab', activeTab);
+  }, [activeTab]);
+
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
@@ -187,38 +195,53 @@ export default function App() {
       setShowLanding(false);
       setIsAuthenticated(false);
       setAuthMode('reset-password');
+      setIsCheckingAuth(false);
     } else {
       checkUser();
     }
   }, []);
 
   const checkUser = async () => {
-    const rememberMe = localStorage.getItem('rememberMe');
-    const tempSession = sessionStorage.getItem('tempSession');
+    try {
+      const rememberMe = localStorage.getItem('rememberMe');
+      const tempSession = sessionStorage.getItem('tempSession');
 
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session?.user) {
-      if (rememberMe === 'false' && tempSession !== 'true') {
-        // User closed browser/tab, so we don't remember them
-        await supabase.auth.signOut();
-        localStorage.removeItem('rememberMe');
-        return;
-      }
-
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-      if (profile && profile.status === 'Suspended') {
-        await supabase.auth.signOut();
-        return;
-      }
-      let role = profile?.role || session.user.user_metadata?.role || 'user';
-      let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      const { data: { session } } = await supabase.auth.getSession();
       
-      setUser({ id: session.user.id, email: session.user.email, role, name });
-      setIsAuthenticated(true);
-      setShowLanding(false);
+      if (session?.user) {
+        if (rememberMe === 'false' && tempSession !== 'true') {
+          // User closed browser/tab, so we don't remember them
+          await supabase.auth.signOut();
+          localStorage.removeItem('rememberMe');
+          return;
+        }
+
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        if (profile && profile.status === 'Suspended') {
+          await supabase.auth.signOut();
+          return;
+        }
+        let role = profile?.role || session.user.user_metadata?.role || 'user';
+        let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+        
+        setUser({ id: session.user.id, email: session.user.email, role, name });
+        setIsAuthenticated(true);
+        setShowLanding(false);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsCheckingAuth(false);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)' }}>
+        <div className="spinner" style={{ width: '40px', height: '40px', borderColor: 'rgba(79, 70, 229, 0.3)', borderLeftColor: 'var(--primary)' }}></div>
+      </div>
+    );
+  }
 
   if (showLanding) {
     return (
@@ -439,7 +462,7 @@ export default function App() {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t('logoutMsg')}</p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button className="btn-primary" style={{ background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.75rem 2rem' }} onClick={() => setShowLogoutModal(false)}>{t('cancel')}</button>
-              <button className="btn-primary" style={{ background: '#EF4444', padding: '0.75rem 2rem' }} onClick={() => { setShowLogoutModal(false); setIsAuthenticated(false); setUser(null); }}>{t('logout')}</button>
+              <button className="btn-primary" style={{ background: '#EF4444', padding: '0.75rem 2rem' }} onClick={() => { setShowLogoutModal(false); setIsAuthenticated(false); setUser(null); setActiveTab('home'); localStorage.removeItem('lastActiveTab'); }}>{t('logout')}</button>
             </div>
           </div>
         </div>
