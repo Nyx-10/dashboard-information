@@ -91,7 +91,10 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
   useEffect(() => {
     if (initialChatUser && currentUserId) {
-      if (initialChatUser.id === currentUserId) return;
+      if (initialChatUser.id === currentUserId) {
+        if (activeChat === currentUserId) setActiveChat(null);
+        return;
+      }
       setActiveChat(initialChatUser.id);
       if (initialChatUser.preview && initialChatUser.preview !== '...') {
         setNewMessage(`[ ${initialChatUser.preview} ] - `);
@@ -197,6 +200,10 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !activeChat || !currentUserId) return;
+    if (activeChat === currentUserId) {
+      alert(t('cannotContactSelf') || 'You cannot contact yourself.');
+      return;
+    }
 
     if (!file.type.startsWith('image/')) {
       alert(t('alertInvalidFile') || 'Please upload image files only.');
@@ -244,6 +251,10 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !activeChat || !currentUserId) return;
+    if (activeChat === currentUserId) {
+      alert(t('cannotContactSelf') || 'You cannot contact yourself.');
+      return;
+    }
 
     const messageContent = newMessage;
     setNewMessage('');
