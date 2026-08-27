@@ -60,6 +60,17 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
+  
+  const [lastSeenNotifTime, setLastSeenNotifTime] = useState(0);
+
+  useEffect(() => {
+    if (user?.id) {
+      const time = parseInt(localStorage.getItem('lastSeenNotifTime_' + user.id) || '0', 10);
+      setLastSeenNotifTime(time);
+    }
+  }, [user?.id]);
+
+  const hasUnreadNotifications = notifications.some(n => new Date(n.created_at).getTime() > lastSeenNotifTime);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
@@ -391,9 +402,16 @@ export default function App() {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <div style={{ position: 'relative' }}>
-              <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => setShowNotifications(!showNotifications)}>
+              <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => {
+                setShowNotifications(!showNotifications);
+                if (!showNotifications && user?.id) {
+                  const now = Date.now();
+                  setLastSeenNotifTime(now);
+                  localStorage.setItem('lastSeenNotifTime_' + user.id, now.toString());
+                }
+              }}>
                 <Bell size={24} />
-                {notifications.length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
+                {hasUnreadNotifications && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
               </button>
               {showNotifications && (
                 <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '110%', width: '340px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
