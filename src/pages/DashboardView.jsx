@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
-import { ItemCard } from '../components/ItemCard';
 import { supabase } from '../supabaseClient';
 
 export function DashboardView({ onContact, currentUser }) {
@@ -86,9 +85,9 @@ export function DashboardView({ onContact, currentUser }) {
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-main)' }}>{t('recentlyReported')}</h2>
             {reportItems.length > 0 ? (
-              <div className="grid-cards">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {reportItems.map(item => (
-                  <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
                 ))}
               </div>
             ) : (
