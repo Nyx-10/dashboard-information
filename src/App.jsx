@@ -462,7 +462,17 @@ export default function App() {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t('logoutMsg')}</p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button className="btn-primary" style={{ background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.75rem 2rem' }} onClick={() => setShowLogoutModal(false)}>{t('cancel')}</button>
-              <button className="btn-primary" style={{ background: '#EF4444', padding: '0.75rem 2rem' }} onClick={() => { setShowLogoutModal(false); setIsAuthenticated(false); setUser(null); setActiveTab('home'); localStorage.removeItem('lastActiveTab'); }}>{t('logout')}</button>
+              <button className="btn-primary" style={{ background: '#EF4444', padding: '0.75rem 2rem' }} onClick={async () => { 
+                await supabase.auth.signOut();
+                setShowLogoutModal(false); 
+                setIsAuthenticated(false); 
+                setUser(null); 
+                setActiveTab('home'); 
+                localStorage.removeItem('lastActiveTab'); 
+                sessionStorage.removeItem('tempSession');
+                localStorage.removeItem('rememberMe');
+                setShowLanding(true);
+              }}>{t('logout')}</button>
             </div>
           </div>
         </div>
