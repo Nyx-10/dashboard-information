@@ -134,10 +134,6 @@ export const AdminUsersView = ({ currentUser }) => {
     if (!window.confirm(t('confirmDeleteUser'))) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
-      await supabase.from('user_reports').delete().or(`reporter_id.eq.${userId},reported_id.eq.${userId}`);
-      await supabase.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
-      await supabase.from('items').delete().eq('user_id', userId);
-
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
       
