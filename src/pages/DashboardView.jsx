@@ -41,6 +41,19 @@ export function DashboardView({ onContact, currentUser }) {
     }
   }
 
+  const handleDelete = async (itemId) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      try {
+        const { error } = await supabase.from('items').update({ status: 'deleted' }).eq('id', itemId);
+        if (error) throw error;
+        alert(t('alertSuccessDelete') || 'Successfully deleted!');
+        fetchItems();
+      } catch (err) {
+        alert((t('alertFailedDelete') || 'Failed to delete: ') + err.message);
+      }
+    }
+  };
+
   const infoItems = items.filter(item => item.type === 'info').slice(0, 8);
   const reportItems = items.filter(item => item.type !== 'info').slice(0, 8);
 
@@ -62,7 +75,7 @@ export function DashboardView({ onContact, currentUser }) {
             {infoItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {infoItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
                 ))}
               </div>
             ) : (
@@ -75,7 +88,7 @@ export function DashboardView({ onContact, currentUser }) {
             {reportItems.length > 0 ? (
               <div className="grid-cards">
                 {reportItems.map(item => (
-                  <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
+                  <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
                 ))}
               </div>
             ) : (

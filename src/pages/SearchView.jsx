@@ -43,6 +43,19 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
     }
   }
 
+  const handleDelete = async (itemId) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      try {
+        const { error } = await supabase.from('items').update({ status: 'deleted' }).eq('id', itemId);
+        if (error) throw error;
+        alert(t('alertSuccessDelete') || 'Successfully deleted!');
+        fetchItems();
+      } catch (err) {
+        alert((t('alertFailedDelete') || 'Failed to delete: ') + err.message);
+      }
+    }
+  };
+
   const filtered = items.filter(item => {
     const queryStr = query ? query.toLowerCase() : '';
     const dynamicTitle = item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title;
@@ -96,7 +109,7 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
       ) : (
         <div className="grid-cards">
           {filtered.map(item => (
-            <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} />
+            <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
           ))}
         </div>
       )}

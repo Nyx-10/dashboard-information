@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { MapPin, Calendar, MessageSquare } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
-export function ItemCard({ item, onContact, currentUser }) {
+export function ItemCard({ item, onContact, currentUser, onDelete }) {
   const { t } = useContext(LanguageContext);
   const currentUserId = currentUser ? currentUser.id : null;
 
@@ -36,6 +36,12 @@ export function ItemCard({ item, onContact, currentUser }) {
           {item.type !== 'info' && currentUserId && item.created_by !== currentUserId && (
             <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => { if (onContact) onContact(item.created_by, item.title); else alert(t('messagingComingSoon')); }}>
               <MessageSquare size={16} /> {t('contactReporter')}
+            </button>
+          )}
+          {onDelete && currentUser && (item.created_by === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'superadmin') && (
+            <button className="btn-primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', background: '#fee2e2', color: '#ef4444', border: '1px solid #f87171', cursor: 'pointer', marginTop: '0.5rem' }} onClick={() => onDelete(item.id)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              {t('deleteBtn') || 'Delete'}
             </button>
           )}
         </div>

@@ -37,7 +37,7 @@ export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
             </button>
         )}
 
-        {onDelete && currentUserId && item.created_by === currentUserId && (
+        {onDelete && currentUser && (item.created_by === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'superadmin') && (
             <button className="btn-primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', background: '#fee2e2', color: '#ef4444', border: '1px solid #f87171', cursor: 'pointer', marginTop: '0.25rem' }} onClick={() => onDelete(item.id)}>
               <Trash2 size={12} />
               {t('deleteBtn')}
