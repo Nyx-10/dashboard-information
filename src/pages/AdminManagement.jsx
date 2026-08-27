@@ -134,11 +134,19 @@ export const AdminUsersView = ({ currentUser }) => {
     if (!window.confirm(t('confirmDeleteUser'))) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
-      const { error } = await supabase.from('profiles').delete().eq('id', userId);
-      if (error) throw error;
+      // Panggil fungsi RPC untuk padam pengguna dari auth.users sepenuhnya
+      const { error } = await supabase.rpc('delete_user_completely', { target_user_id: userId });
+      
+      // Fallback jika RPC tidak dijumpai (contoh: belum setup SQL)
+      if (error && error.message.includes('function delete_user_completely does not exist')) {
+         const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+         if (profileError) throw profileError;
+      } else if (error) {
+         throw error;
+      }
       
       if (userToDelete) {
-        logAction(`Memadam pengguna (${userToDelete.email})`);
+        logAction(`Memadam pengguna sepenuhnya (${userToDelete.email})`);
       }
     } catch (e) {
       alert(t('alertFailedDelete') + e.message);
