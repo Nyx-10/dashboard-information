@@ -21,12 +21,27 @@ import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
 export default function App() {
-  const [showLanding, setShowLanding] = useState(true);
+  const [showLanding, setShowLanding] = useState(() => {
+    return sessionStorage.getItem('showLanding') !== 'false';
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('showLanding', showLanding);
+  }, [showLanding]);
+
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [lang, setLang] = useState('en');
   const t = (key) => dict[lang][key] || key;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
+  
+  const [authMode, setAuthMode] = useState(() => {
+    return sessionStorage.getItem('authMode') || 'login';
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('authMode', authMode);
+  }, [authMode]);
+
   const [user, setUser] = useState(null);
 
   const [activeTab, setActiveTab] = useState(() => {
