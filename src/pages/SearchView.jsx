@@ -109,7 +109,7 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
       ) : (
         <div className="grid-cards">
           {filtered.map(item => (
-            <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} />
+            <ItemCard key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={(currentUser?.role === 'admin' || currentUser?.role === 'superadmin') ? handleDelete : undefined} />
           ))}
         </div>
       )}
