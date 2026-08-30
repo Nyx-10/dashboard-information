@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import './index.css';
 import { Sidebar } from './components/Sidebar';
@@ -19,6 +20,7 @@ import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
 export default function App() {
+  const navigate = useNavigate();
   const [showLanding, setShowLanding] = useState(() => {
     return sessionStorage.getItem('showLanding') !== 'false';
   });
@@ -41,14 +43,6 @@ export default function App() {
   }, [authMode]);
 
   const [user, setUser] = useState(null);
-
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('lastActiveTab') || 'home';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('lastActiveTab', activeTab);
-  }, [activeTab]);
 
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,7 +201,7 @@ export default function App() {
       name: name,
       preview: `Item: ${title}`
     });
-    setActiveTab('messages');
+    navigate('/messages');
   };
 
   useEffect(() => {
@@ -275,14 +269,14 @@ export default function App() {
   if (!isAuthenticated) {
     let authContent;
     if (authMode === 'login') {
-      authContent = <LoginView onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); }} onSwitch={() => setAuthMode('signup')} onForgotPassword={() => setAuthMode('forgot-password')} onBackToHome={() => setShowLanding(true)} />;
+      authContent = <LoginView onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} onSwitch={() => setAuthMode('signup')} onForgotPassword={() => setAuthMode('forgot-password')} onBackToHome={() => setShowLanding(true)} />;
     } else if (authMode === 'signup') {
-      authContent = <SignupView onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); }} onSwitch={() => setAuthMode('login')} />;
+      authContent = <SignupView onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} onSwitch={() => setAuthMode('login')} />;
     } else if (authMode === 'forgot-password') {
       authContent = <ForgotPasswordView onSwitchBack={() => setAuthMode('login')} />;
     } else if (authMode === 'reset-password') {
       authContent = <ResetPasswordView onBackToLogin={() => {
-        window.history.pushState({}, '', '/');
+        navigate('/');
         setAuthMode('login');
       }} />;
     }
@@ -293,39 +287,12 @@ export default function App() {
     );
   }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return <DashboardView onContact={handleContact} currentUser={user} />;
-      case 'search':
-        return <SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />;
-      case 'admin-analytics':
-        return <AdminAnalyticsView />;
-      case 'admin-users':
-        return <AdminUsersView currentUser={user} />;
-      case 'admin-reports':
-        return <AdminReportsView currentUser={user} />;
-      case 'admin-logs':
-        return <AdminAuditLogsView />;
-      case 'add':
-        return <AddItemView onSuccess={() => setActiveTab('home')} />;
-      case 'messages':
-        return <MessagesView initialChatUser={activeChatUser} onMessagesRead={fetchTotalUnreadMessages} onlineUsers={onlineUsers} />;
-      case 'profile':
-        return <ProfileView onContact={handleContact} currentUser={user} />;
-      default:
-        return <DashboardView onContact={handleContact} currentUser={user} />;
-    }
-  };
-
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
       <div className="app-container">
         {/* Sidebar */}
         <Sidebar 
           sidebarOpen={sidebarOpen}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
           setActiveChatUser={setActiveChatUser}
           totalUnreadMessages={totalUnreadMessages}
           user={user}
@@ -336,8 +303,6 @@ export default function App() {
         <Topbar 
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           showNotifications={showNotifications}
@@ -351,7 +316,18 @@ export default function App() {
         />
 
         <div className="page-content animate-fade-in" onClick={() => showNotifications && setShowNotifications(false)}>
-          {renderContent()}
+          <Routes>
+            <Route path="/home" element={<DashboardView onContact={handleContact} currentUser={user} />} />
+            <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />} />
+            <Route path="/admin-analytics" element={<AdminAnalyticsView />} />
+            <Route path="/admin-users" element={<AdminUsersView currentUser={user} />} />
+            <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
+            <Route path="/admin-logs" element={<AdminAuditLogsView />} />
+            <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
+            <Route path="/messages" element={<MessagesView initialChatUser={activeChatUser} onMessagesRead={fetchTotalUnreadMessages} onlineUsers={onlineUsers} />} />
+            <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
         </div>
       </main>
 
@@ -369,8 +345,7 @@ export default function App() {
                 setShowLogoutModal(false); 
                 setIsAuthenticated(false); 
                 setUser(null); 
-                setActiveTab('home'); 
-                localStorage.removeItem('lastActiveTab'); 
+                navigate('/'); 
                 sessionStorage.removeItem('tempSession');
                 localStorage.removeItem('rememberMe');
                 setShowLanding(true);

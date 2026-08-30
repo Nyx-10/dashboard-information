@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Bell, LogOut, Menu, MessageSquare, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
 export function Topbar({
   sidebarOpen,
   setSidebarOpen,
-  activeTab,
-  setActiveTab,
   searchQuery,
   setSearchQuery,
   showNotifications,
@@ -19,6 +18,10 @@ export function Topbar({
   user
 }) {
   const { t } = useContext(LanguageContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isSearchActive = location.pathname.startsWith('/search');
 
   return (
     <header className="topbar">
@@ -26,7 +29,7 @@ export function Topbar({
         <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.25rem' }} title="Toggle Sidebar">
           <Menu size={24} />
         </button>
-        {activeTab === 'search' ? (
+        {isSearchActive ? (
           <div style={{ position: 'relative', width: '300px' }}>
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
@@ -65,9 +68,9 @@ export function Topbar({
                     <div key={`${item.notifType}-${item.id}`} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { 
                       if (item.notifType === 'message') {
                         setActiveChatUser({ id: item.sender_id, name: item.sender_name, preview: item.content });
-                        setActiveTab('messages');
+                        navigate('/messages');
                       } else {
-                        setActiveTab('home'); 
+                        navigate('/home'); 
                       }
                       setShowNotifications(false); 
                     }}>
@@ -110,7 +113,7 @@ export function Topbar({
         <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#EF4444', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #EF4444', fontSize: '0.8rem', fontWeight: 500 }} onClick={() => setShowLogoutModal(true)}>
           <LogOut size={16} /> {t('logout')}
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => setActiveTab('profile')}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
           <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
