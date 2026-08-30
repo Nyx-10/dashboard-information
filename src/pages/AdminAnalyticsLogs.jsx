@@ -10,10 +10,23 @@ export const AdminAnalyticsView = () => {
     resolutionRate: '0%',
     activeUsers: 0
   });
+  const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
 
   useEffect(() => {
     fetchAnalytics();
+    fetchMaintenanceStatus();
   }, []);
+
+  const fetchMaintenanceStatus = async () => {
+    try {
+      const { data } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+      if (data) {
+        setIsMaintenanceActive(data.is_maintenance_mode);
+      }
+    } catch (err) {
+      console.error('Failed to fetch maintenance status:', err);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -98,10 +111,13 @@ export const AdminAnalyticsView = () => {
       </div>
 
       {/* Maintenance Mode Toggle Section */}
-      <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #F59E0B' }}>
+      <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: `4px solid ${isMaintenanceActive ? '#EF4444' : '#10B981'}`, background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.05)' : 'var(--surface)' }}>
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Shield size={20} color="#F59E0B" /> Mode Penyelenggaraan (Maintenance Mode)
+            <Shield size={20} color={isMaintenanceActive ? '#EF4444' : '#10B981'} /> Mode Penyelenggaraan 
+            <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '1rem', background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: isMaintenanceActive ? '#EF4444' : '#10B981', marginLeft: '0.5rem' }}>
+              {isMaintenanceActive ? 'AKTIF' : 'TIDAK AKTIF'}
+            </span>
           </h3>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
             Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.
@@ -109,18 +125,15 @@ export const AdminAnalyticsView = () => {
         </div>
         <button 
           onClick={async () => {
-            const confirmed = window.confirm("Adakah anda pasti untuk menukar status Maintenance Mode?");
+            const confirmed = window.confirm(`Adakah anda pasti untuk ${isMaintenanceActive ? 'MEMATIKAN' : 'MENGAKTIFKAN'} Maintenance Mode?`);
             if (confirmed) {
               try {
-                const { data, error } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
-                
-                let currentStatus = false;
-                if (data) currentStatus = data.is_maintenance_mode;
-
-                const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: !currentStatus }).eq('id', 1);
+                const newStatus = !isMaintenanceActive;
+                const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: newStatus }).eq('id', 1);
                 if (updateError) throw updateError;
-
-                alert(`Maintenance Mode kini telah ${!currentStatus ? 'DIAKTIFKAN' : 'DIMATIKAN'}.`);
+                
+                setIsMaintenanceActive(newStatus);
+                alert(`Maintenance Mode kini telah ${newStatus ? 'DIAKTIFKAN' : 'DIMATIKAN'}.`);
               } catch (err) {
                 if (err.code === '42P01') {
                    alert("Jadual 'system_settings' belum wujud di Supabase. Sila jalankan skrip SQL terlebih dahulu.");
@@ -131,9 +144,9 @@ export const AdminAnalyticsView = () => {
             }
           }}
           className="btn-primary" 
-          style={{ background: '#F59E0B', padding: '0.75rem 1.5rem', fontWeight: 600 }}
+          style={{ background: isMaintenanceActive ? '#EF4444' : '#10B981', padding: '0.75rem 1.5rem', fontWeight: 600, border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '0.5rem' }}
         >
-           Tukar Status (On/Off)
+           {isMaintenanceActive ? 'Matikan (Off)' : 'Aktifkan (On)'}
         </button>
       </div>
 
