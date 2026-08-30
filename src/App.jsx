@@ -19,6 +19,8 @@ import { SignupView } from './pages/SignupView';
 import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
+import { AppContext } from './context/AppContext';
+
 export default function App() {
   const navigate = useNavigate();
   const [showLanding, setShowLanding] = useState(() => {
@@ -250,6 +252,17 @@ export default function App() {
     }
   };
 
+  const contextValue = {
+    user,
+    notifications,
+    hasUnreadNotifications,
+    totalUnreadMessages,
+    activeChatUser,
+    setActiveChatUser,
+    onlineUsers,
+    setLastSeenNotifTime
+  };
+
   if (isCheckingAuth) {
     return (
       <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)' }}>
@@ -289,14 +302,10 @@ export default function App() {
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
+      <AppContext.Provider value={contextValue}>
       <div className="app-container">
         {/* Sidebar */}
-        <Sidebar 
-          sidebarOpen={sidebarOpen}
-          setActiveChatUser={setActiveChatUser}
-          totalUnreadMessages={totalUnreadMessages}
-          user={user}
-        />
+        <Sidebar sidebarOpen={sidebarOpen} />
 
       {/* Main Content */}
       <main className="main-content">
@@ -307,25 +316,20 @@ export default function App() {
           setSearchQuery={setSearchQuery}
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
-          hasUnreadNotifications={hasUnreadNotifications}
-          setLastSeenNotifTime={setLastSeenNotifTime}
-          notifications={notifications}
-          setActiveChatUser={setActiveChatUser}
           setShowLogoutModal={setShowLogoutModal}
-          user={user}
         />
 
         <div className="page-content animate-fade-in" onClick={() => showNotifications && setShowNotifications(false)}>
           <Routes>
-            <Route path="/home" element={<DashboardView onContact={handleContact} currentUser={user} />} />
-            <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />} />
+            <Route path="/home" element={<DashboardView onContact={handleContact} />} />
+            <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} />} />
             <Route path="/admin-analytics" element={<AdminAnalyticsView />} />
-            <Route path="/admin-users" element={<AdminUsersView currentUser={user} />} />
-            <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
+            <Route path="/admin-users" element={<AdminUsersView />} />
+            <Route path="/admin-reports" element={<AdminReportsView />} />
             <Route path="/admin-logs" element={<AdminAuditLogsView />} />
             <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
-            <Route path="/messages" element={<MessagesView initialChatUser={activeChatUser} onMessagesRead={fetchTotalUnreadMessages} onlineUsers={onlineUsers} />} />
-            <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
+            <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} />} />
+            <Route path="/profile" element={<ProfileView onContact={handleContact} />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </div>
@@ -355,6 +359,7 @@ export default function App() {
         </div>
       )}
     </div>
+    </AppContext.Provider>
     </LanguageContext.Provider>
   );
 }

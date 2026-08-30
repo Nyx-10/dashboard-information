@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Bell, LogOut, Menu, MessageSquare, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
+import { AppContext } from '../context/AppContext';
 
 export function Topbar({
   sidebarOpen,
@@ -10,14 +11,10 @@ export function Topbar({
   setSearchQuery,
   showNotifications,
   setShowNotifications,
-  hasUnreadNotifications,
-  setLastSeenNotifTime,
-  notifications,
-  setActiveChatUser,
-  setShowLogoutModal,
-  user
+  setShowLogoutModal
 }) {
   const { t } = useContext(LanguageContext);
+  const { user, hasUnreadNotifications, setLastSeenNotifTime, notifications, setActiveChatUser } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
 

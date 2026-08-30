@@ -5,14 +5,11 @@ import {
   MessageSquare, Settings, Calendar
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
+import { AppContext } from '../context/AppContext';
 
-export function Sidebar({ 
-  sidebarOpen, 
-  setActiveChatUser, 
-  totalUnreadMessages, 
-  user 
-}) {
+export function Sidebar({ sidebarOpen }) {
   const { t } = useContext(LanguageContext);
+  const { user, setActiveChatUser, totalUnreadMessages } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
 
