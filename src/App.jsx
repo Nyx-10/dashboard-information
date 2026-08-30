@@ -218,8 +218,18 @@ export default function App() {
     }
   }, []);
 
+  const [isMaintenance, setIsMaintenance] = useState(false);
+
   const checkUser = async () => {
     try {
+      // Check maintenance mode first
+      const { data: settings } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+      let maintenanceActive = false;
+      if (settings?.is_maintenance_mode) {
+        maintenanceActive = true;
+        setIsMaintenance(true);
+      }
+
       const rememberMe = localStorage.getItem('rememberMe');
       const tempSession = sessionStorage.getItem('tempSession');
 
@@ -227,7 +237,6 @@ export default function App() {
       
       if (session?.user) {
         if (rememberMe === 'false' && tempSession !== 'true') {
-          // User closed browser/tab, so we don't remember them
           await supabase.auth.signOut();
           localStorage.removeItem('rememberMe');
           return;
@@ -241,6 +250,13 @@ export default function App() {
         let role = profile?.role || session.user.user_metadata?.role || 'user';
         let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
         
+        // If maintenance is active and user is not admin, sign them out
+        if (maintenanceActive && role !== 'admin' && role !== 'superadmin') {
+          await supabase.auth.signOut();
+          setIsMaintenance(true);
+          return;
+        }
+
         setUser({ id: session.user.id, email: session.user.email, role, name });
         setIsAuthenticated(true);
         setShowLanding(false);
@@ -267,6 +283,18 @@ export default function App() {
     return (
       <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)' }}>
         <div className="spinner" style={{ width: '40px', height: '40px', borderColor: 'rgba(79, 70, 229, 0.3)', borderLeftColor: 'var(--primary)' }}></div>
+      </div>
+    );
+  }
+
+  if (isMaintenance && (!user || (user.role !== 'superadmin' && user.role !== 'admin'))) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)', textAlign: 'center', padding: '2rem' }}>
+        <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>Sistem Sedang Diselenggara</h1>
+        <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
+          Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.
+        </p>
       </div>
     );
   }

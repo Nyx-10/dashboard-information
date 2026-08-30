@@ -54,9 +54,33 @@ export const AdminAnalyticsView = () => {
 
   return (
     <div className="page-bg-common bg-admin-analytics">
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('analyticsOverview')}</h2>
-        <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats')}</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+        <div>
+          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('analyticsOverview')}</h2>
+          <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats')}</p>
+        </div>
+        <button 
+          onClick={() => {
+            const csvContent = "data:text/csv;charset=utf-8," 
+              + "Metric,Value\n"
+              + `Total Users,${stats.totalUsers}\n`
+              + `Active Users,${stats.activeUsers}\n`
+              + `Total Reports,${stats.totalReports}\n`
+              + `Resolution Rate,${stats.resolutionRate}`;
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Analytics_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }}
+          className="btn-primary" 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+        >
+          <FileText size={16} /> Export (CSV)
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
@@ -72,6 +96,47 @@ export const AdminAnalyticsView = () => {
           </div>
         ))}
       </div>
+
+      {/* Maintenance Mode Toggle Section */}
+      <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #F59E0B' }}>
+        <div>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Shield size={20} color="#F59E0B" /> Mode Penyelenggaraan (Maintenance Mode)
+          </h3>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.
+          </p>
+        </div>
+        <button 
+          onClick={async () => {
+            const confirmed = window.confirm("Adakah anda pasti untuk menukar status Maintenance Mode?");
+            if (confirmed) {
+              try {
+                const { data, error } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+                
+                let currentStatus = false;
+                if (data) currentStatus = data.is_maintenance_mode;
+
+                const { error: updateError } = await supabase.from('system_settings').upsert({ id: 1, is_maintenance_mode: !currentStatus });
+                if (updateError) throw updateError;
+
+                alert(`Maintenance Mode kini telah ${!currentStatus ? 'DIAKTIFKAN' : 'DIMATIKAN'}.`);
+              } catch (err) {
+                if (err.code === '42P01') {
+                   alert("Jadual 'system_settings' belum wujud di Supabase. Sila jalankan skrip SQL terlebih dahulu.");
+                } else {
+                   alert("Gagal menukar status: " + err.message);
+                }
+              }
+            }
+          }}
+          className="btn-primary" 
+          style={{ background: '#F59E0B', padding: '0.75rem 1.5rem', fontWeight: 600 }}
+        >
+           Tukar Status (On/Off)
+        </button>
+      </div>
+
     </div>
   );
 };
