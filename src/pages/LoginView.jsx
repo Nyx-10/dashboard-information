@@ -3,7 +3,7 @@ import { LanguageContext } from '../context/LanguageContext';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
-export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome }) {
+export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, onMaintenanceMode }) {
   const { lang, setLang, t } = useContext(LanguageContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,6 +56,17 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome })
         } else if (normalizedEmail === 'admin@adtec.edu.my' || normalizedEmail === 'normaladmin@adtec.edu.my') {
           role = 'admin';
         }
+      }
+
+      // Check maintenance mode
+      const { data: settings } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+      if (settings?.is_maintenance_mode) {
+         let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
+         if (normalizedRole !== 'admin' && normalizedRole !== 'superadmin') {
+            await supabase.auth.signOut();
+            if (onMaintenanceMode) onMaintenanceMode();
+            return;
+         }
       }
 
       onLogin({ id: data.user.id, email, role, name });

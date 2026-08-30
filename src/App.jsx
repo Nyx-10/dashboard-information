@@ -219,6 +219,7 @@ export default function App() {
   }, []);
 
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [showMaintenanceScreen, setShowMaintenanceScreen] = useState(false);
 
   const checkUser = async () => {
     try {
@@ -253,10 +254,10 @@ export default function App() {
         // Normalize role for comparison
         let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
 
-        // If maintenance is active and user is not admin, sign them out
+        // If maintenance is active and user is not admin, sign them out and show screen
         if (maintenanceActive && normalizedRole !== 'admin' && normalizedRole !== 'superadmin') {
           await supabase.auth.signOut();
-          setIsMaintenance(true);
+          setShowMaintenanceScreen(true);
           return;
         }
 
@@ -290,7 +291,7 @@ export default function App() {
     );
   }
 
-  if (isMaintenance && (!user || (user.role !== 'superadmin' && user.role !== 'admin'))) {
+  if (showMaintenanceScreen) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)', textAlign: 'center', padding: '2rem' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
@@ -298,9 +299,14 @@ export default function App() {
         <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
           Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.
         </p>
+        <button onClick={() => setShowMaintenanceScreen(false)} className="btn-primary" style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}>
+           Kembali ke Log Masuk
+        </button>
       </div>
     );
   }
+
+
 
   if (showLanding) {
     return (
@@ -313,7 +319,13 @@ export default function App() {
   if (!isAuthenticated) {
     let authContent;
     if (authMode === 'login') {
-      authContent = <LoginView onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} onSwitch={() => setAuthMode('signup')} onForgotPassword={() => setAuthMode('forgot-password')} onBackToHome={() => setShowLanding(true)} />;
+      authContent = <LoginView 
+          onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} 
+          onSwitch={() => setAuthMode('signup')} 
+          onForgotPassword={() => setAuthMode('forgot-password')} 
+          onBackToHome={() => setShowLanding(true)}
+          onMaintenanceMode={() => setShowMaintenanceScreen(true)}
+        />;
     } else if (authMode === 'signup') {
       authContent = <SignupView onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} onSwitch={() => setAuthMode('login')} />;
     } else if (authMode === 'forgot-password') {
