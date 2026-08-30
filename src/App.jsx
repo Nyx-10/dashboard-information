@@ -1,10 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { 
-  Search, PlusCircle, Bell, User, LayoutDashboard, 
-  MessageSquare, Settings, LogOut, MapPin, Calendar, CheckCircle,
-  AlertCircle, Info, X, Menu
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import './index.css';
+import { Sidebar } from './components/Sidebar';
+import { Topbar } from './components/Topbar';
 import { AdminUsersView, AdminReportsView } from './pages/AdminManagement';
 import LandingPage from './pages/LandingPage';
 import { AdminAnalyticsView, AdminAuditLogsView } from './pages/AdminAnalyticsLogs';
@@ -92,21 +90,18 @@ export default function App() {
         })
         .subscribe();
         
-      // Periodically check if the user has been suspended while logged in
-      const checkStatusInterval = setInterval(async () => {
-        try {
-          const { data, error } = await supabase.from('profiles').select('status').eq('id', user.id).single();
-          if (data && data.status === 'Suspended') {
-            alert(t('accountSuspended'));
+      // Listen for profile updates (e.g. account suspension)
+      const profileChannel = supabase.channel('public:profiles_status')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, (payload) => {
+          if (payload.new && payload.new.status === 'Suspended') {
+            alert(t('accountSuspended') || 'Your account has been suspended.');
             supabase.auth.signOut();
             setIsAuthenticated(false);
             setUser(null);
             setShowLanding(true);
           }
-        } catch(e) {
-          // ignore
-        }
-      }, 10000); // Semak setiap 10 saat
+        })
+        .subscribe();
 
       const presenceChannel = supabase.channel('online-users', {
         config: {
@@ -131,7 +126,7 @@ export default function App() {
         supabase.removeChannel(itemsChannel);
         supabase.removeChannel(messagesChannel);
         supabase.removeChannel(presenceChannel);
-        clearInterval(checkStatusInterval);
+        supabase.removeChannel(profileChannel);
       };
     }
   }, [isAuthenticated, user]);
@@ -327,159 +322,33 @@ export default function App() {
     <LanguageContext.Provider value={{ lang, setLang, t }}>
       <div className="app-container">
         {/* Sidebar */}
-        <aside className={`sidebar ${sidebarOpen ? '' : 'sidebar-collapsed'}`}>
-          <div className="sidebar-header">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="Logo" style={{ width: '28px', height: '28px', borderRadius: '4px' }} />
-            <span>Adtec Melaka</span>
-          </div>
-          
-          <nav style={{ flex: 1 }}>
-            <button className={`nav-link w-full text-left ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
-              <LayoutDashboard size={20} /> {t('dashboard')}
-            </button>
-            <button className={`nav-link w-full text-left ${activeTab === 'search' ? 'active' : ''}`} onClick={() => setActiveTab('search')}>
-              <Search size={20} /> {t('searchItems')}
-            </button>
-            <button className={`nav-link w-full text-left ${activeTab === 'add' ? 'active' : ''}`} onClick={() => setActiveTab('add')}>
-              <PlusCircle size={20} /> {t('missingItem')}
-            </button>
-            <button 
-              className={`nav-link w-full text-left ${activeTab === 'messages' ? 'active' : ''}`} 
-              onClick={() => { setActiveTab('messages'); setActiveChatUser(null); }}
-            >
-              <MessageSquare size={20} /> 
-              <span style={{ flex: 1 }}>{t('messages')}</span>
-              {totalUnreadMessages > 0 && (
-                <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px' }}>
-                  {totalUnreadMessages}
-                </span>
-              )}
-            </button>
-            
-            {(user?.role === 'superadmin' || user?.role === 'admin') && (
-              <>
-                <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', padding: '0 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('adminPanel')}</div>
-                <button className={`nav-link w-full text-left ${activeTab === 'admin-analytics' ? 'active' : ''}`} onClick={() => setActiveTab('admin-analytics')}>
-                  <LayoutDashboard size={20} /> {t('analytics')}
-                </button>
-                <button className={`nav-link w-full text-left ${activeTab === 'admin-users' ? 'active' : ''}`} onClick={() => setActiveTab('admin-users')}>
-                  <User size={20} /> {t('manageUsers')}
-                </button>
-                <button className={`nav-link w-full text-left ${activeTab === 'admin-reports' ? 'active' : ''}`} onClick={() => setActiveTab('admin-reports')}>
-                  <Settings size={20} /> {t('manageReports')}
-                </button>
-                <button className={`nav-link w-full text-left ${activeTab === 'admin-logs' ? 'active' : ''}`} onClick={() => setActiveTab('admin-logs')}>
-                  <Calendar size={20} /> {t('auditLogs')}
-                </button>
-              </>
-            )}
-          </nav>
-        </aside>
+        <Sidebar 
+          sidebarOpen={sidebarOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          setActiveChatUser={setActiveChatUser}
+          totalUnreadMessages={totalUnreadMessages}
+          user={user}
+        />
 
       {/* Main Content */}
       <main className="main-content">
-        <header className="topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.25rem' }} title="Toggle Sidebar">
-              <Menu size={24} />
-            </button>
-            {activeTab === 'search' ? (
-              <div style={{ position: 'relative', width: '300px' }}>
-                <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  placeholder={t('searchAnything')} 
-                  style={{ paddingLeft: '40px' }}
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                  }}
-                />
-              </div>
-            ) : null}
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative' }}>
-              <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => {
-                setShowNotifications(!showNotifications);
-                if (!showNotifications && user?.id) {
-                  const now = Date.now();
-                  setLastSeenNotifTime(now);
-                  localStorage.setItem('lastSeenNotifTime_' + user.id, now.toString());
-                }
-              }}>
-                <Bell size={24} />
-                {hasUnreadNotifications && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
-              </button>
-              {showNotifications && (
-                <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '110%', width: '340px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
-                  <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>{t('notifications')}</div>
-                  <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                    {notifications.length > 0 ? (
-                      notifications.map((item, idx) => (
-                        <div key={`${item.notifType}-${item.id}`} style={{ padding: '0.875rem 1.25rem', borderBottom: idx < notifications.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => { 
-                          if (item.notifType === 'message') {
-                            setActiveChatUser({ id: item.sender_id, name: item.sender_name, preview: item.content });
-                            setActiveTab('messages');
-                          } else {
-                            setActiveTab('home'); 
-                          }
-                          setShowNotifications(false); 
-                        }}>
-                          {item.notifType === 'message' ? (
-                            <MessageSquare size={18} style={{ color: '#4F46E5', marginTop: '2px', flexShrink: 0 }} />
-                          ) : item.type === 'lost' ? (
-                            <AlertCircle size={18} style={{ color: '#EF4444', marginTop: '2px', flexShrink: 0 }} />
-                          ) : item.type === 'found' ? (
-                            <CheckCircle size={18} style={{ color: '#10B981', marginTop: '2px', flexShrink: 0 }} />
-                          ) : (
-                            <Info size={18} style={{ color: '#3B82F6', marginTop: '2px', flexShrink: 0 }} />
-                          )}
-                          <div>
-                            {item.notifType === 'message' ? (
-                              <>
-                                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>{t('messageFrom')} {item.sender_name}</p>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.content.substring(0, 40)}{item.content.length > 40 ? '...' : ''}</p>
-                              </>
-                            ) : (
-                              <>
-                                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title} - {item.type === 'info' ? t('defaultLocation') : item.location}
-                                </p>
-                              </>
-                            )}
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('justNow')}</span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                        {t('noNewNotifications')}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#EF4444', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #EF4444', fontSize: '0.8rem', fontWeight: 500 }} onClick={() => setShowLogoutModal(true)}>
-              <LogOut size={16} /> {t('logout')}
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => setActiveTab('profile')}>
-              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                  {user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User')}
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : t('normalUser')}
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Topbar 
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          hasUnreadNotifications={hasUnreadNotifications}
+          setLastSeenNotifTime={setLastSeenNotifTime}
+          notifications={notifications}
+          setActiveChatUser={setActiveChatUser}
+          setShowLogoutModal={setShowLogoutModal}
+          user={user}
+        />
 
         <div className="page-content animate-fade-in" onClick={() => showNotifications && setShowNotifications(false)}>
           {renderContent()}
