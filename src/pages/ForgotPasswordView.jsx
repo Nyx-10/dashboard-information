@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
+import { supabase } from '../supabaseClient';
 
 export function ForgotPasswordView({ onSwitchBack }) {
   const { lang, setLang, t } = useContext(LanguageContext);
@@ -14,28 +15,18 @@ export function ForgotPasswordView({ onSwitchBack }) {
     setError('');
     
     try {
-      // PERHATIAN: Gantikan URL di bawah dengan URL API Backend anda yang sebenar
-      const response = await fetch('/api/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password',
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Gagal menghantar e-mel. Sila pastikan e-mel anda berdaftar.');
+      if (resetError) {
+        throw resetError;
       }
 
       setSubmitted(true);
     } catch (err) {
       console.error('Ralat Forgot Password:', err);
-      if (err.message === 'Failed to fetch' || err.message === 'Load failed') {
-        setError('Tidak dapat menyambung ke pelayan Backend (Port 5000). Sila pastikan Firewall komputer anda ditutup atau membenarkan port 5000.');
-      } else {
-        setError(err.message || 'Sistem mengalami ralat. Sila cuba lagi nanti.');
-      }
+      setError(err.message || 'Sistem mengalami ralat. Sila cuba lagi nanti.');
     } finally {
       setLoading(false);
     }

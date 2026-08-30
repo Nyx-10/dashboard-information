@@ -14,8 +14,7 @@ export function SignupView({ onSignup, onSwitch }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [showOtpInput, setShowOtpInput] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -35,54 +34,29 @@ export function SignupView({ onSignup, onSwitch }) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.message || 'Gagal menghantar OTP.');
-      }
-      
-      setShowOtpInput(true);
-      alert(t('alertOtpSent'));
-    } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, password, name })
-      });
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.message || 'Kod OTP tidak sah.');
-      }
-
-      // Log masuk pengguna selepas pendaftaran berjaya
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            full_name: name,
+            username: name,
+            role: 'user'
+          }
+        }
       });
 
-      if (signInError) throw signInError;
+      if (signUpError) throw signUpError;
 
-      let role = 'user';
-      onSignup({ id: data.user.id, email, name, role });
+      // Supabase may auto-login if email confirmation is disabled
+      if (data.session) {
+        onSignup({ id: data.user.id, email, name, role: 'user' });
+      } else {
+        // Email confirmation is required
+        setIsSuccess(true);
+      }
     } catch (err) {
-      setError(err.message || 'Kod OTP tidak sah atau ralat berlaku.');
+      setError(err.message || 'Pendaftaran gagal. Sila cuba lagi.');
     } finally {
       setLoading(false);
     }
@@ -105,7 +79,7 @@ export function SignupView({ onSignup, onSwitch }) {
       <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('signupTitle') : 'Create Account'}</h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{showOtpInput ? 'Sahkan e-mel anda.' : (t ? t('signupDesc') : 'Join the Adtec Melaka network.')}</p>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{isSuccess ? 'Pendaftaran Berjaya!' : (t ? t('signupDesc') : 'Join the Adtec Melaka network.')}</p>
         
         {error && (
           <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1rem', textAlign: 'left', fontSize: '0.875rem' }}>
@@ -113,7 +87,7 @@ export function SignupView({ onSignup, onSwitch }) {
           </div>
         )}
 
-        {!showOtpInput ? (
+        {!isSuccess ? (
           <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t ? t('fullNameLabel') : 'Full Name'}</label>
@@ -146,19 +120,12 @@ export function SignupView({ onSignup, onSwitch }) {
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Kod OTP (6-digit)</label>
-              <input type="text" required className="input-field" placeholder="Contoh: 123456" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6} style={{ letterSpacing: '0.25rem', textAlign: 'center', fontSize: '1.25rem' }} />
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Kod ini telah dihantar ke <strong>{email}</strong></p>
-            </div>
-            <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '1rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Mengesahkan...' : 'Sahkan OTP'}
-            </button>
-            <button type="button" onClick={() => setShowOtpInput(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', fontSize: '0.875rem' }}>
-              Kembali
-            </button>
-          </form>
+          <div style={{ padding: '1rem', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: '#10B981', fontWeight: 600 }}>Sila semak peti masuk anda!</p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+              Satu pautan pengesahan telah dihantar ke <strong>{email}</strong>. Sila klik pautan tersebut untuk mengaktifkan akaun anda sebelum log masuk.
+            </p>
+          </div>
         )}
         
         <p style={{ marginTop: '1.5rem', color: 'var(--text-muted)' }}>
