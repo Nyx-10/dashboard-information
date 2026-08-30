@@ -128,7 +128,12 @@ export const AdminAnalyticsView = () => {
             const confirmed = window.confirm(`Adakah anda pasti untuk ${isMaintenanceActive ? 'MEMATIKAN' : 'MENGAKTIFKAN'} Maintenance Mode?`);
             if (confirmed) {
               try {
-                const newStatus = !isMaintenanceActive;
+                // Fetch the absolute latest status from DB to avoid any stale state
+                const { data } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+                let currentStatus = false;
+                if (data) currentStatus = data.is_maintenance_mode;
+
+                const newStatus = !currentStatus;
                 const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: newStatus }).eq('id', 1);
                 if (updateError) throw updateError;
                 
