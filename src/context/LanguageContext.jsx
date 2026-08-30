@@ -102,7 +102,78 @@ export const dict = {
     badgeLost: '丢失', badgeFound: '寻获', badgeInfo: '信息', normalUser: '普通用户', today: '今天', messageFrom: '来自', deleteBtn: '删除', cannotContactSelf: '您不能联系自己。',
     accountSuspended: '您的帐户已被管理员暂停。',
     alertInvalidFile: '请仅上传图像文件。', alertFileSize: '文件大小超过5MB限制。', alertSuccessDelete: '成功删除！', alertFailedDelete: '删除失败：', confirmDelete: '您确定要删除此项目吗？', confirmDeleteUser: '您确定要删除此用户吗？', alertFailedUpdateRole: '更新角色失败：', alertFailedSuspend: '暂停/激活用户失败：', alertFailedUpdateStatus: '更新状态失败：', alertSuccessReport: '报告提交成功。', alertFailedReport: '提交报告失败：', alertFailedUpload: '上传图片失败：', alertFailedSendMsg: '发送消息失败：', alertOtpSent: '请检查您的电子邮件以获取OTP代码。',
-    userManagementTitle: '用户管理', userManagementDesc: '管理注册用户及其角色。', total: '总计', searchByName: '按名称搜索...', status: '状态', actions: '操作', noUsersFound: '未找到用户。', changeRole: '更改角色', activate: '激活', suspend: '暂停', reportManagementTitle: '报告管理', reportManagementDesc: '批准，拒绝或解决用户报告。', reportDetails: '报告详情', noReportsFound: '未找到报告。', approve: '批准', reject: '拒绝', resolve: '解决', viewImage: '查看图片', pending: '待处理', approved: '已批准', rejected: '已拒绝', resolved: '已解决'
+    noReportsFound: 'No reports found.', approve: 'Approve', reject: 'Reject', resolve: 'Resolve', viewImage: 'View Image', pending: 'Pending', approved: 'Approved', rejected: 'Rejected', resolved: 'Resolved',
+    exportCsv: 'Export (CSV)', maintenanceMode: 'Maintenance Mode', maintenanceActive: 'ACTIVE', maintenanceInactive: 'INACTIVE', maintenanceDesc: 'If enabled, normal users cannot log in to the system until it is turned off.', maintenanceTurnOn: 'Turn On', maintenanceTurnOff: 'Turn Off', confirmMaintenanceToggle: 'Are you sure you want to toggle Maintenance Mode?', systemUnderMaintenance: 'System Under Maintenance', maintenanceReturnMsg: 'We are performing maintenance work to improve the system. Please come back later. We apologize for any inconvenience.', returnToLogin: 'Return to Login'
+  },
+  ms: {
+    dashboard: 'Papan Pemuka', searchItems: 'Cari Barang', missingItem: 'Barang Hilang & Info Kolej', messages: 'Mesej',
+    adminPanel: 'PANEL ADMIN', analytics: 'Analitik', manageUsers: 'Urus Pengguna', manageReports: 'Urus Laporan', auditLogs: 'Log Audit',
+    profile: 'Profil', logout: 'Log Keluar', searchAnything: 'Cari apa-apa sahaja...', notifications: 'Notifikasi', infoOnly: 'Maklumat Sahaja',
+    recentlyReported: 'Laporan Terkini', welcomeBack: 'Selamat kembali, ini adalah maklumat terkini di dalam rangkaian.', searchResults: 'Hasil Carian',
+    all: 'Semua', lostItems: 'Barang Hilang', foundItems: 'Barang Jumpa', recentlyInfo: 'Maklumat Terkini', noItemsFound: 'Tiada item dijumpai',
+    contactReporter: 'Hubungi Pelapor', myReports: 'Laporan Saya', languageSettings: 'Tetapan Bahasa', english: 'Bahasa Inggeris', malay: 'Bahasa Melayu', chinese: '中文', tamil: 'தமிழ்',
+    logoutConfirm: 'Log Keluar?', logoutMsg: 'Adakah anda pasti ingin log keluar daripada sistem?', cancel: 'Batal', searchName: 'Cari nama...',
+    reportTitle: 'Laporan Barang Hilang & Maklumat Kolej', reportTypeField: 'Jenis Laporan', typeLost: 'Saya kehilangan barang', typeFound: 'Saya terjumpa barang',
+    typeInfo: 'Untuk maklumat sahaja', typeOthers: 'Lain-lain', itemName: 'Nama Barang', itemNamePlaceholder: 'cth. Beg Galas Biru', date: 'Tarikh', location: 'Lokasi',
+    locationPlaceholder: 'Di manakah lokasinya?', description: 'Penerangan', descriptionPlaceholder: 'Berikan maklumat lanjut tentang barang tersebut...',
+    photo: 'Gambar', photoUpload: 'Klik untuk muat naik atau letak gambar di sini', submitReport: 'Hantar Laporan',
+    // Login & Landing page keys
+    loginTitle: 'Log Masuk', loginWelcome: 'Selamat datang ke Dashboard Adtec Melaka.', emailLabel: 'E-mel', passwordLabel: 'Kata Laluan',
+    forgotPassword: 'Lupa Kata Laluan?', signInBtn: 'Log Masuk', noAccount: 'Belum ada akaun?', signUpBtn: 'Daftar',
+    featuresTab: 'Ciri-ciri', statsTab: 'Statistik', howToTab: 'Cara Guna', loginBtn: 'Log Masuk', heroBadge: 'Platform Rasmi Adtec Melaka',
+    heroTitle: 'Dashboard Maklumat', heroSubtitle: 'Sistem pengurusan barang hilang & jumpa, maklumat kolej, dan komunikasi antara pelajar dalam satu platform yang moden dan selamat.',
+    startNow: 'Mula Sekarang', learnMore: 'Ketahui Lebih',
+    // Forgot Password keys
+    forgotTitle: 'Lupa Kata Laluan', forgotDesc: 'Masukkan e-mel anda dan kami akan menghantar pautan untuk menetapkan semula kata laluan.', sendLinkBtn: 'Hantar Pautan', linkSentTitle: 'Pautan telah dihantar!', linkSentDesc: 'Sila semak peti masuk e-mel anda untuk arahan selanjutnya.', backToLoginBtn: 'Kembali ke Log Masuk',
+    // Signup keys
+    signupTitle: 'Cipta Akaun', signupDesc: 'Sertai rangkaian Adtec Melaka.', fullNameLabel: 'Nama Penuh', alreadyAccount: 'Sudah mempunyai akaun?', confirmPasswordLabel: 'Sahkan Kata Laluan', passwordMismatchError: 'Kata laluan tidak sepadan', backToHome: 'Kembali ke Laman Utama', passwordShortError: 'Kata laluan mestilah sekurang-kurangnya 8 aksara',
+    // New keys
+    staySignedIn: 'Kekal log masuk (Stay signed in)', loading: 'Memuatkan...', loginFailed: 'Log masuk gagal. Sila pastikan email dan kata laluan betul.',
+    analyticsOverview: 'Gambaran Keseluruhan Analitik', monitorStats: 'Pantau statistik sistem anda secara langsung dari pangkalan data.', totalUsers: 'Jumlah Pengguna', totalReports: 'Jumlah Laporan', resolutionRate: 'Kadar Selesai', activeAccounts: 'Akaun Aktif', systemAuditLogs: 'Log Sistem Audit', adminActionRecords: 'Rekod tindakan pentadbir dan sistem.', exportLogs: 'Muat Turun Log', action: 'Tindakan (Action)', userEmail: 'E-mel Pengguna', time: 'Masa', noLogRecords: 'Tiada rekod log buat masa ini. (Sila tambah table \'audit_logs\')',
+    noConversations: 'Tiada perbualan.', selectConversation: 'Pilih perbualan untuk mula mesej', online: 'Talian', reportUser: 'Lapor Pengguna', reportType: 'Jenis Laporan', spam: 'Spam', scammer: 'Scammer', inappropriate: 'Kandungan Tidak Sesuai', harassment: 'Gangguan', typeReason: 'Taip sebab...', submit: 'Hantar', send: 'Hantar', justNow: 'Baru sahaja',
+    noInfoYet: 'Tiada pengumuman setakat ini.', noReportsYet: 'Tiada laporan barang hilang/jumpa setakat ini.', newReport: 'Laporan Baru:', noNewNotifications: 'Tiada notifikasi baru.',
+    myProfile: 'Profil Saya', nameLabel: 'Nama', roleLabel: 'Peranan', memberSince: 'Ahli sejak', loadingReports: 'Sedang memuatkan laporan...', noReportsMade: 'Anda belum melaporkan sebarang item lagi.', saving: 'Sedang menyimpan...', messagingComingSoon: 'Sistem pemesejan dengan pemilik akan datang!',
+    alertFillRequired: 'Sila isikan medan yang diwajibkan (Nama, Tarikh, Lokasi).', alertFillInfo: 'Sila isikan tarikh dan penerangan untuk maklumat ini.', defaultInfoTitle: 'Maklumat', defaultLocation: 'Umum', alertSuccessAdd: 'Berjaya ditambah!', alertFailedAdd: 'Gagal menambah data: ',
+    badgeLost: 'Hilang', badgeFound: 'Jumpa', badgeInfo: 'Info', normalUser: 'Pengguna Biasa', today: 'Hari ini', messageFrom: 'Mesej dari', deleteBtn: 'Padam', cannotContactSelf: 'Anda tidak boleh menghubungi diri sendiri.',
+    accountSuspended: 'Akaun anda telah digantung oleh Admin.',
+    alertInvalidFile: 'Sila muat naik fail gambar sahaja.', alertFileSize: 'Saiz fail melebihi had 5MB.', alertSuccessDelete: 'Berjaya dipadam!', alertFailedDelete: 'Gagal memadam: ', confirmDelete: 'Adakah anda pasti mahu memadam item ini?', confirmDeleteUser: 'Adakah anda pasti mahu memadam pengguna ini?', alertFailedUpdateRole: 'Gagal mengemas kini peranan: ', alertFailedSuspend: 'Gagal menggantung/mengaktifkan pengguna: ', alertFailedUpdateStatus: 'Gagal mengemas kini status: ', alertSuccessReport: 'Laporan berjaya dihantar.', alertFailedReport: 'Gagal menghantar laporan: ', alertFailedUpload: 'Gagal memuat naik gambar: ', alertFailedSendMsg: 'Gagal menghantar mesej: ', alertOtpSent: 'Sila semak e-mel anda untuk kod OTP.',
+    userManagementTitle: 'Pengurusan Pengguna', userManagementDesc: 'Urus pengguna berdaftar dan peranan mereka.', total: 'Jumlah', searchByName: 'Cari mengikut nama...', status: 'Status', actions: 'Tindakan', noUsersFound: 'Tiada pengguna dijumpai.', changeRole: 'Tukar Peranan', activate: 'Aktifkan', suspend: 'Gantung', reportManagementTitle: 'Pengurusan Laporan', reportManagementDesc: 'Luluskan, tolak, atau selesaikan laporan pengguna.', reportDetails: 'Butiran Laporan', noReportsFound: 'Tiada laporan dijumpai.', approve: 'Luluskan', reject: 'Tolak', resolve: 'Selesaikan', viewImage: 'Lihat Gambar', pending: 'Menunggu', approved: 'Diluluskan', rejected: 'Ditolak', resolved: 'Selesai',
+    exportCsv: 'Eksport (CSV)', maintenanceMode: 'Mode Penyelenggaraan', maintenanceActive: 'AKTIF', maintenanceInactive: 'TIDAK AKTIF', maintenanceDesc: 'Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.', maintenanceTurnOn: 'Aktifkan (On)', maintenanceTurnOff: 'Matikan (Off)', confirmMaintenanceToggle: 'Adakah anda pasti untuk menukar status Maintenance Mode?', systemUnderMaintenance: 'Sistem Sedang Diselenggara', maintenanceReturnMsg: 'Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.', returnToLogin: 'Kembali ke Log Masuk'
+  },
+  zh: {
+    dashboard: '仪表板', searchItems: '搜索物品', missingItem: '遗失物品与学院信息', messages: '消息',
+    adminPanel: '管理面板', analytics: '分析', manageUsers: '管理用户', manageReports: '管理报告', auditLogs: '审计日志',
+    profile: '个人资料', logout: '注销', searchAnything: '搜索任何内容...', notifications: '通知', infoOnly: '仅供参考',
+    recentlyReported: '最近报告', welcomeBack: '欢迎回来，以下是网络中的最新物品。', searchResults: '搜索结果',
+    all: '全部', lostItems: '遗失物品', foundItems: '寻获物品', recentlyInfo: '最新信息', noItemsFound: '未找到物品',
+    contactReporter: '联系报告者', myReports: '我的报告', languageSettings: '语言设置', english: 'English', malay: 'Bahasa Melayu', chinese: '中文', tamil: 'தமிழ்',
+    logoutConfirm: '注销？', logoutMsg: '您确定要退出系统吗？', cancel: '取消', searchName: '搜索名称...',
+    reportTitle: '学院遗失物品与信息报告', reportTypeField: '报告类型', typeLost: '我丢失了东西', typeFound: '我找到了东西',
+    typeInfo: '仅供参考', typeOthers: '其他', itemName: '物品名称', itemNamePlaceholder: '例如 蓝色背包', date: '日期', location: '地点',
+    locationPlaceholder: '在哪里？', description: '描述', descriptionPlaceholder: '提供更多详细信息以帮助识别物品...',
+    photo: '照片', photoUpload: '点击上传或拖放图片', submitReport: '提交报告',
+    // Login & Landing page keys
+    loginTitle: '登录', loginWelcome: '欢迎来到马六甲 Adtec 仪表板。', emailLabel: '电子邮件', passwordLabel: '密码',
+    forgotPassword: '忘记密码？', signInBtn: '登录', noAccount: '还没有账号？', signUpBtn: '注册',
+    featuresTab: '功能', statsTab: '统计', howToTab: '如何使用', loginBtn: '登录', heroBadge: '马六甲 Adtec 官方平台',
+    heroTitle: '信息仪表板', heroSubtitle: '在一个现代安全平台上进行失物招领管理、学院信息及学生沟通。',
+    startNow: '现在开始', learnMore: '了解更多',
+    // Forgot Password keys
+    forgotTitle: '忘记密码', forgotDesc: '输入您的电子邮件，我们将发送重置密码的链接。', sendLinkBtn: '发送链接', linkSentTitle: '链接已发送！', linkSentDesc: '请检查您的电子邮件收件箱以获取进一步指示。', backToLoginBtn: '返回登录',
+    // Signup keys
+    signupTitle: '创建账号', signupDesc: '加入马六甲 Adtec 网络。', fullNameLabel: '全名', alreadyAccount: '已有账号？', confirmPasswordLabel: '确认密码', passwordMismatchError: '密码不匹配', backToHome: '返回主页', passwordShortError: '密码必须至少为8个字符',
+    // New keys
+      staySignedIn: '保持登录 (Stay signed in)', loading: '加载中 (Loading)...', loginFailed: '登录失败，请检查电子邮件和密码。',
+      analyticsOverview: '分析概览', monitorStats: '直接从数据库监控系统统计数据。', totalUsers: '总用户', totalReports: '总报告', resolutionRate: '解决率', activeAccounts: '活跃账户', systemAuditLogs: '系统审计日志', adminActionRecords: '管理员和系统操作记录。', exportLogs: '导出日志', action: '操作 (Action)', userEmail: '用户电子邮件', time: '时间', noLogRecords: '目前没有日志记录。 (请添加 \'audit_logs\' 表)',
+      noConversations: '没有对话', selectConversation: '选择一个对话开始聊天', online: '在线', reportUser: '举报用户', reportType: '举报类型', spam: '垃圾信息', scammer: '骗子', inappropriate: '不当内容', harassment: '骚扰', typeReason: '输入原因...', submit: '提交', send: '发送', justNow: '刚刚',
+    noInfoYet: '暂无公告。', noReportsYet: '暂无失物招领报告。', newReport: '新报告：', noNewNotifications: '没有新通知。',
+    myProfile: '我的资料', nameLabel: '姓名', roleLabel: '角色', memberSince: '注册时间', loadingReports: '正在加载报告...', noReportsMade: '您还没有报告任何物品。', saving: '正在保存...', messagingComingSoon: '与所有者的消息系统即将推出！',
+    alertFillRequired: '请填写必填字段（名称，日期，位置）。', alertFillInfo: '请填写此信息的日期和描述。', defaultInfoTitle: '信息', defaultLocation: '一般', alertSuccessAdd: '添加成功！', alertFailedAdd: '添加数据失败：',
+    badgeLost: '丢失', badgeFound: '寻获', badgeInfo: '信息', normalUser: '普通用户', today: '今天', messageFrom: '来自', deleteBtn: '删除', cannotContactSelf: '您不能联系自己。',
+    accountSuspended: '您的帐户已被管理员暂停。',
+    alertInvalidFile: '请仅上传图像文件。', alertFileSize: '文件大小超过5MB限制。', alertSuccessDelete: '成功删除！', alertFailedDelete: '删除失败：', confirmDelete: '您确定要删除此项目吗？', confirmDeleteUser: '您确定要删除此用户吗？', alertFailedUpdateRole: '更新角色失败：', alertFailedSuspend: '暂停/激活用户失败：', alertFailedUpdateStatus: '更新状态失败：', alertSuccessReport: '报告提交成功。', alertFailedReport: '提交报告失败：', alertFailedUpload: '上传图片失败：', alertFailedSendMsg: '发送消息失败：', alertOtpSent: '请检查您的电子邮件以获取OTP代码。',
+    userManagementTitle: '用户管理', userManagementDesc: '管理注册用户及其角色。', total: '总计', searchByName: '按名称搜索...', status: '状态', actions: '操作', noUsersFound: '未找到用户。', changeRole: '更改角色', activate: '激活', suspend: '暂停', reportManagementTitle: '报告管理', reportManagementDesc: '批准，拒绝或解决用户报告。', reportDetails: '报告详情', noReportsFound: '未找到报告。', approve: '批准', reject: '拒绝', resolve: '解决', viewImage: '查看图片', pending: '待处理', approved: '已批准', rejected: '已拒绝', resolved: '已解决',
+    exportCsv: '导出 (CSV)', maintenanceMode: '维护模式', maintenanceActive: '启用', maintenanceInactive: '未启用', maintenanceDesc: '如果启用，普通用户将无法登录系统，直到其被关闭。', maintenanceTurnOn: '启用 (On)', maintenanceTurnOff: '关闭 (Off)', confirmMaintenanceToggle: '您确定要切换维护模式吗？', systemUnderMaintenance: '系统维护中', maintenanceReturnMsg: '我们正在进行维护以改善系统。请稍后再来。给您带来的不便，我们深表歉意。', returnToLogin: '返回登录'
   },
   ta: {
     dashboard: 'டாஷ்போர்டு', searchItems: 'பொருட்களைத் தேடு', missingItem: 'காணாமல் போன பொருள் & கல்லூரி தகவல்', messages: 'செய்திகள்',
@@ -136,6 +207,7 @@ export const dict = {
     badgeLost: 'தொலைந்தவை', badgeFound: 'கிடைத்தவை', badgeInfo: 'தகவல்', normalUser: 'சாதாரண பயனர்', today: 'இன்று', messageFrom: 'இருந்து செய்தி', deleteBtn: 'அழி', cannotContactSelf: 'உங்களை நீங்கள் தொடர்புகொள்ள முடியாது.',
     accountSuspended: 'நிர்வாகியால் உங்கள் கணக்கு இடைநிறுத்தப்பட்டுள்ளது.',
     alertInvalidFile: 'தயவுசெய்து படக் கோப்புகளை மட்டுமே பதிவேற்றவும்.', alertFileSize: 'கோப்பு அளவு 5MB ஐ விட அதிகமாக உள்ளது.', alertSuccessDelete: 'வெற்றிகரமாக நீக்கப்பட்டது!', alertFailedDelete: 'நீக்க முடியவில்லை: ', confirmDelete: 'இந்த உருப்படியை நிச்சயமாக நீக்க விரும்புகிறீர்களா?', confirmDeleteUser: 'இந்த பயனரை நிச்சயமாக நீக்க விரும்புகிறீர்களா?', alertFailedUpdateRole: 'பங்கு புதுப்பிக்க முடியவில்லை: ', alertFailedSuspend: 'பயனரை இடைநிறுத்த/செயல்படுத்த முடியவில்லை: ', alertFailedUpdateStatus: 'நிலை புதுப்பிக்க முடியவில்லை: ', alertSuccessReport: 'அறிக்கை வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது.', alertFailedReport: 'அறிக்கையை சமர்ப்பிக்க முடியவில்லை: ', alertFailedUpload: 'படம் பதிவேற்ற முடியவில்லை: ', alertFailedSendMsg: 'செய்தியை அனுப்ப முடியவில்லை: ', alertOtpSent: 'OTP குறியீட்டிற்கு உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்.',
-    userManagementTitle: 'பயனர் மேலாண்மை', userManagementDesc: 'பதிவுசெய்யப்பட்ட பயனர்களையும் அவர்களின் பங்குகளையும் நிர்வகிக்கவும்.', total: 'மொத்தம்', searchByName: 'பெயரால் தேடு...', status: 'நிலை', actions: 'செயல்கள்', noUsersFound: 'பயனர்கள் யாரும் கிடைக்கவில்லை.', changeRole: 'பங்கை மாற்று', activate: 'செயல்படுத்து', suspend: 'இடைநிறுத்து', reportManagementTitle: 'அறிக்கை மேலாண்மை', reportManagementDesc: 'பயனர் அறிக்கைகளை அங்கீகரிக்கவும், நிராகரிக்கவும் அல்லது தீர்க்கவும்.', reportDetails: 'அறிக்கை விவரங்கள்', noReportsFound: 'அறிக்கைகள் எதுவும் கிடைக்கவில்லை.', approve: 'அங்கீகரி', reject: 'நிராகரி', resolve: 'தீர்க்க', viewImage: 'படத்தைக் காண்க', pending: 'நிலுவையில்', approved: 'அங்கீகரிக்கப்பட்டது', rejected: 'நிராகரிக்கப்பட்டது', resolved: 'தீர்க்கப்பட்டது'
+    userManagementTitle: 'பயனர் மேலாண்மை', userManagementDesc: 'பதிவுசெய்யப்பட்ட பயனர்களையும் அவர்களின் பங்குகளையும் நிர்வகிக்கவும்.', total: 'மொத்தம்', searchByName: 'பெயரால் தேடு...', status: 'நிலை', actions: 'செயல்கள்', noUsersFound: 'பயனர்கள் யாரும் கிடைக்கவில்லை.', changeRole: 'பங்கை மாற்று', activate: 'செயல்படுத்து', suspend: 'இடைநிறுத்து', reportManagementTitle: 'அறிக்கை மேலாண்மை', reportManagementDesc: 'பயனர் அறிக்கைகளை அங்கீகரிக்கவும், நிராகரிக்கவும் அல்லது தீர்க்கவும்.', reportDetails: 'அறிக்கை விவரங்கள்', noReportsFound: 'அறிக்கைகள் எதுவும் கிடைக்கவில்லை.', approve: 'அங்கீகரி', reject: 'நிராகரி', resolve: 'தீர்க்க', viewImage: 'படத்தைக் காண்க', pending: 'நிலுவையில்', approved: 'அங்கீகரிக்கப்பட்டது', rejected: 'நிராகரிக்கப்பட்டது', resolved: 'தீர்க்கப்பட்டது',
+    exportCsv: 'ஏற்றுமதி (CSV)', maintenanceMode: 'பராமரிப்பு முறை', maintenanceActive: 'செயலில்', maintenanceInactive: 'செயலற்றது', maintenanceDesc: 'செயல்படுத்தப்பட்டால், சாதாரண பயனர்கள் அதை அணைக்கப்படும் வரை கணினியில் உள்நுழைய முடியாது.', maintenanceTurnOn: 'ஆன் (On)', maintenanceTurnOff: 'ஆஃப் (Off)', confirmMaintenanceToggle: 'பராமரிப்பு முறையை மாற்ற விரும்புகிறீர்களா?', systemUnderMaintenance: 'கணினி பராமரிப்பில் உள்ளது', maintenanceReturnMsg: 'கணினியை மேம்படுத்த பராமரிப்பு பணிகளைச் செய்து வருகிறோம். தயவுசெய்து பின்னர் மீண்டும் வரவும். சிரமத்திற்கு வருந்துகிறோம்.', returnToLogin: 'உள்நுழைவுக்குத் திரும்பு'
   }
 };

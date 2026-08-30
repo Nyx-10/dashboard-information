@@ -90,20 +90,25 @@ export const AdminAnalyticsView = () => {
             document.body.removeChild(link);
           }}
           className="btn-primary" 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
         >
-          <FileText size={16} /> Export (CSV)
+          <Download size={16} /> {t('exportCsv') || 'Export (CSV)'}
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-        {statCards.map((stat, index) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        {[
+          { label: t('totalUsers'), value: stats.totalUsers, icon: Users, color: '#3B82F6' },
+          { label: t('totalReports'), value: stats.totalReports, icon: FileText, color: '#8B5CF6' },
+          { label: t('resolutionRate'), value: stats.resolutionRate, icon: CheckCircle, color: '#10B981' },
+          { label: t('activeAccounts'), value: stats.activeUsers, icon: Activity, color: '#F59E0B' }
+        ].map((stat, index) => (
           <div key={index} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ padding: '1rem', background: 'var(--surface)', borderRadius: '0.75rem', boxShadow: 'var(--shadow-sm)' }}>
-              {stat.icon}
+            <div style={{ background: `${stat.color}15`, padding: '1rem', borderRadius: '1rem' }}>
+              <stat.icon size={24} color={stat.color} />
             </div>
             <div>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{stat.label}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 500 }}>{stat.label}</p>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>{stat.value}</h3>
             </div>
           </div>
@@ -114,18 +119,18 @@ export const AdminAnalyticsView = () => {
       <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: `4px solid ${isMaintenanceActive ? '#EF4444' : '#10B981'}`, background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.05)' : 'var(--surface)' }}>
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Shield size={20} color={isMaintenanceActive ? '#EF4444' : '#10B981'} /> Mode Penyelenggaraan 
+            <Shield size={20} color={isMaintenanceActive ? '#EF4444' : '#10B981'} /> {t('maintenanceMode') || 'Maintenance Mode'} 
             <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '1rem', background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: isMaintenanceActive ? '#EF4444' : '#10B981', marginLeft: '0.5rem' }}>
-              {isMaintenanceActive ? 'AKTIF' : 'TIDAK AKTIF'}
+              {isMaintenanceActive ? (t('maintenanceActive') || 'AKTIF') : (t('maintenanceInactive') || 'TIDAK AKTIF')}
             </span>
           </h3>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.
+            {t('maintenanceDesc') || 'Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.'}
           </p>
         </div>
         <button 
           onClick={async () => {
-            const confirmed = window.confirm(`Adakah anda pasti untuk ${isMaintenanceActive ? 'MEMATIKAN' : 'MENGAKTIFKAN'} Maintenance Mode?`);
+            const confirmed = window.confirm(t('confirmMaintenanceToggle') || `Adakah anda pasti untuk menukar status Maintenance Mode?`);
             if (confirmed) {
               try {
                 // Fetch the absolute latest status from DB to avoid any stale state
@@ -138,12 +143,11 @@ export const AdminAnalyticsView = () => {
                 if (updateError) throw updateError;
                 
                 setIsMaintenanceActive(newStatus);
-                alert(`Maintenance Mode kini telah ${newStatus ? 'DIAKTIFKAN' : 'DIMATIKAN'}.`);
               } catch (err) {
                 if (err.code === '42P01') {
-                   alert("Jadual 'system_settings' belum wujud di Supabase. Sila jalankan skrip SQL terlebih dahulu.");
+                   alert("Table 'system_settings' not found. Please run the SQL script.");
                 } else {
-                   alert("Gagal menukar status: " + err.message);
+                   alert("Failed to change status: " + err.message);
                 }
               }
             }
@@ -151,7 +155,7 @@ export const AdminAnalyticsView = () => {
           className="btn-primary" 
           style={{ background: isMaintenanceActive ? '#EF4444' : '#10B981', padding: '0.75rem 1.5rem', fontWeight: 600, border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '0.5rem' }}
         >
-           {isMaintenanceActive ? 'Matikan (Off)' : 'Aktifkan (On)'}
+           {isMaintenanceActive ? (t('maintenanceTurnOff') || 'Matikan (Off)') : (t('maintenanceTurnOn') || 'Aktifkan (On)')}
         </button>
       </div>
 

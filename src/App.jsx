@@ -304,12 +304,12 @@ export default function App() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)', textAlign: 'center', padding: '2rem' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>Sistem Sedang Diselenggara</h1>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>{t('systemUnderMaintenance') || 'Sistem Sedang Diselenggara'}</h1>
         <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
-          Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.
+          {t('maintenanceReturnMsg') || 'Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.'}
         </p>
         <button onClick={() => setShowMaintenanceScreen(false)} className="btn-primary" style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}>
-           Kembali ke Log Masuk
+           {t('returnToLogin') || 'Kembali ke Log Masuk'}
         </button>
       </div>
     );
