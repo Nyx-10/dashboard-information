@@ -117,7 +117,7 @@ export const AdminAnalyticsView = () => {
                 let currentStatus = false;
                 if (data) currentStatus = data.is_maintenance_mode;
 
-                const { error: updateError } = await supabase.from('system_settings').upsert({ id: 1, is_maintenance_mode: !currentStatus });
+                const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: !currentStatus }).eq('id', 1);
                 if (updateError) throw updateError;
 
                 alert(`Maintenance Mode kini telah ${!currentStatus ? 'DIAKTIFKAN' : 'DIMATIKAN'}.`);
