@@ -250,8 +250,11 @@ export default function App() {
         let role = profile?.role || session.user.user_metadata?.role || 'user';
         let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
         
+        // Normalize role for comparison
+        let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
+
         // If maintenance is active and user is not admin, sign them out
-        if (maintenanceActive && role !== 'admin' && role !== 'superadmin') {
+        if (maintenanceActive && normalizedRole !== 'admin' && normalizedRole !== 'superadmin') {
           await supabase.auth.signOut();
           setIsMaintenance(true);
           return;
