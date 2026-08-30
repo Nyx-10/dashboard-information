@@ -251,6 +251,15 @@ export default function App() {
         let role = profile?.role || session.user.user_metadata?.role || 'user';
         let name = profile?.username || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
         
+        const normalizedEmail = session.user.email.trim().toLowerCase();
+        if (!profile?.role) {
+          if (normalizedEmail.includes('adam.darwish.it')) {
+            role = 'superadmin';
+          } else if (normalizedEmail === 'admin@adtec.edu.my' || normalizedEmail === 'normaladmin@adtec.edu.my') {
+            role = 'admin';
+          }
+        }
+        
         // Normalize role for comparison
         let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
 
