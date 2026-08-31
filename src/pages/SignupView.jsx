@@ -101,8 +101,8 @@ export function SignupView({ onSignup, onSwitch }) {
         {/* Animated Character on the left */}
         <div className="auth-left-anim" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
           <img 
-            src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Raising%20Hand%20Light%20Skin%20Tone.png" 
-            alt="3D Character" 
+            src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" 
+            alt="Animated Rocket" 
             className="floating-character"
           />
         </div>
