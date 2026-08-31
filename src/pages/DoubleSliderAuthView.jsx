@@ -93,6 +93,11 @@ export function DoubleSliderAuthView({
     }
   };
 
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+
   const handleSignup = async (e) => {
     e.preventDefault();
     if (signupEmail === 'adam.darwish.it@gmail.com') {
@@ -128,12 +133,36 @@ export function DoubleSliderAuthView({
       if (data.session) {
         onSignup({ id: data.user.id, email: signupEmail, name: signupName, role: 'user' });
       } else {
-        setSignupSuccess(true);
+        setShowOtpInput(true);
       }
     } catch (err) {
       setSignupError(err.message || 'Pendaftaran gagal. Sila cuba lagi.');
     } finally {
       setSignupLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: signupEmail,
+        token: otpCode,
+        type: 'signup'
+      });
+      if (error) throw error;
+      
+      if (data.session) {
+        onSignup({ id: data.user.id, email: signupEmail, name: signupName, role: 'user' });
+      } else {
+        setOtpError('Sesi tidak dijumpai selepas pengesahan OTP. Sila log masuk.');
+      }
+    } catch (err) {
+      setOtpError(err.message || 'OTP tidak sah. Sila cuba lagi.');
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -162,10 +191,29 @@ export function DoubleSliderAuthView({
         
         {/* Sign Up Container */}
         <div className="ds-form-container ds-sign-up-container">
-          <form className="ds-form" onSubmit={handleSignup}>
-            <h1>{t ? t('signupTitle') : 'Create Account'}</h1>
-            {signupSuccess ? (
-              <p style={{ color: '#10b981', marginBottom: '2rem' }}>Pendaftaran Berjaya! Sila semak emel anda.</p>
+          <form className="ds-form" onSubmit={showOtpInput ? handleVerifyOtp : handleSignup}>
+            <h1>{showOtpInput ? (t ? t('verifyOtpTitle') : 'Sahkan OTP') : (t ? t('signupTitle') : 'Create Account')}</h1>
+            
+            {showOtpInput ? (
+              <>
+                <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t ? t('otpSentMsg') : 'Sila masukkan kod OTP 6-digit yang dihantar ke emel anda.'}</p>
+                {otpError && <div style={{ color: '#ef4444', marginBottom: '10px', fontSize: '13px' }}>{otpError}</div>}
+                
+                <input 
+                  type="text" 
+                  placeholder="000000" 
+                  className="input-field" 
+                  value={otpCode} 
+                  onChange={(e) => setOtpCode(e.target.value)} 
+                  maxLength={6}
+                  style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}
+                  required 
+                />
+
+                <button type="submit" className="btn-primary" disabled={otpLoading}>
+                  {otpLoading ? '...' : (t ? t('verifyOtpBtn') : 'Sahkan OTP')}
+                </button>
+              </>
             ) : (
               <>
                 <span>{t ? t('signupDesc') : 'Join the Adtec Melaka network.'}</span>
