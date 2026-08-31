@@ -26,6 +26,12 @@ export function Topbar({
         <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.25rem' }} title="Toggle Sidebar">
           <Menu size={24} />
         </button>
+        {location.pathname === '/home' && (
+          <div style={{ marginLeft: '0.5rem' }}>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, lineHeight: 1, color: 'var(--text-main)' }}>Dashboard Adtec Melaka</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: '0.25rem 0 0 0' }}>{t('welcomeBack')}</p>
+          </div>
+        )}
         {isSearchActive ? (
           <div style={{ position: 'relative', width: '300px' }}>
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
