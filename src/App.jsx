@@ -50,7 +50,7 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   
@@ -355,7 +355,7 @@ export default function App() {
       <AppContext.Provider value={contextValue}>
       <div className="app-container">
         {/* Sidebar */}
-        <Sidebar sidebarOpen={sidebarOpen} />
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Main Content */}
       <main className="main-content">
