@@ -33,7 +33,7 @@ export function ItemCard({ item, onContact, currentUser, onDelete }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Calendar size={16} /> {item.date}
           </div>
-          {item.category && <span style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--primary)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>{item.category}</span>}
+
           <button 
             onClick={() => {
               const title = item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title;

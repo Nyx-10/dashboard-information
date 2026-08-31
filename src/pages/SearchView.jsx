@@ -8,7 +8,6 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
   const { t } = useContext(LanguageContext);
   const [filter, setFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,11 +73,8 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
     let dateMatches = false;
     if (!dateFilter) dateMatches = true;
     else if (item.date === dateFilter) dateMatches = true;
-
-    let categoryMatches = true;
-    if (categoryFilter && item.category !== categoryFilter) categoryMatches = false;
     
-    return matchesQuery && typeMatches && dateMatches && categoryMatches;
+    return matchesQuery && typeMatches && dateMatches;
   });
 
   return (
@@ -99,22 +95,6 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
           onChange={(e) => setDateFilter(e.target.value)}
           style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', marginLeft: 'auto', outline: 'none' }}
         />
-        <select 
-          value={categoryFilter} 
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', outline: 'none' }}
-        >
-          <option value="">{t('allCategories') || 'Semua Kategori'}</option>
-          <option value="Telefon">📱 Telefon</option>
-          <option value="Kad Pelajar">🪪 Kad Pelajar</option>
-          <option value="Kunci">🔑 Kunci</option>
-          <option value="Buku">📚 Buku</option>
-          <option value="Pakaian">👕 Pakaian</option>
-          <option value="Dompet">👛 Dompet</option>
-          <option value="Elektronik">💻 Elektronik</option>
-          <option value="Dokumen">📄 Dokumen</option>
-          <option value="Lain-lain">📦 Lain-lain</option>
-        </select>
       </div>
 
       {loading ? (
