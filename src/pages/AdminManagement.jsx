@@ -197,7 +197,7 @@ export const AdminUsersView = ({ currentUser }) => {
         />
       </div>
       
-      <div className="glass-panel" style={{ overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
@@ -321,7 +321,7 @@ export const AdminReportsView = ({ currentUser }) => {
         <p style={{ color: 'var(--text-muted)' }}>{t('reportManagementDesc') || 'Approve, reject, or resolve user reports.'}</p>
       </div>
 
-      <div className="glass-panel" style={{ overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>

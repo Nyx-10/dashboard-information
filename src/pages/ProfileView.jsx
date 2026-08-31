@@ -67,7 +67,7 @@ export function ProfileView({ onContact, currentUser }) {
   return (
     <div className="page-bg-common bg-profile">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
+      <div className="glass-panel profile-header" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
         <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff&size=120`} alt="User" style={{ borderRadius: '50%' }} />
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{user?.name || 'User Name'}</h1>
