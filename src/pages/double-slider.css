@@ -1,22 +1,9 @@
-.double-slider-wrapper {
-  display: flex;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background-color: var(--background);
-}
-
 .ds-container {
-  background-color: var(--surface);
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   position: relative;
   overflow: hidden;
   width: 900px;
   max-width: 100%;
   min-height: 550px;
-  border: 1px solid var(--border);
 }
 
 .ds-form-container {

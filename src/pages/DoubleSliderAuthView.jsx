@@ -138,7 +138,7 @@ export function DoubleSliderAuthView({
   };
 
   return (
-    <div className="double-slider-wrapper">
+    <div className="bg-auth" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {/* Top Controls */}
       <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 1000 }}>
         <button onClick={onBackToHome} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 500 }}>
@@ -158,7 +158,7 @@ export function DoubleSliderAuthView({
         </select>
       </div>
 
-      <div className={`ds-container ${isRightPanelActive ? 'right-panel-active' : ''}`}>
+      <div className={`ds-container glass-panel ${isRightPanelActive ? 'right-panel-active' : ''}`}>
         
         {/* Sign Up Container */}
         <div className="ds-form-container ds-sign-up-container">
