@@ -74,7 +74,7 @@ export function DashboardView({ onContact, currentUser }) {
             {infoItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {infoItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={(currentUser?.role === 'admin' || currentUser?.role === 'superadmin') ? handleDelete : undefined} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={((currentUser?.role === 'admin' || currentUser?.role === 'superadmin') && item.created_by !== currentUser?.id) ? handleDelete : undefined} />
                 ))}
               </div>
             ) : (
@@ -87,7 +87,7 @@ export function DashboardView({ onContact, currentUser }) {
             {reportItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {reportItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={(currentUser?.role === 'admin' || currentUser?.role === 'superadmin') ? handleDelete : undefined} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={((currentUser?.role === 'admin' || currentUser?.role === 'superadmin') && item.created_by !== currentUser?.id) ? handleDelete : undefined} />
                 ))}
               </div>
             ) : (
