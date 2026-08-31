@@ -378,7 +378,7 @@ export default function App() {
             <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
             <Route path="/admin-logs" element={<AdminAuditLogsView />} />
             <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
-            <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} />} />
+            <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} initialChatUser={activeChatUser} onlineUsers={onlineUsers} />} />
             <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
