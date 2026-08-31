@@ -77,7 +77,7 @@ export function DashboardView({ onContact, currentUser }) {
           </div>
 
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-main)' }}>{t('recentlyReported')}</h2>
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('recentlyReported')}</h2>
             {reportItems.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {reportItems.map(item => (
