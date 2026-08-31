@@ -46,7 +46,15 @@ export function ForgotPasswordView({ onSwitchBack }) {
           <option value="ta">தமிழ்</option>
         </select>
       </div>
-      <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+      <style>
+        {`
+          @keyframes slideUpFadeIn {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+        `}
+      </style>
+      <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center', animation: 'slideUpFadeIn 0.5s ease-out forwards' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('forgotTitle') : 'Lupa Kata Laluan'}</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
