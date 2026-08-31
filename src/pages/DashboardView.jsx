@@ -57,7 +57,7 @@ export function DashboardView({ onContact, currentUser }) {
   const reportItems = items.filter(item => item.type !== 'info').slice(0, 8);
 
   return (
-    <div style={{ backgroundImage: 'url(/night_sky_bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: 'calc(100vh - 60px)', margin: '-1.5rem', padding: '1.5rem' }}>
+    <div className="page-bg-common" style={{ backgroundImage: 'url(/night_sky_bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>{t('loadingReports')}</div>

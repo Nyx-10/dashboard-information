@@ -28,8 +28,8 @@ export function Topbar({
         </button>
         {location.pathname === '/home' && (
           <div style={{ marginLeft: '0.5rem' }}>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, lineHeight: 1, color: 'var(--text-main)' }}>Dashboard Adtec Melaka</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: '0.25rem 0 0 0' }}>{t('welcomeBack')}</p>
+            <h1 className="topbar-title" style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, lineHeight: 1, color: 'var(--text-main)' }}>Dashboard Adtec Melaka</h1>
+            <p className="topbar-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: '0.25rem 0 0 0' }}>{t('welcomeBack')}</p>
           </div>
         )}
         {isSearchActive ? (
@@ -49,7 +49,7 @@ export function Topbar({
         ) : null}
       </div>
       
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <div className="topbar-right-gap" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
         <div style={{ position: 'relative' }}>
           <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => {
             setShowNotifications(!showNotifications);
@@ -63,7 +63,7 @@ export function Topbar({
             {hasUnreadNotifications && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
           </button>
           {showNotifications && (
-            <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '110%', width: '340px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
+            <div className="glass-panel" style={{ position: 'absolute', right: '-80px', top: '110%', width: '300px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
               <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>{t('notifications')}</div>
               <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
                 {notifications.length > 0 ? (
@@ -113,12 +113,12 @@ export function Topbar({
             </div>
           )}
         </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#EF4444', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #EF4444', fontSize: '0.8rem', fontWeight: 500 }} onClick={() => setShowLogoutModal(true)}>
-          <LogOut size={16} /> {t('logout')}
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#EF4444', padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid #EF4444', fontSize: '0.8rem', fontWeight: 500 }} onClick={() => setShowLogoutModal(true)}>
+          <LogOut size={16} /> <span className="hide-on-mobile">{t('logout')}</span>
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-          <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
+          <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
               {user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User')}
             </span>

@@ -454,3 +454,38 @@ button {
   }
 }
 
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .topbar {
+    padding: 0 0.5rem !important;
+    gap: 0.5rem;
+  }
+  
+  .topbar-title {
+    font-size: 1rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+  
+  .topbar-subtitle {
+    display: none !important;
+  }
+  
+  .topbar-right-gap {
+    gap: 0.5rem !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .glass-panel {
+    padding: 1rem !important;
+  }
+}
+
