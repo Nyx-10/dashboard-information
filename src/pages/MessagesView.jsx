@@ -291,9 +291,9 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
   return (
     <div className="page-bg-common bg-messages">
-      <div style={{ display: 'flex', height: 'calc(100vh - 150px)', background: 'var(--surface)', borderRadius: '1rem', border: '1px solid var(--border)', overflow: 'hidden' }}>
+      <div className="messages-layout" style={{ display: 'flex', height: 'calc(100vh - 150px)', background: 'var(--surface)', borderRadius: '1rem', border: '1px solid var(--border)', overflow: 'hidden' }}>
       {/* Sidebar */}
-      <div style={{ width: '320px', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
+      <div className={`messages-sidebar ${activeChat ? 'hidden-on-mobile' : ''}`} style={{ width: '320px', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>{t('messages')}</h2>
           <div style={{ position: 'relative' }}>
@@ -356,7 +356,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
+      <div className={`messages-chat-area ${!activeChat ? 'hidden-on-mobile' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
         {!activeChatData ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
             <p>{t('selectConversation')}</p>
@@ -366,6 +366,9 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
             {/* Chat Header */}
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button className="mobile-only-btn" onClick={() => setActiveChat(null)} style={{ display: 'none', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer', marginRight: '-0.5rem' }}>
+                  &larr;
+                </button>
                 <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>

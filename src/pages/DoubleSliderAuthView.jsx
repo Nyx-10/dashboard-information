@@ -239,6 +239,10 @@ export function DoubleSliderAuthView({
                 <button type="submit" className="btn-primary" disabled={signupLoading}>
                   {signupLoading ? '...' : (t ? t('signUpBtn') : 'Sign Up')}
                 </button>
+                <div className="mobile-auth-switch" style={{ marginTop: '1rem', fontSize: '13px', display: 'none' }}>
+                  {t ? t('alreadyHaveAccount') || 'Already have an account? ' : 'Already have an account? '}
+                  <span onClick={() => setIsRightPanelActive(false)} style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>{t ? t('signInBtn') : 'Sign In'}</span>
+                </div>
               </>
             )}
           </form>
@@ -273,6 +277,10 @@ export function DoubleSliderAuthView({
             <button type="submit" className="btn-primary" disabled={loginLoading}>
               {loginLoading ? '...' : (t ? t('signInBtn') : 'Sign In')}
             </button>
+            <div className="mobile-auth-switch" style={{ marginTop: '1rem', fontSize: '13px', display: 'none' }}>
+              {t ? t('dontHaveAccount') || 'Don\'t have an account? ' : 'Don\'t have an account? '}
+              <span onClick={() => setIsRightPanelActive(true)} style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>{t ? t('signUpBtn') : 'Sign Up'}</span>
+            </div>
           </form>
         </div>
 

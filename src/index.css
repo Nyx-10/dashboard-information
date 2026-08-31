@@ -335,3 +335,108 @@ button {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+  .app-container {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1050;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar:not(.sidebar-collapsed) {
+    transform: translateX(0);
+    width: 280px;
+    opacity: 1;
+    pointer-events: auto;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  }
+
+  .grid-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-bg-common {
+    margin: -1rem;
+    padding: 1rem;
+  }
+  
+  .topbar {
+    padding: 0 1rem;
+  }
+
+  .ds-container {
+    width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .ds-form-container {
+    width: 100% !important;
+    transform: none !important;
+    opacity: 1 !important;
+    z-index: 5 !important;
+    transition: none !important;
+  }
+  
+  .ds-overlay-container {
+    display: none !important;
+  }
+
+  .ds-sign-up-container {
+    display: none;
+  }
+  
+  .ds-container.right-panel-active .ds-sign-in-container {
+    display: none;
+  }
+  
+  .ds-container.right-panel-active .ds-sign-up-container {
+    display: flex;
+    animation: none;
+  }
+  
+  .mobile-auth-switch {
+    display: block !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .messages-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+  
+  .hidden-on-mobile {
+    display: none !important;
+  }
+  
+  .mobile-only-btn {
+    display: block !important;
+  }
+  
+  /* Reset some paddings */
+  .messages-layout {
+    height: calc(100vh - 100px) !important;
+  }
+}
+
+
+.topbar-search {
+  width: 300px;
+}
+@media (max-width: 768px) {
+  .topbar-search {
+    width: 150px;
+  }
+}
+

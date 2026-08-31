@@ -33,7 +33,7 @@ export function Topbar({
           </div>
         )}
         {isSearchActive ? (
-          <div style={{ position: 'relative', width: '300px' }}>
+          <div className="topbar-search" style={{ position: 'relative' }}>
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
