@@ -232,18 +232,18 @@ export function DoubleSliderAuthView({
         <div className="ds-overlay-container">
           <div className="ds-overlay">
             <div className="ds-overlay-panel ds-overlay-left">
-              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>Welcome Back!</h1>
+              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>{t ? t('overlayWelcomeTitle') : 'Welcome Back!'}</h1>
               <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '14px', lineHeight: '1.5' }}>
-                To keep connected with us please login with your personal info
+                {t ? t('overlayWelcomeDesc') : 'To keep connected with us please login with your personal info'}
               </p>
-              <button className="ds-ghost-btn" style={{ borderColor: 'var(--text-main)', color: 'var(--text-main)' }} onClick={() => setIsRightPanelActive(false)}>Sign In</button>
+              <button className="ds-ghost-btn" style={{ borderColor: 'var(--text-main)', color: 'var(--text-main)' }} onClick={() => setIsRightPanelActive(false)}>{t ? t('signInBtn') : 'Sign In'}</button>
             </div>
             <div className="ds-overlay-panel ds-overlay-right">
-              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>Hello, Friend!</h1>
+              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>{t ? t('overlayHelloTitle') : 'Hello, Friend!'}</h1>
               <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '14px', lineHeight: '1.5' }}>
-                Enter your personal details and start your journey with us
+                {t ? t('overlayHelloDesc') : 'Enter your personal details and start your journey with us'}
               </p>
-              <button className="ds-ghost-btn" style={{ borderColor: 'var(--text-main)', color: 'var(--text-main)' }} onClick={() => setIsRightPanelActive(true)}>Sign Up</button>
+              <button className="ds-ghost-btn" style={{ borderColor: 'var(--text-main)', color: 'var(--text-main)' }} onClick={() => setIsRightPanelActive(true)}>{t ? t('signUpBtn') : 'Sign Up'}</button>
             </div>
           </div>
         </div>
