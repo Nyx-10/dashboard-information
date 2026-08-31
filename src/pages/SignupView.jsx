@@ -96,10 +96,10 @@ export function SignupView({ onSignup, onSwitch }) {
         `}
       </style>
 
-      <div className="auth-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4rem', width: '100%', maxWidth: '1000px', padding: '1rem', zIndex: 1 }}>
+      <div className="auth-layout glass-panel" style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', width: '100%', maxWidth: '850px', padding: '0', zIndex: 1, overflow: 'hidden' }}>
         
         {/* Animated Character on the left */}
-        <div className="auth-left-anim" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <div className="auth-left-anim" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'rgba(255,255,255,0.02)' }}>
           <img 
             src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" 
             alt="Animated Rocket" 
@@ -108,7 +108,7 @@ export function SignupView({ onSignup, onSwitch }) {
         </div>
 
         {/* Original Form on the right */}
-        <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center', flexShrink: 0 }}>
+        <div style={{ flex: 1.2, padding: '2.5rem', textAlign: 'center' }}>
           <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('signupTitle') : 'Create Account'}</h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{isSuccess ? 'Pendaftaran Berjaya!' : (t ? t('signupDesc') : 'Join the Adtec Melaka network.')}</p>
