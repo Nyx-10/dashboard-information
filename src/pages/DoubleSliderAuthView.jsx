@@ -189,7 +189,7 @@ export function DoubleSliderAuthView({
                 </div>
 
                 <button type="submit" className="btn-primary" disabled={signupLoading}>
-                  {signupLoading ? '...' : (t ? t('signupBtn') : 'Sign Up')}
+                  {signupLoading ? '...' : (t ? t('signUpBtn') : 'Sign Up')}
                 </button>
               </>
             )}
@@ -223,7 +223,7 @@ export function DoubleSliderAuthView({
             </div>
 
             <button type="submit" className="btn-primary" disabled={loginLoading}>
-              {loginLoading ? '...' : (t ? t('loginBtn') : 'Sign In')}
+              {loginLoading ? '...' : (t ? t('signInBtn') : 'Sign In')}
             </button>
           </form>
         </div>
