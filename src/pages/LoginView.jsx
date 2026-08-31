@@ -78,13 +78,13 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, o
   };
 
   return (
-    <div className="bg-auth" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem' }}>
+    <div className="bg-auth" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 10 }}>
         <button onClick={onBackToHome} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 500 }}>
           <ArrowLeft size={16} /> {t ? t('backToHome') : 'Back to Home'}
         </button>
       </div>
-      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
         <select 
           value={lang} 
           onChange={(e) => setLang(e.target.value)}
@@ -96,52 +96,85 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, o
           <option value="ta">தமிழ்</option>
         </select>
       </div>
-      <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-        <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('loginTitle') : 'Login'}</h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t ? t('loginWelcome') : 'Welcome to Dashboard Adtec Melaka.'}</p>
-        
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t ? t('emailLabel') : 'Email'}</label>
-            <input type="email" required className="input-field" placeholder="student@adtec.edu.my" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t ? t('passwordLabel') : 'Password'}</label>
-            <div style={{ position: 'relative' }}>
-              <input type={showPassword ? 'text' : 'password'} required className="input-field" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: '2.5rem' }} />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
-              <button type="button" onClick={onForgotPassword} style={{ color: 'var(--text-main)', background: 'none', border: 'none', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 500 }}>
-                {t ? t('forgotPassword') : 'Forgot Password?'}
-              </button>
-            </div>
-          </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <input 
-              type="checkbox" 
-              id="rememberMe" 
-              checked={rememberMe} 
-              onChange={(e) => setRememberMe(e.target.checked)} 
-              style={{ cursor: 'pointer' }}
-            />
-            <label htmlFor="rememberMe" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
-              {t ? t('staySignedIn') : 'Stay signed in'}
-            </label>
-          </div>
+      <style>
+        {`
+          .floating-character {
+            width: 100%;
+            max-width: 350px;
+            animation: float 4s ease-in-out infinite;
+          }
+          @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+          }
+          @media (max-width: 768px) {
+            .auth-layout { flex-direction: column !important; }
+            .auth-left-anim { display: none !important; }
+          }
+        `}
+      </style>
 
-          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '0.5rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
-            {loading ? (t ? t('loading') : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
-          </button>
-        </form>
+      <div className="auth-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4rem', width: '100%', maxWidth: '1000px', padding: '1rem', zIndex: 1 }}>
         
-        <p style={{ marginTop: '1.5rem', color: 'var(--text-muted)' }}>
-          {t ? t('noAccount') : "Don't have an account?"} <button onClick={onSwitch} style={{ color: 'var(--text-main)', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer' }}>{t ? t('signUpBtn') : 'Sign Up'}</button>
-        </p>
+        {/* Animated Character on the left */}
+        <div className="auth-left-anim" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          <img 
+            src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Raising%20Hand%20Light%20Skin%20Tone.png" 
+            alt="3D Character" 
+            className="floating-character"
+          />
+        </div>
+
+        {/* Original Form on the right */}
+        <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center', flexShrink: 0 }}>
+          <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('loginTitle') : 'Login'}</h1>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t ? t('loginWelcome') : 'Welcome to Dashboard Adtec Melaka.'}</p>
+          
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t ? t('emailLabel') : 'Email'}</label>
+              <input type="email" required className="input-field" placeholder="student@adtec.edu.my" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t ? t('passwordLabel') : 'Password'}</label>
+              <div style={{ position: 'relative' }}>
+                <input type={showPassword ? 'text' : 'password'} required className="input-field" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: '2.5rem' }} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                <button type="button" onClick={onForgotPassword} style={{ color: 'var(--text-main)', background: 'none', border: 'none', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 500 }}>
+                  {t ? t('forgotPassword') : 'Forgot Password?'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <input 
+                type="checkbox" 
+                id="rememberMe" 
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)} 
+                style={{ cursor: 'pointer' }}
+              />
+              <label htmlFor="rememberMe" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                {t ? t('staySignedIn') : 'Stay signed in'}
+              </label>
+            </div>
+
+            <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: '0.5rem', padding: '0.75rem', width: '100%', opacity: loading ? 0.7 : 1 }}>
+              {loading ? (t ? t('loading') : 'Loading...') : (t ? t('signInBtn') : 'Sign In')}
+            </button>
+          </form>
+          
+          <p style={{ marginTop: '1.5rem', color: 'var(--text-muted)' }}>
+            {t ? t('noAccount') : "Don't have an account?"} <button onClick={onSwitch} style={{ color: 'var(--text-main)', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer' }}>{t ? t('signUpBtn') : 'Sign Up'}</button>
+          </p>
+        </div>
       </div>
     </div>
   );
