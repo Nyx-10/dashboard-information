@@ -64,7 +64,7 @@ export function DoubleSliderAuthView({
       }
       
       let role = profile?.role || data.user.user_metadata?.role || 'user';
-      let name = profile?.username || data.user.user_metadata?.name || 'User';
+      let name = profile?.username || data.user.user_metadata?.full_name || data.user.user_metadata?.username || data.user.user_metadata?.name || 'User';
       
       const normalizedEmail = loginEmail.trim().toLowerCase();
       if (!profile?.role) {

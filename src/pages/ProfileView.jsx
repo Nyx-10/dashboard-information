@@ -22,7 +22,7 @@ export function ProfileView({ onContact, currentUser }) {
       
       if (supabaseUser) {
         setUser({
-          name: supabaseUser.user_metadata?.name || 'User',
+          name: currentUser?.name || supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.username || 'User',
           email: supabaseUser.email
         });
 
