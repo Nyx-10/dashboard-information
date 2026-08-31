@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, Sun, Moon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
@@ -72,9 +72,19 @@ export function ProfileView({ onContact, currentUser }) {
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{user?.name || 'User Name'}</h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{user?.email || 'Email'}</p>
-          <div style={{ display: 'flex', gap: '1rem', position: 'relative', zIndex: 20 }}>
+          <div style={{ display: 'flex', gap: '1rem', position: 'relative', zIndex: 20, flexWrap: 'wrap' }}>
             <button className="btn-primary" style={{ background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border)' }} onClick={() => setShowSettings(!showSettings)}>
               <Settings size={18} /> {t('languageSettings')}
+            </button>
+            <button className="btn-primary" style={{ background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border)' }} onClick={() => {
+              const html = document.documentElement;
+              const currentTheme = html.getAttribute('data-theme');
+              const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+              html.setAttribute('data-theme', newTheme);
+              localStorage.setItem('theme', newTheme);
+            }}>
+              {document.documentElement.getAttribute('data-theme') === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              {' '}{document.documentElement.getAttribute('data-theme') === 'light' ? (t('darkMode') || 'Dark Mode') : (t('lightMode') || 'Light Mode')}
             </button>
 
             {showSettings && (

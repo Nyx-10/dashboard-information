@@ -12,6 +12,7 @@ export function AddItemView({ onSuccess }) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
+  const [category, setCategory] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
   const handleDrag = (e) => {
@@ -105,6 +106,7 @@ export function AddItemView({ onSuccess }) {
             date,
             description,
             image: imageUrl,
+            category: category || null,
             status: 'open',
             created_by: user ? user.id : null 
           }
@@ -162,6 +164,24 @@ export function AddItemView({ onSuccess }) {
               </div>
             )}
           </div>
+
+          {type !== 'info' && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('category') || 'Kategori'}</label>
+              <select className="input-field" value={category} onChange={(e) => setCategory(e.target.value)}>
+                <option value="">{t('selectCategory') || '-- Pilih Kategori --'}</option>
+                <option value="Telefon">📱 {t('catPhone') || 'Telefon'}</option>
+                <option value="Kad Pelajar">🪪 {t('catStudentCard') || 'Kad Pelajar'}</option>
+                <option value="Kunci">🔑 {t('catKeys') || 'Kunci'}</option>
+                <option value="Buku">📚 {t('catBooks') || 'Buku'}</option>
+                <option value="Pakaian">👕 {t('catClothing') || 'Pakaian'}</option>
+                <option value="Dompet">👛 {t('catWallet') || 'Dompet'}</option>
+                <option value="Elektronik">💻 {t('catElectronics') || 'Elektronik'}</option>
+                <option value="Dokumen">📄 {t('catDocuments') || 'Dokumen'}</option>
+                <option value="Lain-lain">📦 {t('catOthers') || 'Lain-lain'}</option>
+              </select>
+            </div>
+          )}
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('description')}</label>

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MapPin, Calendar, Trash2 } from 'lucide-react';
+import { MapPin, Calendar, Trash2, Share2 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
 export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
@@ -28,6 +28,18 @@ export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 'auto', marginBottom: '0.5rem' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><MapPin size={10} /> {item.type === 'info' ? t('defaultLocation') : item.location}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Calendar size={10} /> {item.date}</span>
+          {item.category && <span style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--primary)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 600 }}>{item.category}</span>}
+          <button 
+            onClick={() => {
+              const title = item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title;
+              const text = `*${title}*\n📍 ${item.type === 'info' ? t('defaultLocation') : item.location}\n📅 ${item.date}\n\n${item.description || ''}\n\n${window.location.origin}`;
+              window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', background: 'none', border: 'none', color: '#25D366', cursor: 'pointer', fontSize: '0.65rem', marginLeft: 'auto', padding: 0 }}
+            title="Share to WhatsApp"
+          >
+            <Share2 size={10} /> Share
+          </button>
         </div>
         
         {item.type !== 'info' && currentUserId && item.created_by !== currentUserId && (

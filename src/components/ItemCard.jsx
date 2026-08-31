@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MapPin, Calendar, MessageSquare } from 'lucide-react';
+import { MapPin, Calendar, MessageSquare, Share2 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
 export function ItemCard({ item, onContact, currentUser, onDelete }) {
@@ -33,6 +33,18 @@ export function ItemCard({ item, onContact, currentUser, onDelete }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Calendar size={16} /> {item.date}
           </div>
+          {item.category && <span style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--primary)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>{item.category}</span>}
+          <button 
+            onClick={() => {
+              const title = item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title;
+              const text = `*${title}*\n📍 ${item.type === 'info' ? t('defaultLocation') : item.location}\n📅 ${item.date}\n\n${item.description || ''}\n\n${window.location.origin}`;
+              window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            }}
+            className="btn-primary" 
+            style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer' }}
+          >
+            <Share2 size={16} /> WhatsApp
+          </button>
           {item.type !== 'info' && currentUserId && item.created_by !== currentUserId && (
             <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => { if (onContact) onContact(item.created_by, item.title); else alert(t('messagingComingSoon')); }}>
               <MessageSquare size={16} /> {t('contactReporter')}
