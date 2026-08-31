@@ -196,17 +196,17 @@ export function DoubleSliderAuthView({
             
             {showOtpInput ? (
               <>
-                <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t ? t('otpSentMsg') : 'Sila masukkan kod OTP 6-digit yang dihantar ke emel anda.'}</p>
+                <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t ? t('otpSentMsg') : 'Sila masukkan kod OTP yang dihantar ke emel anda.'}</p>
                 {otpError && <div style={{ color: '#ef4444', marginBottom: '10px', fontSize: '13px' }}>{otpError}</div>}
                 
                 <input 
                   type="text" 
-                  placeholder="000000" 
+                  placeholder="Contoh: 12345678" 
                   className="input-field" 
                   value={otpCode} 
                   onChange={(e) => setOtpCode(e.target.value)} 
-                  maxLength={6}
-                  style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}
+                  maxLength={8}
+                  style={{ textAlign: 'center', letterSpacing: '0.2rem', fontSize: '1.25rem', fontWeight: 'bold' }}
                   required 
                 />
 
