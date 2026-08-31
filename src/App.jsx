@@ -371,15 +371,15 @@ export default function App() {
 
         <div className="page-content animate-fade-in" onClick={() => showNotifications && setShowNotifications(false)}>
           <Routes>
-            <Route path="/home" element={<DashboardView onContact={handleContact} />} />
-            <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} />} />
+            <Route path="/home" element={<DashboardView onContact={handleContact} currentUser={user} />} />
+            <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />} />
             <Route path="/admin-analytics" element={<AdminAnalyticsView />} />
-            <Route path="/admin-users" element={<AdminUsersView />} />
-            <Route path="/admin-reports" element={<AdminReportsView />} />
+            <Route path="/admin-users" element={<AdminUsersView currentUser={user} />} />
+            <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
             <Route path="/admin-logs" element={<AdminAuditLogsView />} />
             <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
             <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} />} />
-            <Route path="/profile" element={<ProfileView onContact={handleContact} />} />
+            <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </div>
