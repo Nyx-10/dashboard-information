@@ -1,0 +1,187 @@
+.double-slider-wrapper {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: var(--background);
+}
+
+.ds-container {
+  background-color: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  position: relative;
+  overflow: hidden;
+  width: 900px;
+  max-width: 100%;
+  min-height: 550px;
+  border: 1px solid var(--border);
+}
+
+.ds-form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+}
+
+.ds-sign-in-container {
+  left: 0;
+  width: 50%;
+  z-index: 2;
+}
+
+.ds-container.right-panel-active .ds-sign-in-container {
+  transform: translateX(100%);
+}
+
+.ds-sign-up-container {
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+}
+
+.ds-container.right-panel-active .ds-sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+  animation: show 0.6s;
+}
+
+@keyframes show {
+  0%, 49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+  50%, 100% {
+    opacity: 1;
+    z-index: 5;
+  }
+}
+
+.ds-overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+}
+
+.ds-container.right-panel-active .ds-overlay-container {
+  transform: translateX(-100%);
+}
+
+.ds-overlay {
+  background: var(--primary, #3b82f6);
+  background: linear-gradient(to right, var(--primary, #3b82f6), #2563eb);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 0;
+  color: #FFFFFF;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+.ds-container.right-panel-active .ds-overlay {
+  transform: translateX(50%);
+}
+
+.ds-overlay-panel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 40px;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+.ds-overlay-left {
+  transform: translateX(-20%);
+}
+
+.ds-container.right-panel-active .ds-overlay-left {
+  transform: translateX(0);
+}
+
+.ds-overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.ds-container.right-panel-active .ds-overlay-right {
+  transform: translateX(20%);
+}
+
+.ds-form {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 50px;
+  height: 100%;
+  text-align: center;
+}
+
+.ds-ghost-btn {
+  background-color: transparent;
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid #FFFFFF;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.ds-ghost-btn:active {
+  transform: scale(0.95);
+}
+
+.ds-ghost-btn:focus {
+  outline: none;
+}
+
+.ds-form h1 {
+  font-weight: bold;
+  margin: 0;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.ds-form span {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+}
+
+.ds-form .input-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.ds-form .btn-primary {
+  border-radius: 20px;
+  margin-top: 10px;
+  width: 100%;
+}

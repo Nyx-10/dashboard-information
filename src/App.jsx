@@ -14,8 +14,7 @@ import { SearchView } from './pages/SearchView';
 import { AddItemView } from './pages/AddItemView';
 import { MessagesView } from './pages/MessagesView';
 import { ProfileView } from './pages/ProfileView';
-import { LoginView } from './pages/LoginView';
-import { SignupView } from './pages/SignupView';
+import { DoubleSliderAuthView } from './pages/DoubleSliderAuthView';
 import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
@@ -327,16 +326,15 @@ export default function App() {
 
   if (!isAuthenticated) {
     let authContent;
-    if (authMode === 'login') {
-      authContent = <LoginView 
+    if (authMode === 'login' || authMode === 'signup') {
+      authContent = <DoubleSliderAuthView 
+          initialMode={authMode}
           onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} 
-          onSwitch={() => setAuthMode('signup')} 
+          onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} 
           onForgotPassword={() => setAuthMode('forgot-password')} 
           onBackToHome={() => setShowLanding(true)}
           onMaintenanceMode={() => setShowMaintenanceScreen(true)}
         />;
-    } else if (authMode === 'signup') {
-      authContent = <SignupView onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} onSwitch={() => setAuthMode('login')} />;
     } else if (authMode === 'forgot-password') {
       authContent = <ForgotPasswordView onSwitchBack={() => setAuthMode('login')} />;
     } else if (authMode === 'reset-password') {
