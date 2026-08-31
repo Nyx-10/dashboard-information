@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Users, FileText, CheckCircle, Activity, Clock, User, Shield } from 'lucide-react';
+import { Users, FileText, CheckCircle, Activity, Clock, User, Shield, Download } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
 export const AdminAnalyticsView = () => {
