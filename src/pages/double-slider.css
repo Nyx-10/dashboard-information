@@ -21,6 +21,7 @@
 
 .ds-container.right-panel-active .ds-sign-in-container {
   transform: translateX(100%);
+  opacity: 0;
 }
 
 .ds-sign-up-container {
