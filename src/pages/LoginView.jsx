@@ -40,10 +40,28 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, o
         console.error("Profile fetch error:", profileError);
       }
 
-      // Check if user is suspended
+      // Check if user is suspended & Auto-unsuspend if duration expired
       if (profile && profile.status === 'Suspended') {
-        await supabase.auth.signOut();
-        throw new Error(t('accountSuspended'));
+        if (profile.suspended_until && new Date(profile.suspended_until) <= new Date()) {
+          // Suspension duration has ended -> System automatically unsuspends user
+          await supabase.from('profiles').update({
+            status: 'Active',
+            suspended_until: null
+          }).eq('id', profile.id);
+          
+          profile.status = 'Active';
+          profile.suspended_until = null;
+        } else {
+          await supabase.auth.signOut();
+          let suspendMsg = t('accountSuspended') || 'Your account has been suspended by the Admin.';
+          if (profile.suspended_until) {
+            const untilDate = new Date(profile.suspended_until).toLocaleString('ms-MY', {
+              day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            suspendMsg += ` (${t('suspendedUntilDate') || 'Digantung sehingga'} ${untilDate})`;
+          }
+          throw new Error(suspendMsg);
+        }
       }
       
       let role = profile?.role || data.user.user_metadata?.role || 'user';

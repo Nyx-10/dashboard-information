@@ -40,6 +40,9 @@ export const AdminUsersView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [suspendTargetUser, setSuspendTargetUser] = useState(null);
+  const [suspendDaysOption, setSuspendDaysOption] = useState('7');
+  const [customDaysVal, setCustomDaysVal] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -59,24 +62,38 @@ export const AdminUsersView = ({ currentUser }) => {
       }
       
       if (data && data.length > 0) {
-        setUsers(data.map(u => {
+        const now = new Date();
+        const processedUsers = await Promise.all(data.map(async u => {
+          let status = u.status || 'Active';
+          let suspendedUntil = u.suspended_until;
+
+          // Auto-unsuspend check if suspension duration has expired
+          if (status === 'Suspended' && suspendedUntil && new Date(suspendedUntil) <= now) {
+            status = 'Active';
+            suspendedUntil = null;
+            await supabase.from('profiles').update({ status: 'Active', suspended_until: null }).eq('id', u.id);
+          }
+
           let normalizedRole = 'User';
           if (u.role) {
             const r = u.role.toLowerCase();
             if (r === 'superadmin' || r === 'super admin') normalizedRole = 'Super Admin';
             else if (r === 'admin') normalizedRole = 'Admin';
           }
-          
+
           return {
             id: u.id,
             name: u.username || 'Unknown',
             email: u.email || 'No Email',
             role: normalizedRole,
-            status: u.status || 'Active'
+            status: status,
+            suspendedUntil: suspendedUntil
           };
         }));
+
+        setUsers(processedUsers);
       } else {
-        setUsers(mockUsers); // Fallback to mock data if empty
+        setUsers(mockUsers);
       }
     } catch (e) {
       console.error('Exception fetching profiles:', e);
@@ -111,21 +128,72 @@ export const AdminUsersView = ({ currentUser }) => {
       }
     } catch (e) {
       alert(t('alertFailedUpdateRole') + e.message);
-      fetchUsers(); // revert
+      fetchUsers();
     }
   };
 
-  const handleToggleSuspend = async (user) => {
-    const newStatus = user.status === 'Active' ? 'Suspended' : 'Active';
-    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: newStatus } : u)));
+  const handleToggleSuspendClick = (user) => {
+    if (user.status === 'Suspended') {
+      handleUnsuspend(user);
+    } else {
+      setSuspendTargetUser(user);
+      setSuspendDaysOption('7');
+      setCustomDaysVal('');
+    }
+  };
+
+  const handleUnsuspend = async (user) => {
+    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: 'Active', suspendedUntil: null } : u)));
     try {
-      const { error } = await supabase.from('profiles').update({ status: newStatus }).eq('id', user.id);
+      const { error } = await supabase.from('profiles').update({ status: 'Active', suspended_until: null }).eq('id', user.id);
       if (error) throw error;
       
-      logAction(`Menukar status pengguna (${user.email}) kepada ${newStatus}`);
+      logAction(`Mengaktifkan semula akaun pengguna (${user.email})`);
     } catch (e) {
-      alert(t('alertFailedSuspend') + e.message);
-      fetchUsers(); // revert
+      alert((t('alertFailedSuspend') || 'Failed to activate user: ') + e.message);
+      fetchUsers();
+    }
+  };
+
+  const handleConfirmSuspend = async () => {
+    if (!suspendTargetUser) return;
+    
+    let days = 0;
+    if (suspendDaysOption === 'custom') {
+      days = parseInt(customDaysVal, 10);
+    } else {
+      days = parseInt(suspendDaysOption, 10);
+    }
+
+    if (isNaN(days) || days < 0) days = 0;
+
+    let suspendedUntil = null;
+    let dateStr = '';
+    if (days > 0) {
+      const until = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      suspendedUntil = until.toISOString();
+      dateStr = until.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    setUsers((prev) => prev.map((u) => (u.id === suspendTargetUser.id ? { ...u, status: 'Suspended', suspendedUntil } : u)));
+
+    try {
+      const { error } = await supabase.from('profiles').update({
+        status: 'Suspended',
+        suspended_until: suspendedUntil
+      }).eq('id', suspendTargetUser.id);
+
+      if (error) throw error;
+
+      const logText = days > 0 
+        ? `Menggantung akaun pengguna (${suspendTargetUser.email}) selama ${days} hari (sehingga ${dateStr})`
+        : `Menggantung akaun pengguna (${suspendTargetUser.email}) secara kekal`;
+
+      logAction(logText);
+      setSuspendTargetUser(null);
+    } catch (e) {
+      alert((t('alertFailedSuspend') || 'Failed to suspend user: ') + e.message);
+      fetchUsers();
     }
   };
 
@@ -134,10 +202,8 @@ export const AdminUsersView = ({ currentUser }) => {
     if (!window.confirm(t('confirmDeleteUser'))) return;
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
-      // Panggil fungsi RPC untuk padam pengguna dari auth.users sepenuhnya
       const { error } = await supabase.rpc('delete_user_completely', { target_user_id: userId });
       
-      // Fallback jika RPC tidak dijumpai (contoh: belum setup SQL)
       if (error && error.message.includes('function delete_user_completely does not exist')) {
          const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
          if (profileError) throw profileError;
@@ -150,7 +216,7 @@ export const AdminUsersView = ({ currentUser }) => {
       }
     } catch (e) {
       alert(t('alertFailedDelete') + e.message);
-      fetchUsers(); // revert
+      fetchUsers();
     }
   };
 
@@ -164,7 +230,7 @@ export const AdminUsersView = ({ currentUser }) => {
 
   const canModifyUser = (targetUser) => {
     if (!currentUser) return false;
-    if (currentUser.id === targetUser.id) return false; // Cannot modify self from here
+    if (currentUser.id === targetUser.id) return false;
     if (currentUser.role === 'superadmin') return true;
     if (currentUser.role === 'admin' && (targetUser.role === 'Admin' || targetUser.role === 'Super Admin')) return false;
     return true;
@@ -219,7 +285,18 @@ export const AdminUsersView = ({ currentUser }) => {
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{user.email}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-main)' }}>{user.role}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>
-                  <span style={badgeStyle(user.status)}>{user.status}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                    <span style={badgeStyle(user.status)}>{user.status}</span>
+                    {user.status === 'Suspended' && (
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        {user.suspendedUntil ? (
+                          `⏰ ${t('suspendedUntilDate') || 'Sehingga'} ${new Date(user.suspendedUntil).toLocaleDateString('ms-MY')}`
+                        ) : (
+                          `🔒 ${t('indefinite') || 'Kekal'}`
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td style={{ padding: '1rem 1.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', opacity: canEdit ? 1 : 0.5 }}>
                   <select
@@ -242,7 +319,7 @@ export const AdminUsersView = ({ currentUser }) => {
                     <option value="Admin">Admin</option>
                     {currentUser?.role === 'superadmin' && <option value="Super Admin">Super Admin</option>}
                   </select>
-                  <button onClick={() => handleToggleSuspend(user)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={user.status === 'Suspended' ? (t('activate') || 'Activate') : (t('suspend') || 'Suspend')}>
+                  <button onClick={() => handleToggleSuspendClick(user)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: user.status === 'Suspended' ? '#10B981' : '#F59E0B', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={user.status === 'Suspended' ? (t('activate') || 'Activate') : (t('suspend') || 'Suspend')}>
                     {user.status === 'Suspended' ? <CheckCircle size={18} /> : <UserX size={18} />}
                   </button>
                   <button onClick={() => handleDeleteUser(user.id)} disabled={!canEdit} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canEdit ? 'pointer' : 'not-allowed' }} title={t('deleteBtn') || 'Delete'}>
@@ -254,6 +331,148 @@ export const AdminUsersView = ({ currentUser }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Suspend Duration Modal */}
+      {suspendTargetUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            width: '100%',
+            maxWidth: '450px',
+            background: 'var(--surface)',
+            borderRadius: '1rem',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--border)',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <UserX size={20} color="#F59E0B" />
+                {t('suspendModalTitle') || 'Gantung Akaun Pengguna'}
+              </h3>
+              <button onClick={() => setSuspendTargetUser(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Pengguna:</p>
+                <p style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '1rem' }}>{suspendTargetUser.name} ({suspendTargetUser.email})</p>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                  {t('suspendDurationLabel') || 'Pilih Tempoh Penggantungan'}
+                </label>
+                <select
+                  value={suspendDaysOption}
+                  onChange={(e) => setSuspendDaysOption(e.target.value)}
+                  className="input-field"
+                  style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.875rem' }}
+                >
+                  <option value="1">1 {t('dayCount1') || '1 Hari'}</option>
+                  <option value="3">3 {t('dayCount3') || '3 Hari'}</option>
+                  <option value="7">7 {t('dayCount7') || '7 Hari'}</option>
+                  <option value="14">14 {t('dayCount14') || '14 Hari'}</option>
+                  <option value="30">30 {t('dayCount30') || '30 Hari'}</option>
+                  <option value="custom">{t('customDays') || 'Hari Tersuai'}</option>
+                  <option value="0">{t('indefinite') || 'Kekal (Tanpa Had)'}</option>
+                </select>
+              </div>
+
+              {suspendDaysOption === 'custom' && (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                    {t('customDays') || 'Bilangan Hari'}:
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="365"
+                    className="input-field"
+                    placeholder="Contoh: 5"
+                    value={customDaysVal}
+                    onChange={(e) => setCustomDaysVal(e.target.value)}
+                    style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.875rem' }}
+                  />
+                </div>
+              )}
+
+              {/* Date Preview Box */}
+              <div style={{
+                padding: '0.75rem 1rem',
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: '0.5rem',
+                fontSize: '0.85rem',
+                color: '#D97706',
+                fontWeight: 500
+              }}>
+                {(() => {
+                  let days = suspendDaysOption === 'custom' ? parseInt(customDaysVal, 10) : parseInt(suspendDaysOption, 10);
+                  if (isNaN(days) || days <= 0) {
+                    return '🔒 Akaun akan digantung secara kekal sehingga diaktifkan semula secara manual.';
+                  }
+                  const until = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+                  const str = until.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                  return `⏰ Akaun akan digantung sehingga: ${str} (Sistem akan automatik unsuspend selepas tempoh tamat)`;
+                })()}
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setSuspendTargetUser(null)}
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    borderRadius: '0.5rem',
+                    border: '1px solid var(--border)',
+                    background: 'transparent',
+                    color: 'var(--text-main)',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('cancel') || 'Batal'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmSuspend}
+                  className="btn-primary"
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    borderRadius: '0.5rem',
+                    background: '#F59E0B',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('confirmSuspendBtn') || 'Gantung Akaun'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
