@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Users, FileText, CheckCircle, Activity, Clock, User, Shield, Download } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
-export const AdminAnalyticsView = () => {
+export const AdminAnalyticsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -11,6 +11,12 @@ export const AdminAnalyticsView = () => {
     activeUsers: 0
   });
   const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
+
+  const normalizedRole = currentUser?.role ? currentUser.role.toLowerCase().replace(/\s+/g, '') : '';
+  const isSuperAdmin = Boolean(
+    normalizedRole === 'superadmin' ||
+    (currentUser?.email && currentUser.email.toLowerCase().includes('adam.darwish.it'))
+  );
 
   useEffect(() => {
     fetchAnalytics();
@@ -115,49 +121,50 @@ export const AdminAnalyticsView = () => {
         ))}
       </div>
 
-      {/* Maintenance Mode Toggle Section */}
-      <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderLeft: `4px solid ${isMaintenanceActive ? '#EF4444' : '#10B981'}`, background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.05)' : 'var(--surface)' }}>
-        <div>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Shield size={20} color={isMaintenanceActive ? '#EF4444' : '#10B981'} /> {t('maintenanceMode') || 'Maintenance Mode'} 
-            <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '1rem', background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: isMaintenanceActive ? '#EF4444' : '#10B981', marginLeft: '0.5rem' }}>
-              {isMaintenanceActive ? (t('maintenanceActive') || 'AKTIF') : (t('maintenanceInactive') || 'TIDAK AKTIF')}
-            </span>
-          </h3>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            {t('maintenanceDesc') || 'Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.'}
-          </p>
-        </div>
-        <button 
-          onClick={async () => {
-            const confirmed = window.confirm(t('confirmMaintenanceToggle') || `Adakah anda pasti untuk menukar status Maintenance Mode?`);
-            if (confirmed) {
-              try {
-                // Fetch the absolute latest status from DB to avoid any stale state
-                const { data } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
-                let currentStatus = false;
-                if (data) currentStatus = data.is_maintenance_mode;
+      {/* Maintenance Mode Toggle Section - Only for Super Admin */}
+      {isSuperAdmin && (
+        <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderLeft: `4px solid ${isMaintenanceActive ? '#EF4444' : '#10B981'}`, background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.05)' : 'var(--surface)' }}>
+          <div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Shield size={20} color={isMaintenanceActive ? '#EF4444' : '#10B981'} /> {t('maintenanceMode') || 'Maintenance Mode'} 
+              <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '1rem', background: isMaintenanceActive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: isMaintenanceActive ? '#EF4444' : '#10B981', marginLeft: '0.5rem' }}>
+                {isMaintenanceActive ? (t('maintenanceActive') || 'AKTIF') : (t('maintenanceInactive') || 'TIDAK AKTIF')}
+              </span>
+            </h3>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+              {t('maintenanceDesc') || 'Jika diaktifkan, pengguna biasa tidak boleh log masuk ke dalam sistem sehingga ia dimatikan.'}
+            </p>
+          </div>
+          <button 
+            onClick={async () => {
+              const confirmed = window.confirm(t('confirmMaintenanceToggle') || `Adakah anda pasti untuk menukar status Maintenance Mode?`);
+              if (confirmed) {
+                try {
+                  const { data } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
+                  let currentStatus = false;
+                  if (data) currentStatus = data.is_maintenance_mode;
 
-                const newStatus = !currentStatus;
-                const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: newStatus }).eq('id', 1);
-                if (updateError) throw updateError;
-                
-                setIsMaintenanceActive(newStatus);
-              } catch (err) {
-                if (err.code === '42P01') {
-                   alert("Table 'system_settings' not found. Please run the SQL script.");
-                } else {
-                   alert("Failed to change status: " + err.message);
+                  const newStatus = !currentStatus;
+                  const { error: updateError } = await supabase.from('system_settings').update({ is_maintenance_mode: newStatus }).eq('id', 1);
+                  if (updateError) throw updateError;
+                  
+                  setIsMaintenanceActive(newStatus);
+                } catch (err) {
+                  if (err.code === '42P01') {
+                     alert("Table 'system_settings' not found. Please run the SQL script.");
+                  } else {
+                     alert("Failed to change status: " + err.message);
+                  }
                 }
               }
-            }
-          }}
-          className="btn-primary" 
-          style={{ background: isMaintenanceActive ? '#EF4444' : '#10B981', padding: '0.75rem 1.5rem', fontWeight: 600, border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '0.5rem' }}
-        >
-           {isMaintenanceActive ? (t('maintenanceTurnOff') || 'Matikan (Off)') : (t('maintenanceTurnOn') || 'Aktifkan (On)')}
-        </button>
-      </div>
+            }}
+            className="btn-primary" 
+            style={{ background: isMaintenanceActive ? '#EF4444' : '#10B981', padding: '0.75rem 1.5rem', fontWeight: 600, border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '0.5rem' }}
+          >
+             {isMaintenanceActive ? (t('maintenanceTurnOff') || 'Matikan (Off)') : (t('maintenanceTurnOn') || 'Aktifkan (On)')}
+          </button>
+        </div>
+      )}
 
     </div>
   );

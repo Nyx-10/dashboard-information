@@ -373,7 +373,7 @@ export default function App() {
           <Routes>
             <Route path="/home" element={<DashboardView onContact={handleContact} currentUser={user} />} />
             <Route path="/search" element={<SearchView query={searchQuery} setQuery={setSearchQuery} onContact={handleContact} currentUser={user} />} />
-            <Route path="/admin-analytics" element={<AdminAnalyticsView />} />
+            <Route path="/admin-analytics" element={<AdminAnalyticsView currentUser={user} />} />
             <Route path="/admin-users" element={<AdminUsersView currentUser={user} />} />
             <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
             <Route path="/admin-logs" element={<AdminAuditLogsView />} />
