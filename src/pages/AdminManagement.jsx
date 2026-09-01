@@ -152,6 +152,18 @@ export const AdminUsersView = ({ currentUser }) => {
       if (error) throw error;
       
       logAction(`Mengaktifkan semula akaun pengguna (${user.email})`);
+
+      if (user.email) {
+        await fetch('/api/send-notification-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            title: 'Akaun Diaktifkan Semula',
+            message: `Berita baik! Akaun ADTEC Dashboard anda telah diaktifkan semula oleh pentadbir. Anda kini boleh log masuk seperti biasa.`
+          })
+        }).catch(console.error);
+      }
     } catch (e) {
       alert((t('alertFailedSuspend') || 'Failed to activate user: ') + e.message);
       fetchUsers();
@@ -193,6 +205,26 @@ export const AdminUsersView = ({ currentUser }) => {
         : `Menggantung akaun pengguna (${suspendTargetUser.email}) secara kekal`;
 
       logAction(logText);
+
+      // Send email notification to the suspended user
+      if (suspendTargetUser.email) {
+        let msg = `Akaun ADTEC Dashboard anda telah digantung oleh pentadbir atas sebab melanggar terma dan syarat. `;
+        if (days > 0) {
+          msg += `Akaun anda akan digantung selama ${days} hari dan boleh diakses semula selepas ${dateStr}.`;
+        } else {
+          msg += `Akaun anda telah digantung secara KEKAL. Sila hubungi pihak pentadbiran jika ini adalah satu kesilapan.`;
+        }
+        await fetch('/api/send-notification-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: suspendTargetUser.email,
+            title: 'Notis Penggantungan Akaun',
+            message: msg
+          })
+        }).catch(console.error);
+      }
+
       setSuspendTargetUser(null);
     } catch (e) {
       alert((t('alertFailedSuspend') || 'Failed to suspend user: ') + e.message);
@@ -569,6 +601,30 @@ export const AdminReportsView = ({ currentUser }) => {
           action: `Menukar status laporan (${report.reportedEmail || id}) kepada ${newStatus}`,
           user_email: currentUser.email
         });
+
+        // Insert smart notification for the reporter
+        if (report.reporter_id) {
+          await supabase.from('notifications').insert({
+            user_id: report.reporter_id,
+            title: `Status Laporan Dikemas Kini`,
+            message: `Laporan anda terhadap ${report.reportedName} kini berstatus: ${newStatus}.`,
+            type: 'report'
+          });
+
+          // Fetch reporter email
+          const { data: reporterProfile } = await supabase.from('profiles').select('email').eq('id', report.reporter_id).single();
+          if (reporterProfile?.email) {
+            await fetch('/api/send-notification-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: reporterProfile.email,
+                title: 'Status Laporan Anda Telah Dikemas Kini',
+                message: `Laporan anda terhadap pengguna ${report.reportedName} telah disemak oleh Admin dan kini berstatus: ${newStatus}. Terima kasih kerana membantu komuniti ADTEC Melaka.`
+              })
+            }).catch(console.error);
+          }
+        }
       }
       
       fetchReports();

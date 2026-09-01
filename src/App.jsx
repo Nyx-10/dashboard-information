@@ -70,8 +70,8 @@ export default function App() {
       fetchNotifications();
       fetchTotalUnreadMessages();
 
-      const itemsChannel = supabase.channel('public:items')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
+      const notifChannel = supabase.channel('public:notifications')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => {
           fetchNotifications();
         })
         .subscribe();
@@ -118,7 +118,7 @@ export default function App() {
         });
 
       return () => {
-        supabase.removeChannel(itemsChannel);
+        supabase.removeChannel(notifChannel);
         supabase.removeChannel(messagesChannel);
         supabase.removeChannel(presenceChannel);
         supabase.removeChannel(profileChannel);
@@ -129,12 +129,12 @@ export default function App() {
   const fetchNotifications = async () => {
     if (!user || !user.id) return;
     try {
-      const { data: itemsData } = await supabase
-        .from('items')
+      const { data: notifData } = await supabase
+        .from('notifications')
         .select('*')
-        .neq('status', 'deleted')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(5);
       
       const { data: messagesData } = await supabase
         .from('messages')
@@ -147,8 +147,8 @@ export default function App() {
         .limit(3);
 
       let allNotifs = [];
-      if (itemsData) {
-        allNotifs = [...allNotifs, ...itemsData.map(item => ({ ...item, notifType: 'item' }))];
+      if (notifData) {
+        allNotifs = [...allNotifs, ...notifData.map(n => ({ ...n, notifType: 'system' }))];
       }
       if (messagesData) {
         allNotifs = [...allNotifs, ...messagesData.map(msg => ({ 

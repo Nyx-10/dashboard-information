@@ -94,9 +94,9 @@ export function Topbar({
                           </>
                         ) : (
                           <>
-                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{t('newReport')} {item.type === 'lost' ? t('badgeLost') : item.type === 'found' ? t('badgeFound') : t('badgeInfo')}</p>
+                            <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '0.25rem', textTransform: 'capitalize' }}>{item.title}</p>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                              {item.type === 'info' ? `${t('defaultInfoTitle')} (${item.date})` : item.title} - {item.type === 'info' ? t('defaultLocation') : item.location}
+                              {item.message}
                             </p>
                           </>
                         )}
