@@ -293,7 +293,7 @@ export default function App() {
 
   if (isCheckingAuth) {
     return (
-      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)' }}>
+      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
         <div className="spinner" style={{ width: '40px', height: '40px', borderColor: 'rgba(79, 70, 229, 0.3)', borderLeftColor: 'var(--primary)' }}></div>
       </div>
     );
@@ -301,7 +301,7 @@ export default function App() {
 
   if (showMaintenanceScreen) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', background: 'var(--background)', textAlign: 'center', padding: '2rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
         <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>{t('systemUnderMaintenance') || 'Sistem Sedang Diselenggara'}</h1>
         <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>

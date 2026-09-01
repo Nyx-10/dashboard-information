@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root,
 [data-theme="light"] {
@@ -37,10 +37,52 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--background);
+  background: linear-gradient(-45deg, var(--background), var(--surface), var(--background));
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before, body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::before {
+  background: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.08), transparent 50%),
+              radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08), transparent 50%);
+  animation: floatingShapes 20s ease-in-out infinite alternate;
+}
+
+body::after {
+  background: radial-gradient(circle at 50% 80%, rgba(79, 70, 229, 0.05), transparent 50%);
+  animation: floatingShapes2 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatingShapes {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.1) translate(2%, 3%); }
+}
+
+@keyframes floatingShapes2 {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.2) translate(-2%, -2%); }
 }
 
 a {

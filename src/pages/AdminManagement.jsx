@@ -127,7 +127,19 @@ export const AdminUsersView = ({ currentUser }) => {
       
       const updatedUser = users.find(u => u.id === userId);
       if (updatedUser) {
-        logAction(`Menukar pangkat pengguna (${updatedUser.email}) kepada ${newRole}`);
+        logAction(t('logRoleChange').replace('{email}', updatedUser.email).replace('{role}', newRole));
+
+        if (updatedUser.email) {
+          await fetch('/api/send-notification-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: updatedUser.email,
+              title: t('emailRoleChangeTitle'),
+              message: t('emailRoleChangeMsg').replace('{role}', newRole)
+            })
+          }).catch(console.error);
+        }
       }
     } catch (e) {
       alert(t('alertFailedUpdateRole') + e.message);
@@ -151,7 +163,7 @@ export const AdminUsersView = ({ currentUser }) => {
       const { error } = await supabase.from('profiles').update({ status: 'Active', suspended_until: null }).eq('id', user.id);
       if (error) throw error;
       
-      logAction(`Mengaktifkan semula akaun pengguna (${user.email})`);
+      logAction(t('logUnsuspend').replace('{email}', user.email));
 
       if (user.email) {
         await fetch('/api/send-notification-email', {
@@ -159,8 +171,8 @@ export const AdminUsersView = ({ currentUser }) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: user.email,
-            title: 'Akaun Diaktifkan Semula',
-            message: `Berita baik! Akaun ADTEC Dashboard anda telah diaktifkan semula oleh pentadbir. Anda kini boleh log masuk seperti biasa.`
+            title: t('emailAccountActivatedTitle'),
+            message: t('emailAccountActivatedMsg')
           })
         }).catch(console.error);
       }
@@ -201,25 +213,25 @@ export const AdminUsersView = ({ currentUser }) => {
       if (error) throw error;
 
       const logText = days > 0 
-        ? `Menggantung akaun pengguna (${suspendTargetUser.email}) selama ${days} hari (sehingga ${dateStr})`
-        : `Menggantung akaun pengguna (${suspendTargetUser.email}) secara kekal`;
+        ? t('logSuspendDays').replace('{email}', suspendTargetUser.email).replace('{days}', days).replace('{date}', dateStr)
+        : t('logSuspendPermanent').replace('{email}', suspendTargetUser.email);
 
       logAction(logText);
 
       // Send email notification to the suspended user
       if (suspendTargetUser.email) {
-        let msg = `Akaun ADTEC Dashboard anda telah digantung oleh pentadbir atas sebab melanggar terma dan syarat. `;
+        let msg = t('emailAccountSuspendedMsg1');
         if (days > 0) {
-          msg += `Akaun anda akan digantung selama ${days} hari dan boleh diakses semula selepas ${dateStr}.`;
+          msg += t('emailAccountSuspendedMsgDays').replace('{days}', days).replace('{date}', dateStr);
         } else {
-          msg += `Akaun anda telah digantung secara KEKAL. Sila hubungi pihak pentadbiran jika ini adalah satu kesilapan.`;
+          msg += t('emailAccountSuspendedMsgPermanent');
         }
         await fetch('/api/send-notification-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: suspendTargetUser.email,
-            title: 'Notis Penggantungan Akaun',
+            title: t('emailAccountSuspendedTitle'),
             message: msg
           })
         }).catch(console.error);
@@ -247,7 +259,7 @@ export const AdminUsersView = ({ currentUser }) => {
       }
       
       if (userToDelete) {
-        logAction(`Memadam pengguna sepenuhnya (${userToDelete.email})`);
+        logAction(t('logDeleteUser').replace('{email}', userToDelete.email));
       }
     } catch (e) {
       alert(t('alertFailedDelete') + e.message);
@@ -501,11 +513,11 @@ export const AdminUsersView = ({ currentUser }) => {
                 {(() => {
                   let days = suspendDaysOption === 'custom' ? parseInt(customDaysVal, 10) : parseInt(suspendDaysOption, 10);
                   if (isNaN(days) || days <= 0) {
-                    return '🔒 Akaun akan digantung secara kekal sehingga diaktifkan semula secara manual.';
+                    return t('suspendPreviewPermanent');
                   }
                   const until = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
                   const str = until.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                  return `⏰ Akaun akan digantung sehingga: ${str} (Sistem akan automatik unsuspend selepas tempoh tamat)`;
+                  return t('suspendPreviewDays').replace('{date}', str);
                 })()}
               </div>
 
@@ -598,7 +610,7 @@ export const AdminReportsView = ({ currentUser }) => {
       const report = reports.find(r => r.id === id);
       if (report && currentUser?.email) {
         await supabase.from('audit_logs').insert({
-          action: `Menukar status laporan (${report.reportedEmail || id}) kepada ${newStatus}`,
+          action: t('logReportStatus').replace('{email}', report.reportedEmail || id).replace('{status}', newStatus),
           user_email: currentUser.email
         });
 
@@ -606,8 +618,8 @@ export const AdminReportsView = ({ currentUser }) => {
         if (report.reporter_id) {
           await supabase.from('notifications').insert({
             user_id: report.reporter_id,
-            title: `Status Laporan Dikemas Kini`,
-            message: `Laporan anda terhadap ${report.reportedName} kini berstatus: ${newStatus}.`,
+            title: t('notifReportStatusTitle'),
+            message: t('notifReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus),
             type: 'report'
           });
 
@@ -619,8 +631,8 @@ export const AdminReportsView = ({ currentUser }) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 email: reporterProfile.email,
-                title: 'Status Laporan Anda Telah Dikemas Kini',
-                message: `Laporan anda terhadap pengguna ${report.reportedName} telah disemak oleh Admin dan kini berstatus: ${newStatus}. Terima kasih kerana membantu komuniti ADTEC Melaka.`
+                title: t('emailReportStatusTitle'),
+                message: t('emailReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus)
               })
             }).catch(console.error);
           }
