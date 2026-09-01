@@ -153,6 +153,37 @@ app.post('/api/forgot-password', async (req, res) => {
   }
 });
 
+app.post('/api/send-notification-email', async (req, res) => {
+  const { email, title, message } = req.body;
+
+  if (!email || !title || !message) {
+    return res.status(400).json({ message: 'Maklumat tidak lengkap.' });
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Adtec Melaka Dashboard" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: title,
+      text: message,
+      html: `<b>${title}</b><br><br><p>${message}</p>`,
+    });
+
+    res.status(200).json({ success: true, message: 'Notifikasi e-mel berjaya dihantar.' });
+  } catch (error) {
+    console.error('Ralat menghantar e-mel notifikasi:', error);
+    res.status(500).json({ message: 'Gagal menghantar e-mel.' });
+  }
+});
+
 // Untuk Local Development (Bukan di Vercel)
 if (process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
