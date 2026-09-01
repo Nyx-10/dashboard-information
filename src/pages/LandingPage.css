@@ -14,56 +14,115 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  background-color: #0b0e14;
+}
+
+/* Base aurora gradient layer */
+.landing-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 30% 40%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+  animation: landingAuroraRotate 25s linear infinite;
+  z-index: 0;
+}
+
+/* Floating particles layer */
+.landing-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2px at 15% 25%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 85% 15%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(circle 2px at 45% 75%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(circle 1px at 70% 55%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(circle 2px at 25% 60%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 55% 35%, rgba(255,255,255,0.15) 0%, transparent 100%);
+  background-size: 100% 100%;
+  animation: landingParticleFloat 10s ease-in-out infinite alternate;
+  z-index: 1;
 }
 
 .landing-bg-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.5;
-  animation: float 10s ease-in-out infinite alternate;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation: landingFloatOrb 12s ease-in-out infinite alternate;
+  z-index: 2;
 }
 
 .landing-bg-orb-1 {
-  width: 500px;
-  height: 500px;
-  background: rgba(79, 70, 229, 0.3);
-  top: -100px;
-  left: -100px;
+  width: 40vw;
+  height: 40vw;
+  background: rgba(79, 70, 229, 0.2);
+  top: -10%;
+  left: -10%;
 }
 
 .landing-bg-orb-2 {
-  width: 400px;
-  height: 400px;
-  background: rgba(16, 185, 129, 0.2);
-  bottom: -50px;
-  right: -50px;
-  animation-delay: -3s;
+  width: 35vw;
+  height: 35vw;
+  background: rgba(16, 185, 129, 0.15);
+  bottom: -10%;
+  right: -5%;
+  animation-delay: -4s;
+  animation-duration: 15s;
 }
 
 .landing-bg-orb-3 {
-  width: 300px;
-  height: 300px;
-  background: rgba(239, 68, 68, 0.2);
+  width: 30vw;
+  height: 30vw;
+  background: rgba(239, 68, 68, 0.1);
   top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 40%;
   animation-delay: -7s;
+  animation-duration: 18s;
 }
 
 .landing-bg-grid {
   position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
-  mask-image: radial-gradient(circle at center, black, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+  inset: -50%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+  animation: landingGridMove 20s linear infinite;
+  mask-image: linear-gradient(to top, transparent, black, transparent);
+  -webkit-mask-image: linear-gradient(to top, transparent, black, transparent);
+  z-index: 3;
 }
 
-@keyframes float {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-30px) scale(1.1); }
+@keyframes landingAuroraRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes landingParticleFloat {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+  50% { transform: translateY(-20px) translateX(15px); opacity: 1; }
+  100% { transform: translateY(10px) translateX(-10px); opacity: 0.7; }
+}
+
+@keyframes landingFloatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5%, -5%) scale(1.05); }
+  66% { transform: translate(-2%, 3%) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes landingGridMove {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(60px) translateZ(-200px); }
 }
 
 /* Typography & Utils */
