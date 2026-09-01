@@ -386,11 +386,11 @@ export const AdminUsersView = ({ currentUser }) => {
                   className="input-field"
                   style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.875rem' }}
                 >
-                  <option value="1">1 {t('dayCount1') || '1 Hari'}</option>
-                  <option value="3">3 {t('dayCount3') || '3 Hari'}</option>
-                  <option value="7">7 {t('dayCount7') || '7 Hari'}</option>
-                  <option value="14">14 {t('dayCount14') || '14 Hari'}</option>
-                  <option value="30">30 {t('dayCount30') || '30 Hari'}</option>
+                  <option value="1">{t('dayCount1') || '1 Hari'}</option>
+                  <option value="3">{t('dayCount3') || '3 Hari'}</option>
+                  <option value="7">{t('dayCount7') || '7 Hari'}</option>
+                  <option value="14">{t('dayCount14') || '14 Hari'}</option>
+                  <option value="30">{t('dayCount30') || '30 Hari'}</option>
                   <option value="custom">{t('customDays') || 'Hari Tersuai'}</option>
                   <option value="0">{t('indefinite') || 'Kekal (Tanpa Had)'}</option>
                 </select>
