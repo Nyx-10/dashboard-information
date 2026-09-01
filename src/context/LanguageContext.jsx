@@ -56,7 +56,7 @@ export const dict = {
     emailReportStatusTitle: 'Your Report Status Has Been Updated',
     emailReportStatusMsg: 'Your report against user {name} has been reviewed by Admin and is now: {status}. Thank you for helping the ADTEC Melaka community.',
     suspendPreviewPermanent: '🔒 Account will be permanently suspended until manually reactivated.',
-    suspendPreviewDays: '⏰ Account will be suspended until: {date} (System will automatically unsuspend after period ends)'
+    suspendPreviewDays: '⏰ Account will be suspended until: {date} (System will automatically unsuspend after period ends)', resetPasswordTitle: 'Set New Password', resetPasswordDesc: 'Please enter your new password below.', resetPasswordSuccess: 'Password successfully changed! You can now login using your new password.', newPasswordLabel: 'New Password', confirmNewPasswordLabel: 'Confirm Password', changePasswordBtn: 'Change Password', invalidLink: 'Invalid or expired link.', sessionNotFound: 'Session not found. Please request a new reset link from the login page.', resetFailed: 'Failed to change password. Please try again.'
   },
   ms: {
     dashboard: 'Papan Pemuka', searchItems: 'Cari Barang', missingItem: 'Barang Hilang & Info Kolej', messages: 'Mesej',
@@ -113,7 +113,7 @@ export const dict = {
     emailReportStatusTitle: 'Status Laporan Anda Telah Dikemas Kini',
     emailReportStatusMsg: 'Laporan anda terhadap pengguna {name} telah disemak oleh Admin dan kini berstatus: {status}. Terima kasih kerana membantu komuniti ADTEC Melaka.',
     suspendPreviewPermanent: '🔒 Akaun akan digantung secara kekal sehingga diaktifkan semula secara manual.',
-    suspendPreviewDays: '⏰ Akaun akan digantung sehingga: {date} (Sistem akan automatik unsuspend selepas tempoh tamat)'
+    suspendPreviewDays: '⏰ Akaun akan digantung sehingga: {date} (Sistem akan automatik unsuspend selepas tempoh tamat)', resetPasswordTitle: 'Set Kata Laluan Baharu', resetPasswordDesc: 'Sila masukkan kata laluan baru anda di bawah.', resetPasswordSuccess: 'Kata laluan berjaya ditukar! Anda kini boleh log masuk menggunakan kata laluan baharu anda.', newPasswordLabel: 'Kata Laluan Baharu', confirmNewPasswordLabel: 'Sahkan Kata Laluan', changePasswordBtn: 'Tukar Kata Laluan', invalidLink: 'Pautan tidak sah atau telah luput.', sessionNotFound: 'Sesi tidak dijumpai. Sila mohon pautan reset yang baru dari halaman log masuk.', resetFailed: 'Gagal menukar kata laluan. Sila cuba lagi.'
   },
   zh: {
     dashboard: '仪表板', searchItems: '搜索物品', missingItem: '遗失物品与学院信息', messages: '消息',
@@ -170,7 +170,7 @@ export const dict = {
     emailReportStatusTitle: '您的报告状态已更新',
     emailReportStatusMsg: '您针对用户 {name} 的报告已被管理员审核，现在为：{status}。感谢您帮助 ADTEC 马六甲社区。',
     suspendPreviewPermanent: '🔒 帐户将被永久暂停，直到手动重新激活。',
-    suspendPreviewDays: '⏰ 帐户将被暂停至：{date} (期限结束后系统将自动解除暂停)'
+    suspendPreviewDays: '⏰ 帐户将被暂停至：{date} (期限结束后系统将自动解除暂停)', resetPasswordTitle: '设置新密码', resetPasswordDesc: '请在下方输入您的新密码。', resetPasswordSuccess: '密码修改成功！您现在可以使用新密码登录。', newPasswordLabel: '新密码', confirmNewPasswordLabel: '确认密码', changePasswordBtn: '更改密码', invalidLink: '无效或过期的链接。', sessionNotFound: '未找到会话。请从登录页面请求新的重置链接。', resetFailed: '修改密码失败。请重试。'
   },
   ta: {
     dashboard: 'டாஷ்போர்டு', searchItems: 'பொருட்களைத் தேடு', missingItem: 'காணாமல் போன பொருள் & கல்லூரி தகவல்', messages: 'செய்திகள்',

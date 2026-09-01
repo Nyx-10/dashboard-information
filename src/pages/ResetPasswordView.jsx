@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import { Eye, EyeOff } from 'lucide-react';
+import { LanguageContext } from '../context/LanguageContext';
 
 export function ResetPasswordView({ onBackToLogin }) {
+  const { t } = useContext(LanguageContext);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +18,7 @@ export function ResetPasswordView({ onBackToLogin }) {
     const hash = window.location.hash;
     if (hash && hash.includes('error_description=')) {
       const params = new URLSearchParams(hash.substring(1));
-      setError(params.get('error_description')?.replace(/\+/g, ' ') || 'Pautan tidak sah atau telah luput.');
+      setError(params.get('error_description')?.replace(/\+/g, ' ') || t('invalidLink') || 'Invalid or expired link.');
       setSessionValid(false);
       return;
     }
@@ -24,20 +26,20 @@ export function ResetPasswordView({ onBackToLogin }) {
     // Check if session actually exists
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session && !hash.includes('access_token=')) {
-        setError('Sesi tidak dijumpai. Sila mohon pautan reset yang baru dari halaman log masuk.');
+        setError(t('sessionNotFound') || 'Session not found. Please request a new reset link from the login page.');
         setSessionValid(false);
       }
     });
-  }, []);
+  }, [t]);
 
   const handleReset = async (e) => {
     e.preventDefault();
     if (password.length < 8) {
-      setError('Kata laluan mesti sekurang-kurangnya 8 aksara.');
+      setError(t('passwordShortError') || 'Password must be at least 8 characters.');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Kata laluan tidak sepadan.');
+      setError(t('passwordMismatchError') || 'Passwords do not match.');
       return;
     }
     
@@ -49,7 +51,7 @@ export function ResetPasswordView({ onBackToLogin }) {
       if (error) throw error;
       setSuccess(true);
     } catch (err) {
-      setError(err.message || 'Gagal menukar kata laluan. Sila cuba lagi.');
+      setError(err.message || t('resetFailed') || 'Failed to change password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -71,17 +73,17 @@ export function ResetPasswordView({ onBackToLogin }) {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
             <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '60px', objectFit: 'contain' }} />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Set Kata Laluan Baharu</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sila masukkan kata laluan baru anda di bawah.</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>{t('resetPasswordTitle') || 'Set New Password'}</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('resetPasswordDesc') || 'Please enter your new password below.'}</p>
         </div>
 
         {success ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
-              Kata laluan berjaya ditukar! Anda kini boleh log masuk menggunakan kata laluan baharu anda.
+              {t('resetPasswordSuccess') || 'Password successfully changed! You can now login using your new password.'}
             </div>
             <button onClick={onBackToLogin} className="btn-primary" style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }}>
-              Kembali ke Log Masuk
+              {t('backToLoginBtn') || 'Back to Login'}
             </button>
           </div>
         ) : (
@@ -93,7 +95,7 @@ export function ResetPasswordView({ onBackToLogin }) {
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Kata Laluan Baharu</label>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>{t('newPasswordLabel') || 'New Password'}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -113,7 +115,7 @@ export function ResetPasswordView({ onBackToLogin }) {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Sahkan Kata Laluan</label>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>{t('confirmNewPasswordLabel') || 'Confirm Password'}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -126,7 +128,7 @@ export function ResetPasswordView({ onBackToLogin }) {
             </div>
 
             <button type="submit" disabled={loading || !sessionValid} className="btn-primary" style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '1rem', opacity: (!sessionValid) ? 0.5 : 1 }}>
-              {loading ? 'Menyimpan...' : 'Tukar Kata Laluan'}
+              {loading ? (t('saving') || 'Saving...') : (t('changePasswordBtn') || 'Change Password')}
             </button>
           </form>
         )}
