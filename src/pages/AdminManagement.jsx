@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search } from 'lucide-react';
+import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search, Image as ImageIcon, ExternalLink, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
 const mockUsers = [
@@ -261,6 +261,7 @@ export const AdminUsersView = ({ currentUser }) => {
 export const AdminReportsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [reports, setReports] = useState([]);
+  const [selectedProofImage, setSelectedProofImage] = useState(null);
   
   useEffect(() => {
     fetchReports();
@@ -271,7 +272,7 @@ export const AdminReportsView = ({ currentUser }) => {
       const { data, error } = await supabase
         .from('user_reports')
         .select(`
-          id, report_type, reason_text, status, created_at,
+          id, report_type, reason_text, image_url, status, created_at,
           reporter:profiles!user_reports_reporter_id_fkey(username),
           reported:profiles!user_reports_reported_id_fkey(username, email)
         `)
@@ -283,7 +284,8 @@ export const AdminReportsView = ({ currentUser }) => {
           id: r.id,
           itemName: `Report on ${r.reported?.username || 'Unknown'} by ${r.reporter?.username || 'Unknown'}`,
           reportedEmail: r.reported?.email,
-          type: r.report_type === 'Others' ? `Others (${r.reason_text})` : r.report_type,
+          type: r.report_type === 'Others' ? `Others (${r.reason_text})` : (r.reason_text ? `${r.report_type} (${r.reason_text})` : r.report_type),
+          imageUrl: r.image_url,
           status: r.status || 'Pending'
         })));
       }
@@ -327,17 +329,44 @@ export const AdminReportsView = ({ currentUser }) => {
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('reportDetails') || 'Report Details'}</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('reportType') || 'Report Type'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('photo') || 'Proof / Screenshot'}</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('status') || 'Status'}</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>{t('actions') || 'Actions'}</th>
             </tr>
           </thead>
           <tbody>
             {reports.length === 0 ? (
-               <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noReportsFound') || 'No reports found.'}</td></tr>
+               <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noReportsFound') || 'No reports found.'}</td></tr>
             ) : reports.map((report, index) => (
               <tr key={report.id} style={{ borderBottom: index === reports.length - 1 ? 'none' : '1px solid var(--border)' }}>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{report.itemName}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{report.type}</td>
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  {report.imageUrl ? (
+                    <button 
+                      onClick={() => setSelectedProofImage(report.imageUrl)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.35rem 0.65rem',
+                        borderRadius: '0.375rem',
+                        background: 'rgba(99, 102, 241, 0.1)',
+                        color: 'var(--primary)',
+                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <ImageIcon size={14} /> {t('viewProof') || 'Lihat Bukti'}
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                      {t('noProofProvided') || 'Tiada tangkapan skrin'}
+                    </span>
+                  )}
+                </td>
                 <td style={{ padding: '1rem 1.5rem' }}>
                   <span style={badgeStyle(report.status)}>{report.status}</span>
                 </td>
@@ -354,6 +383,66 @@ export const AdminReportsView = ({ currentUser }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Proof Lightbox Modal */}
+      {selectedProofImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.75)',
+          backdropFilter: 'blur(5px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1.5rem'
+        }} onClick={() => setSelectedProofImage(null)}>
+          <div className="glass-panel" style={{
+            position: 'relative',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            width: '100%',
+            background: 'var(--surface)',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            boxShadow: 'var(--shadow-lg)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ImageIcon size={18} color="var(--primary)" />
+                {t('proofModalTitle') || 'Bukti Tangkapan Skrin Laporan'}
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <a 
+                  href={selectedProofImage} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
+                >
+                  <ExternalLink size={14} /> Open full size
+                </a>
+                <button 
+                  onClick={() => setSelectedProofImage(null)}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem' }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000', borderRadius: '0.5rem', padding: '0.5rem' }}>
+              <img 
+                src={selectedProofImage} 
+                alt="Proof screenshot" 
+                style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain' }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

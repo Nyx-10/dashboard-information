@@ -1,13 +1,16 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Search, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Search, AlertCircle, Image as ImageIcon, Upload, X, Check } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
 export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = new Set() }) {
   const { t } = useContext(LanguageContext);
-  const [showReportMenu, setShowReportMenu] = useState(false);
-  const [showOtherInput, setShowOtherInput] = useState(false);
-  const [otherReason, setOtherReason] = useState('');
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportType, setReportType] = useState('Spam');
+  const [reportReason, setReportReason] = useState('');
+  const [reportFile, setReportFile] = useState(null);
+  const [reportFilePreview, setReportFilePreview] = useState(null);
+  const [submittingReport, setSubmittingReport] = useState(false);
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [chats, setChats] = useState([]);
@@ -176,25 +179,70 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
     }, 100);
   };
 
-  const handleReportUser = async (reportType, customReason = '') => {
+  const handleReportScreenshotSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert(t('alertInvalidFile') || 'Please upload image files only.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert(t('alertFileSize') || 'File size exceeds 5MB limit.');
+      return;
+    }
+    setReportFile(file);
+    setReportFilePreview(URL.createObjectURL(file));
+  };
+
+  const handleReportSubmit = async (e) => {
+    e.preventDefault();
     if (!currentUserId || !activeChatData) return;
+    if (!reportFile) {
+      alert(t('screenshotRequired') || 'Please upload a screenshot proof before submitting.');
+      return;
+    }
+
+    setSubmittingReport(true);
     try {
+      let imageUrl = '';
+      const fileExt = reportFile.name.split('.').pop();
+      const fileName = `report-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('item-images')
+        .upload(fileName, reportFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('item-images')
+        .getPublicUrl(fileName);
+        
+      imageUrl = publicUrl;
+
       const { error } = await supabase.from('user_reports').insert([{
         reporter_id: currentUserId,
         reported_id: activeChatData.id,
         report_type: reportType,
-        reason_text: customReason,
+        reason_text: reportReason,
+        image_url: imageUrl,
         status: 'Pending'
       }]);
+
       if (error) throw error;
-      alert(t('alertSuccessAdd') || 'Report submitted successfully.');
+
+      alert(t('alertSuccessReport') || 'Report submitted successfully.');
+      setShowReportModal(false);
+      setReportType('Spam');
+      setReportReason('');
+      setReportFile(null);
+      setReportFilePreview(null);
     } catch (err) {
       console.error(err);
-      alert(t('alertFailedReport') + err.message);
+      alert((t('alertFailedReport') || 'Failed to submit report: ') + err.message);
+    } finally {
+      setSubmittingReport(false);
     }
-    setShowReportMenu(false);
-    setShowOtherInput(false);
-    setOtherReason('');
   };
 
   const handleImageUpload = async (e) => {
@@ -383,37 +431,14 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   </div>
                 </div>
               </div>
-              <div style={{ position: 'relative' }}>
-                <button className="btn-primary" onClick={() => { setShowReportMenu(!showReportMenu); setShowOtherInput(false); setOtherReason(''); }} style={{ background: 'transparent', border: '1px solid #EF4444', color: '#EF4444', padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>
+              <div>
+                <button 
+                  className="btn-primary" 
+                  onClick={() => setShowReportModal(true)} 
+                  style={{ background: 'transparent', border: '1px solid #EF4444', color: '#EF4444', padding: '0.4rem 0.75rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
+                >
                   <AlertCircle size={14} /> {t('reportUser')}
                 </button>
-                {showReportMenu && (
-                  <div className="glass-panel" style={{ position: 'absolute', right: 0, top: '120%', width: '200px', zIndex: 10, padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', boxShadow: 'var(--shadow-lg)' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', padding: '0.25rem 0.5rem', textTransform: 'uppercase' }}>{t('reportType')}</div>
-                    {!showOtherInput ? (
-                      <>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Spam')}>{t('spam')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Scammer')}>{t('scammer')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Inappropriate')}>{t('inappropriate')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => handleReportUser('Harassment')}>{t('harassment')}</button>
-                        <button style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.875rem', color: 'var(--text-main)', borderRadius: '0.25rem' }} className="nav-link" onClick={() => setShowOtherInput(true)}>{t('typeOthers')}</button>
-                      </>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.25rem' }}>
-                        <textarea 
-                          placeholder={t('typeReason')} 
-                          style={{ width: '100%', padding: '0.5rem', fontSize: '0.75rem', borderRadius: '0.25rem', border: '1px solid var(--border)', background: 'var(--bg-main)', color: 'var(--text-main)', resize: 'vertical', minHeight: '60px' }}
-                          value={otherReason}
-                          onChange={(e) => setOtherReason(e.target.value)}
-                        />
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-main)' }} onClick={() => { setShowOtherInput(false); setOtherReason(''); }}>{t('cancel')}</button>
-                          <button className="btn-primary" style={{ flex: 1, padding: '0.25rem', fontSize: '0.75rem' }} onClick={() => { if(otherReason.trim()){ handleReportUser('Others', otherReason); } }}>{t('submit')}</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
             
@@ -501,6 +526,190 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         )}
       </div>
     </div>
+
+      {/* Report User Modal with Screenshot Proof */}
+      {showReportModal && activeChatData && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            width: '100%',
+            maxWidth: '500px',
+            background: 'var(--surface)',
+            borderRadius: '1rem',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--border)',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <AlertCircle size={20} color="#EF4444" />
+                {t('reportUser')}: {activeChatData.name}
+              </h3>
+              <button 
+                onClick={() => setShowReportModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleReportSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              
+              {/* Report Type */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                  {t('reportType')} <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                <select
+                  value={reportType}
+                  onChange={(e) => setReportType(e.target.value)}
+                  className="input-field"
+                  style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.875rem' }}
+                >
+                  <option value="Spam">{t('spam') || 'Spam'}</option>
+                  <option value="Scammer">{t('scammer') || 'Scammer'}</option>
+                  <option value="Inappropriate">{t('inappropriate') || 'Inappropriate Content'}</option>
+                  <option value="Harassment">{t('harassment') || 'Harassment'}</option>
+                  <option value="Others">{t('typeOthers') || 'Others'}</option>
+                </select>
+              </div>
+
+              {/* Reason / Details */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                  {t('description')} / {t('typeReason')}
+                </label>
+                <textarea
+                  className="input-field"
+                  rows={3}
+                  placeholder={t('typeReason') || 'Provide additional context or details...'}
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.875rem', resize: 'vertical' }}
+                />
+              </div>
+
+              {/* Screenshot Upload Notice & Input */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                  {t('uploadScreenshot')} <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px dashed rgba(239, 68, 68, 0.3)',
+                  borderRadius: '0.5rem',
+                  marginBottom: '0.75rem',
+                  fontSize: '0.8rem',
+                  color: '#DC2626',
+                  lineHeight: '1.4'
+                }}>
+                  🛡️ {t('screenshotNotice') || 'Sila muat naik tangkapan skrin bukti supaya pentadbir dapat mengesahkan laporan dan mengelakkan penipuan.'}
+                </div>
+
+                {!reportFilePreview ? (
+                  <label style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1.25rem',
+                    border: '2px dashed var(--border)',
+                    borderRadius: '0.5rem',
+                    cursor: 'pointer',
+                    background: 'var(--bg-main)',
+                    transition: 'all 0.2s'
+                  }}>
+                    <Upload size={24} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 500 }}>{t('uploadScreenshot')}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>PNG, JPG, WEBP (Max 5MB)</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleReportScreenshotSelect} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                ) : (
+                  <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid var(--border)', maxHeight: '180px', display: 'flex', justifyContent: 'center', background: '#000' }}>
+                    <img src={reportFilePreview} alt="Screenshot proof preview" style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain' }} />
+                    <button
+                      type="button"
+                      onClick={() => { setReportFile(null); setReportFilePreview(null); }}
+                      style={{
+                        position: 'absolute', top: '8px', right: '8px',
+                        background: 'rgba(0,0,0,0.7)', color: 'white',
+                        border: 'none', borderRadius: '50%', padding: '4px',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}
+                      title="Remove image"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Buttons */}
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowReportModal(false)}
+                  disabled={submittingReport}
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    borderRadius: '0.5rem',
+                    border: '1px solid var(--border)',
+                    background: 'transparent',
+                    color: 'var(--text-main)',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingReport || !reportFile}
+                  className="btn-primary"
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    borderRadius: '0.5rem',
+                    background: '#EF4444',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    cursor: (submittingReport || !reportFile) ? 'not-allowed' : 'pointer',
+                    opacity: (submittingReport || !reportFile) ? 0.6 : 1,
+                    border: 'none'
+                  }}
+                >
+                  {submittingReport ? (t('loading') || 'Submitting...') : (t('submitReport') || 'Hantar Laporan')}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
