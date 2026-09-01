@@ -218,6 +218,7 @@ button {
   flex-direction: column;
   overflow-y: auto;
   min-width: 0;
+  background-color: var(--background);
 }
 
 .topbar {
@@ -304,6 +305,7 @@ button {
   min-height: calc(100vh - 60px);
   margin: -1.5rem;
   padding: 1.5rem;
+  background-color: var(--background);
 }
 
 .bg-dashboard {
