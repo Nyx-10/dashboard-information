@@ -117,10 +117,10 @@ export function Topbar({
           <LogOut size={16} /> <span className="hide-on-mobile">{t('logout')}</span>
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-          <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User'))}&background=4F46E5&color=fff`} alt="User" style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
+          <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff`} alt="User" style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
           <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-              {user?.role === 'superadmin' ? 'Adam darwish' : (user?.name || 'User')}
+              {user?.name || 'User'}
             </span>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : t('normalUser')}
