@@ -3,8 +3,8 @@ import { Users, FileText, CheckCircle, Activity, Shield, Download, FileDown } fr
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 export const AdminAnalyticsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [stats, setStats] = useState({
@@ -112,7 +112,7 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             onClick={() => {
               const doc = new jsPDF();
               doc.text("Analytics Report", 14, 15);
-              doc.autoTable({
+              autoTable(doc, {
                 head: [['Metric', 'Value']],
                 body: [
                   ['Total Users', stats.totalUsers],

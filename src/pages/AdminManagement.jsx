@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search, Image as ImageIcon, ExternalLink, X, Download, FileDown } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const mockUsers = [
   { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'Admin', status: 'Active' },
@@ -271,7 +271,7 @@ export const AdminUsersView = ({ currentUser }) => {
             onClick={() => {
               const doc = new jsPDF();
               doc.text("User List Report", 14, 15);
-              doc.autoTable({
+              autoTable(doc, {
                 head: [['Name', 'Email', 'Role', 'Status']],
                 body: filteredUsers.map(u => [u.name, u.email, u.role, u.status]),
                 startY: 20
