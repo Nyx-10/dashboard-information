@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search, Image as ImageIcon, ExternalLink, X } from 'lucide-react';
+import { Trash2, UserX, CheckCircle, XCircle, AlertTriangle, Search, Image as ImageIcon, ExternalLink, X, Download, FileDown } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 const mockUsers = [
   { id: 1, name: 'Alice Smith', email: 'alice@example.com', role: 'Admin', status: 'Active' },
   { id: 2, name: 'Bob Jones', email: 'bob@example.com', role: 'User', status: 'Active' },
@@ -252,15 +255,54 @@ export const AdminUsersView = ({ currentUser }) => {
         ))}
       </div>
 
-      <div style={{ marginBottom: '1.5rem', position: 'relative', maxWidth: '400px' }}>
-        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-        <input 
-          type="text" 
-          placeholder={t('searchByName') || 'Search by name...'} 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', outline: 'none' }}
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          <input 
+            type="text" 
+            placeholder={t('searchByName') || 'Search by name...'} 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', outline: 'none' }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button 
+            onClick={() => {
+              const doc = new jsPDF();
+              doc.text("User List Report", 14, 15);
+              doc.autoTable({
+                head: [['Name', 'Email', 'Role', 'Status']],
+                body: filteredUsers.map(u => [u.name, u.email, u.role, u.status]),
+                startY: 20
+              });
+              doc.save(`Users_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+            }}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          >
+            <FileDown size={16} /> Export (PDF)
+          </button>
+          <button 
+            onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," 
+                + "Name,Email,Role,Status\n"
+                + filteredUsers.map(u => `${u.name},${u.email},${u.role},${u.status}`).join('\n');
+              
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", `Users_Report_${new Date().toISOString().split('T')[0]}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          >
+            <Download size={16} /> Export (CSV)
+          </button>
+        </div>
       </div>
       
       <div className="glass-panel" style={{ overflowX: 'auto' }}>

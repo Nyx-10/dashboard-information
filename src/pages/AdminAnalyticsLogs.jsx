@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Users, FileText, CheckCircle, Activity, Clock, User, Shield, Download } from 'lucide-react';
+import { Users, FileText, CheckCircle, Activity, Shield, Download, FileDown } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 export const AdminAnalyticsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [stats, setStats] = useState({
@@ -10,6 +13,7 @@ export const AdminAnalyticsView = ({ currentUser }) => {
     resolutionRate: '0%',
     activeUsers: 0
   });
+  const [chartData, setChartData] = useState([]);
   const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
 
   const normalizedRole = currentUser?.role ? currentUser.role.toLowerCase().replace(/\s+/g, '') : '';
@@ -36,16 +40,9 @@ export const AdminAnalyticsView = ({ currentUser }) => {
 
   const fetchAnalytics = async () => {
     try {
-      // Fetch Total Users
       const { count: totalUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-      
-      // Fetch Active Users (Not suspended)
       const { count: activeUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'Active');
-      
-      // Fetch Total Reports
       const { count: totalReports } = await supabase.from('user_reports').select('*', { count: 'exact', head: true });
-      
-      // Fetch Resolved Reports
       const { count: resolvedReports } = await supabase.from('user_reports').select('*', { count: 'exact', head: true }).eq('status', 'Resolved');
 
       let resolutionRate = '0%';
@@ -59,6 +56,38 @@ export const AdminAnalyticsView = ({ currentUser }) => {
         resolutionRate,
         activeUsers: activeUsers || 0
       });
+
+      // Chart Data: Grouping items (lost/found) by month
+      const { data: items } = await supabase.from('items').select('created_at, type');
+      
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      
+      let aggregatedData = [];
+      for (let i = 5; i >= 0; i--) {
+        let d = new Date(currentYear, currentMonth - i, 1);
+        aggregatedData.push({
+          name: monthNames[d.getMonth()],
+          year: d.getFullYear(),
+          monthIndex: d.getMonth(),
+          Lost: 0,
+          Found: 0
+        });
+      }
+
+      if (items) {
+        items.forEach(item => {
+          const itemDate = new Date(item.created_at);
+          const idx = aggregatedData.findIndex(d => d.monthIndex === itemDate.getMonth() && d.year === itemDate.getFullYear());
+          if (idx !== -1) {
+            if (item.type === 'lost') aggregatedData[idx].Lost += 1;
+            if (item.type === 'found') aggregatedData[idx].Found += 1;
+          }
+        });
+      }
+
+      setChartData(aggregatedData);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     }
@@ -75,39 +104,62 @@ export const AdminAnalyticsView = ({ currentUser }) => {
     <div className="page-bg-common bg-admin-analytics">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
         <div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('analyticsOverview')}</h2>
-          <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats')}</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('analyticsOverview') || 'Analytics Overview'}</h2>
+          <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats') || 'Monitor system statistics and download reports'}</p>
         </div>
-        <button 
-          onClick={() => {
-            const csvContent = "data:text/csv;charset=utf-8," 
-              + "Metric,Value\n"
-              + `Total Users,${stats.totalUsers}\n`
-              + `Active Users,${stats.activeUsers}\n`
-              + `Total Reports,${stats.totalReports}\n`
-              + `Resolution Rate,${stats.resolutionRate}`;
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Analytics_Report_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }}
-          className="btn-primary" 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
-        >
-          <Download size={16} /> {t('exportCsv') || 'Export (CSV)'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button 
+            onClick={() => {
+              const doc = new jsPDF();
+              doc.text("Analytics Report", 14, 15);
+              doc.autoTable({
+                head: [['Metric', 'Value']],
+                body: [
+                  ['Total Users', stats.totalUsers],
+                  ['Active Users', stats.activeUsers],
+                  ['Total Reports', stats.totalReports],
+                  ['Resolution Rate', stats.resolutionRate],
+                ],
+                startY: 20
+              });
+              doc.save(`Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+            }}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          >
+            <FileDown size={16} /> Export (PDF)
+          </button>
+          <button 
+            onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," 
+                + "Metric,Value\n"
+                + `Total Users,${stats.totalUsers}\n`
+                + `Active Users,${stats.activeUsers}\n`
+                + `Total Reports,${stats.totalReports}\n`
+                + `Resolution Rate,${stats.resolutionRate}`;
+              
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", `Analytics_Report_${new Date().toISOString().split('T')[0]}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          >
+            <Download size={16} /> Export (CSV)
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         {[
-          { label: t('totalUsers'), value: stats.totalUsers, icon: Users, color: '#3B82F6' },
-          { label: t('totalReports'), value: stats.totalReports, icon: FileText, color: '#8B5CF6' },
-          { label: t('resolutionRate'), value: stats.resolutionRate, icon: CheckCircle, color: '#10B981' },
-          { label: t('activeAccounts'), value: stats.activeUsers, icon: Activity, color: '#F59E0B' }
+          { label: t('totalUsers') || 'Total Users', value: stats.totalUsers, icon: Users, color: '#3B82F6' },
+          { label: t('totalReports') || 'Total Reports', value: stats.totalReports, icon: FileText, color: '#8B5CF6' },
+          { label: t('resolutionRate') || 'Resolution Rate', value: stats.resolutionRate, icon: CheckCircle, color: '#10B981' },
+          { label: t('activeAccounts') || 'Active Accounts', value: stats.activeUsers, icon: Activity, color: '#F59E0B' }
         ].map((stat, index) => (
           <div key={index} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ background: `${stat.color}15`, padding: '1rem', borderRadius: '1rem' }}>
@@ -119,6 +171,24 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Analytics Chart */}
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', height: '400px' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '1.5rem' }}>Items Reported (Last 6 Months)</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="name" stroke="var(--text-muted)" />
+            <YAxis stroke="var(--text-muted)" allowDecimals={false} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-main)', borderRadius: '0.5rem' }} 
+              itemStyle={{ color: 'var(--text-main)' }}
+            />
+            <Bar dataKey="Lost" name="Lost Items" fill="#EF4444" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Found" name="Found Items" fill="#10B981" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Maintenance Mode Toggle Section - Only for Super Admin */}
