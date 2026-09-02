@@ -29,7 +29,8 @@ export function DashboardView({ onContact, currentUser }) {
         .from('items')
         .select('*')
         .neq('status', 'deleted')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(16);
         
       if (error) throw error;
       if (data) setItems(data);
@@ -53,8 +54,8 @@ export function DashboardView({ onContact, currentUser }) {
     }
   };
 
-  const infoItems = items.filter(item => item.type === 'info').slice(0, 8);
-  const reportItems = items.filter(item => item.type !== 'info').slice(0, 8);
+  const infoItems = items.filter(item => item.type === 'info');
+  const reportItems = items.filter(item => item.type !== 'info');
 
   return (
     <div className="page-bg-common bg-dashboard">
