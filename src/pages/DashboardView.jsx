@@ -25,15 +25,30 @@ export function DashboardView({ onContact, currentUser }) {
   async function fetchItems(showLoading = false) {
     try {
       if (showLoading) setLoading(true);
-      const { data, error } = await supabase
-        .from('items')
-        .select('*')
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false })
-        .limit(16);
-        
-      if (error) throw error;
-      if (data) setItems(data);
+      
+      const [infoRes, reportRes] = await Promise.all([
+        supabase
+          .from('items')
+          .select('*')
+          .neq('status', 'deleted')
+          .eq('type', 'info')
+          .order('created_at', { ascending: false })
+          .limit(8),
+        supabase
+          .from('items')
+          .select('*')
+          .neq('status', 'deleted')
+          .neq('type', 'info')
+          .order('created_at', { ascending: false })
+          .limit(8)
+      ]);
+
+      if (infoRes.error) throw infoRes.error;
+      if (reportRes.error) throw reportRes.error;
+      
+      if (infoRes.data && reportRes.data) {
+        setItems([...infoRes.data, ...reportRes.data]);
+      }
     } catch (error) {
       console.error('Error fetching items:', error.message);
     } finally {
