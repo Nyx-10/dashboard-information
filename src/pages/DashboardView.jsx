@@ -9,11 +9,11 @@ export function DashboardView({ onContact, currentUser }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchItems();
+    fetchItems(true);
 
     const channel = supabase.channel('dashboard_items_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
-        fetchItems();
+        fetchItems(false);
       })
       .subscribe();
 
@@ -22,9 +22,9 @@ export function DashboardView({ onContact, currentUser }) {
     };
   }, []);
 
-  async function fetchItems() {
+  async function fetchItems(showLoading = false) {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const { data, error } = await supabase
         .from('items')
         .select('*')
@@ -37,7 +37,7 @@ export function DashboardView({ onContact, currentUser }) {
     } catch (error) {
       console.error('Error fetching items:', error.message);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }
 
