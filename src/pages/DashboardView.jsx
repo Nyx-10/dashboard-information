@@ -54,8 +54,8 @@ export function DashboardView({ onContact, currentUser }) {
     }
   };
 
-  const infoItems = items.filter(item => item.type === 'info');
-  const reportItems = items.filter(item => item.type !== 'info');
+  const infoItems = items.filter(item => item.type === 'info').slice(0, 8);
+  const reportItems = items.filter(item => item.type !== 'info').slice(0, 8);
 
   return (
     <div className="page-bg-common bg-dashboard">
