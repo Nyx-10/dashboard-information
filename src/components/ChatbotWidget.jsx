@@ -42,7 +42,7 @@ export function ChatbotWidget() {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const prompt = \
+      const prompt = `
 Anda ialah AdtecBot, sebuah pembantu maya yang mesra, profesional, dan pintar untuk sistem web "Lost & Found" (Barang Hilang & Jumpa) di institusi ADTEC Melaka.
 Tugas anda adalah menjawab pertanyaan pelajar atau staf mengenai cara menggunakan sistem, cara melapor barang hilang, dan perkara berkaitan.
 
@@ -52,14 +52,14 @@ Maklumat Sistem:
 3. Sistem ada fungsi 'Messages' (Mesej) untuk berbual dengan pengguna lain (secara 1 lawan 1) jika mereka mahu menghubungi orang yang terjumpa barang.
 4. Terdapat fungsi carian pintar (Smart Search) di bahagian atas untuk mencari barang dengan pantas.
 5. Jika masalah teknikal, pengguna boleh mesej 'Super Admin' atau rujuk Pejabat HEP ADTEC Melaka.
-6. Nama pengguna yang sedang bercakap dengan anda sekarang ialah: \.
+6. Nama pengguna yang sedang bercakap dengan anda sekarang ialah: ${user?.name || 'Pelajar/Staf'}.
 
 Gaya bahasa:
 Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra. 
 JANGAN beri jawapan terlalu panjang. Jawab dengan ringkas dan padat (maksimum 2-3 perenggan pendek).
 
-Mesej pengguna: "\"
-\;
+Mesej pengguna: "${userInput}"
+`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -186,7 +186,7 @@ Mesej pengguna: "\"
         </div>
       )}
 
-      <button className={\chatbot-fab \\} onClick={() => setIsOpen(!isOpen)} title="Bantuan AdtecBot AI">
+      <button className={`chatbot-fab ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)} title="Bantuan AdtecBot AI">
         {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
       </button>
     </div>
