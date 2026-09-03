@@ -36,10 +36,16 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const typingTimeoutRef = useRef(null);
   const typingChannelRef = useRef(null);
 
+  const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         setCurrentUserId(user.id);
+        const { data: profile } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).single();
+        if (profile?.avatar_url) {
+          setCurrentUserAvatar(profile.avatar_url);
+        }
         fetchChats(user.id);
       }
     });
@@ -50,8 +56,8 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
       .from('messages')
       .select(`
         sender_id, receiver_id, content, created_at, is_read,
-        sender:profiles!messages_sender_id_fkey(username),
-        receiver:profiles!messages_receiver_id_fkey(username)
+        sender:profiles!messages_sender_id_fkey(username, avatar_url),
+        receiver:profiles!messages_receiver_id_fkey(username, avatar_url)
       `)
       .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
       .order('created_at', { ascending: false });
@@ -64,13 +70,16 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         if (otherId === userId) return; // Prevent self-contact
         
         if (!chatMap.has(otherId)) {
-          const otherName = msg.sender_id === userId ? (msg.receiver?.username || 'User') : (msg.sender?.username || 'User');
+          const otherProfile = msg.sender_id === userId ? msg.receiver : msg.sender;
+          const otherName = otherProfile?.username || 'User';
+          const otherAvatar = otherProfile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherName)}&background=4F46E5&color=fff`;
+
           chatMap.set(otherId, {
             id: otherId,
             name: otherName,
             time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             preview: msg.content,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(otherName)}&background=4F46E5&color=fff`,
+            avatar: otherAvatar,
             unreadCount: 0
           });
         }
@@ -90,7 +99,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
           name: initialChatUser.name,
           time: t('justNow'),
           preview: initialChatUser.preview || '...',
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
+          avatar: initialChatUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
           unreadCount: 0
         }, ...chatList];
       }
@@ -102,7 +111,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         name: initialChatUser.name,
         time: t('justNow'),
         preview: initialChatUser.preview || '...',
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
+        avatar: initialChatUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(initialChatUser.name)}&background=4F46E5&color=fff`,
         unreadCount: 0
       }]);
     }
@@ -424,7 +433,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 }}
               >
                 <div style={{ position: 'relative' }}>
-                  <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                  <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   {onlineUsers.has(chat.id) && (
                     <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#10B981', border: '2px solid var(--surface)', borderRadius: '50%' }}></span>
                   )}
@@ -465,7 +474,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 <button className="mobile-only-btn" onClick={() => setActiveChat(null)} style={{ display: 'none', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer', marginRight: '-0.5rem' }}>
                   &larr;
                 </button>
-                <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -495,7 +504,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
               
               {messages.length === 0 ? (
                 <div style={{ display: 'flex', gap: '1rem', maxWidth: '80%' }}>
-                  <img src={activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} />
+                  <img src={activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
                   <div>
                     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1rem', borderRadius: '0 1rem 1rem 1rem', color: 'var(--text-main)' }}>
                       {activeChatData.preview}
@@ -508,7 +517,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   const isMe = msg.sender_id === currentUserId;
                   return (
                     <div key={idx} style={{ display: 'flex', gap: '1rem', maxWidth: '80%', alignSelf: isMe ? 'flex-end' : 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row' }}>
-                      <img src={isMe ? `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff` : activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} />
+                      <img src={isMe ? (currentUserAvatar || `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff`) : activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
                           background: (isMe && !msg.content.startsWith('[IMAGE]')) ? 'var(--primary)' : 'var(--surface)', 

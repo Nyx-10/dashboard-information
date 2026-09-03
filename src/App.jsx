@@ -301,7 +301,7 @@ export default function App() {
           return;
         }
 
-        setUser({ id: session.user.id, email: session.user.email, role, name });
+        setUser({ id: session.user.id, email: session.user.email, role, name, avatar_url: profile?.avatar_url });
         setIsAuthenticated(true);
         setShowLanding(false);
       }

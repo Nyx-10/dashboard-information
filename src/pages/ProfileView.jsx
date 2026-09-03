@@ -11,6 +11,8 @@ export function ProfileView({ onContact, currentUser }) {
   const [userItems, setUserItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingItemId, setDeletingItemId] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     fetchProfileData();
@@ -22,9 +24,13 @@ export function ProfileView({ onContact, currentUser }) {
       const { data: { user: supabaseUser } } = await supabase.auth.getUser();
       
       if (supabaseUser) {
+        // Fetch profiles table for avatar_url
+        const { data: profileData } = await supabase.from('profiles').select('avatar_url').eq('id', supabaseUser.id).single();
+        
         setUser({
           name: currentUser?.name || supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.username || 'User',
-          email: supabaseUser.email
+          email: supabaseUser.email,
+          avatar_url: profileData?.avatar_url || currentUser?.avatar_url
         });
 
         // Fetch items reported by this user
@@ -44,6 +50,64 @@ export function ProfileView({ onContact, currentUser }) {
       setLoading(false);
     }
   }
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Saiz fail terlalu besar (maksimum 5MB).');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+      if (!supabaseUser) throw new Error('Sila log masuk semula.');
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `avatar_${supabaseUser.id}_${Date.now()}.${fileExt}`;
+
+      // Upload to item-images bucket
+      const { error: uploadError } = await supabase.storage
+        .from('item-images')
+        .upload(`avatars/${fileName}`, file);
+
+      if (uploadError) throw new Error('Gagal memuat naik gambar: ' + uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('item-images')
+        .getPublicUrl(`avatars/${fileName}`);
+
+      // Update profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', supabaseUser.id);
+        
+      if (updateError) {
+         if (updateError.code === 'PGRST204' || updateError.message.includes('avatar_url')) {
+            throw new Error('Sistem pangkalan data perlu dikemas kini. Sila run SQL script yang diberikan.');
+         }
+         throw updateError;
+      }
+
+      setUser(prev => ({ ...prev, avatar_url: publicUrl }));
+      
+      // Attempt to update global currentUser via prop if possible
+      if (currentUser) {
+         currentUser.avatar_url = publicUrl;
+      }
+
+      alert('Gambar profil berjaya ditukar!');
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleDelete = async (itemId) => {
     const confirmDelete = window.confirm(t ? t('logoutConfirm')?.replace('Log Out', 'Delete') || 'Are you sure you want to delete this report?' : 'Are you sure?');
@@ -74,7 +138,25 @@ export function ProfileView({ onContact, currentUser }) {
     <div className="page-bg-common bg-profile">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div className="glass-panel profile-header" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
-        <img className="profile-avatar" src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff&size=120`} alt="User" style={{ borderRadius: '50%' }} />
+        <div 
+          style={{ position: 'relative', cursor: 'pointer' }}
+          onClick={() => !uploadingAvatar && fileInputRef.current?.click()}
+          title={t('uploadAvatar') || 'Tukar Gambar Profil'}
+        >
+          <img 
+            className="profile-avatar" 
+            src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff&size=120`} 
+            alt="User" 
+            style={{ borderRadius: '50%', width: '120px', height: '120px', objectFit: 'cover', opacity: uploadingAvatar ? 0.5 : 1 }} 
+          />
+          <input 
+            type="file" 
+            accept="image/*" 
+            ref={fileInputRef} 
+            onChange={handleAvatarUpload} 
+            style={{ display: 'none' }} 
+          />
+        </div>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{user?.name || 'User Name'}</h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{user?.email || 'Email'}</p>
