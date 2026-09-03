@@ -2,6 +2,94 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Search, AlertCircle, Image as ImageIcon, Upload, X, Check } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
+import { ItemCardCompact } from '../components/ItemCardCompact';
+
+function UserProfileModal({ profile, onClose, t }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState(profile);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!profile.id) {
+           setLoading(false);
+           return;
+        }
+        
+        // Fetch full profile info
+        const { data: pData } = await supabase.from('profiles').select('*').eq('id', profile.id).single();
+        if (pData) {
+          setProfileData(prev => ({ ...prev, role: pData.role, email: pData.email }));
+        }
+
+        // Fetch their reports
+        const { data: iData } = await supabase
+          .from('items')
+          .select('*')
+          .eq('created_by', profile.id)
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false });
+        
+        if (iData) {
+          setItems(iData);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [profile.id]);
+
+  return (
+    <div className="modal-backdrop" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex',
+      alignItems: 'center', justifyContent: 'center', padding: '1rem'
+    }}>
+      <div className="glass-panel modal-bounce" onClick={e => e.stopPropagation()} style={{ 
+        background: 'var(--surface)', borderRadius: '1rem', padding: '2rem', 
+        width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' 
+      }}>
+        <button className="modal-close" onClick={onClose} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <X size={24} />
+        </button>
+        
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <a href={profileData.avatar} target="_blank" rel="noopener noreferrer">
+             <img src={profileData.avatar} alt={profileData.name} style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1rem', display: 'block', cursor: 'zoom-in', boxShadow: 'var(--shadow-md)' }} />
+          </a>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{profileData.name}</h2>
+          {profileData.role && (
+            <span style={{ fontSize: '0.8rem', background: 'var(--primary)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '1rem', display: 'inline-block' }}>
+              {profileData.role === 'superadmin' ? 'Super Admin' : profileData.role === 'admin' ? 'Admin' : 'User'}
+            </span>
+          )}
+        </div>
+
+        <div style={{ textAlign: 'left' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--text-main)' }}>
+             {t('reportsByUser') || 'Laporan oleh pengguna ini'}
+          </h3>
+          
+          {loading ? (
+             <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{t('loading') || 'Loading...'}</p>
+          ) : items.length === 0 ? (
+             <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{t('noReportsMade') || 'Tiada laporan'}</p>
+          ) : (
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+               {items.map(item => (
+                 <ItemCardCompact key={item.id} item={item} currentUser={null} />
+               ))}
+             </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TypingIndicator({ avatar }) {
   return (
@@ -438,7 +526,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                     src={chat.avatar} 
                     alt={chat.name} 
                     style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
-                    onClick={(e) => { e.stopPropagation(); setViewingProfile({ name: chat.name, avatar: chat.avatar }); }}
+                    onClick={(e) => { e.stopPropagation(); setViewingProfile({ id: chat.id, name: chat.name, avatar: chat.avatar }); }}
                   />
                   {onlineUsers.has(chat.id) && (
                     <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#10B981', border: '2px solid var(--surface)', borderRadius: '50%' }}></span>
@@ -484,7 +572,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   src={activeChatData.avatar} 
                   alt="Avatar" 
                   style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }} 
-                  onClick={() => setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar })}
+                  onClick={() => setViewingProfile({ id: activeChatData.id, name: activeChatData.name, avatar: activeChatData.avatar })}
                 />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>
@@ -519,7 +607,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                     src={activeChatData.avatar} 
                     alt="Avatar" 
                     style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover', cursor: 'pointer' }} 
-                    onClick={() => setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar })}
+                    onClick={() => setViewingProfile({ id: activeChatData.id, name: activeChatData.name, avatar: activeChatData.avatar })}
                   />
                   <div>
                     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1rem', borderRadius: '0 1rem 1rem 1rem', color: 'var(--text-main)' }}>
@@ -537,7 +625,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                         src={isMe ? (currentUserAvatar || `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff`) : activeChatData.avatar} 
                         alt="Avatar" 
                         style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover', cursor: isMe ? 'default' : 'pointer' }} 
-                        onClick={() => { if (!isMe) setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar }); }}
+                        onClick={() => { if (!isMe) setViewingProfile({ id: activeChatData.id, name: activeChatData.name, avatar: activeChatData.avatar }); }}
                       />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
@@ -793,27 +881,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       {/* Avatar Profile Modal */}
       {viewingProfile && (
-        <div className="modal-backdrop" onClick={() => setViewingProfile(null)} style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.6)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '1rem'
-        }}>
-          <div className="glass-panel modal-bounce" onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', borderRadius: '1rem', textAlign: 'center', padding: '2.5rem 2rem', width: '100%', maxWidth: '350px', position: 'relative' }}>
-            <button className="modal-close" onClick={() => setViewingProfile(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-              <X size={24} />
-            </button>
-            <a href={viewingProfile.avatar} target="_blank" rel="noopener noreferrer">
-               <img src={viewingProfile.avatar} alt={viewingProfile.name} style={{ width: '180px', height: '180px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1.5rem', display: 'block', cursor: 'zoom-in', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }} />
-            </a>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{viewingProfile.name}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('clickImageToViewLarge') || 'Klik gambar untuk papar penuh'}</p>
-          </div>
-        </div>
+        <UserProfileModal profile={viewingProfile} onClose={() => setViewingProfile(null)} t={t} />
       )}
     </div>
   );
