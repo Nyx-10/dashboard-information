@@ -355,6 +355,16 @@ button {
   white-space: nowrap;
 }
 
+/* ===== 5. Logo Wobble ===== */
+.sidebar-header img {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sidebar-header:hover img {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Sidebar Nav Link Enhancements */
 .nav-link {
   display: flex;
   align-items: center;
@@ -363,20 +373,89 @@ button {
   border-radius: 0.5rem;
   color: var(--text-muted);
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 0.5rem;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  /* 4. Staggered Entrance Setup */
+  opacity: 0;
+  animation: sidebarLinkEnter 0.4s forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-link:hover {
+/* Base styles for SVGs inside nav-link (for 1. Icon Hover Slide) */
+.nav-link svg {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 2. Sweep Background Setup */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: var(--background);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: -1;
+  border-radius: 0.5rem;
+}
+
+/* Hover States */
+.nav-link:hover {
   color: var(--text-main);
 }
 
-.nav-link.active {
-  background-color: rgba(99, 102, 241, 0.1);
+.nav-link:hover::before {
+  transform: translateX(0);
+}
+
+/* 1. Icon Hover Slide Trigger */
+.nav-link:hover svg {
+  transform: translateX(4px) scale(1.1);
   color: var(--primary);
 }
+
+/* 3. Active Border Indicator */
+.nav-link.active {
+  background-color: rgba(99, 102, 241, 0.05); /* Lighter bg so sweep is visible */
+  color: var(--primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: var(--primary);
+  border-radius: 4px 0 0 4px;
+  animation: activeBorderGrow 0.3s ease forwards;
+}
+
+@keyframes activeBorderGrow {
+  0% { height: 0; top: 50%; transform: translateY(-50%); }
+  100% { height: 70%; top: 50%; transform: translateY(-50%); }
+}
+
+/* 4. Staggered Entrance Animation */
+@keyframes sidebarLinkEnter {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+nav .nav-link:nth-of-type(1) { animation-delay: 0.1s; }
+nav .nav-link:nth-of-type(2) { animation-delay: 0.15s; }
+nav .nav-link:nth-of-type(3) { animation-delay: 0.2s; }
+nav .nav-link:nth-of-type(4) { animation-delay: 0.25s; }
+nav .nav-link:nth-of-type(5) { animation-delay: 0.3s; }
+nav .nav-link:nth-of-type(6) { animation-delay: 0.35s; }
+nav .nav-link:nth-of-type(7) { animation-delay: 0.4s; }
+nav .nav-link:nth-of-type(8) { animation-delay: 0.45s; }
 
 .main-content {
   flex: 1;
