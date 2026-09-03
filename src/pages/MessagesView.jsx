@@ -37,6 +37,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const typingChannelRef = useRef(null);
 
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
+  const [viewingProfile, setViewingProfile] = useState(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -433,7 +434,12 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 }}
               >
                 <div style={{ position: 'relative' }}>
-                  <img src={chat.avatar} alt={chat.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <img 
+                    src={chat.avatar} 
+                    alt={chat.name} 
+                    style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+                    onClick={(e) => { e.stopPropagation(); setViewingProfile({ name: chat.name, avatar: chat.avatar }); }}
+                  />
                   {onlineUsers.has(chat.id) && (
                     <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#10B981', border: '2px solid var(--surface)', borderRadius: '50%' }}></span>
                   )}
@@ -474,7 +480,12 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 <button className="mobile-only-btn" onClick={() => setActiveChat(null)} style={{ display: 'none', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer', marginRight: '-0.5rem' }}>
                   &larr;
                 </button>
-                <img src={activeChatData.avatar} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                <img 
+                  src={activeChatData.avatar} 
+                  alt="Avatar" 
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }} 
+                  onClick={() => setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar })}
+                />
                 <div>
                   <h3 style={{ fontWeight: 600, color: 'var(--text-main)' }}>{activeChatData.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -504,7 +515,12 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
               
               {messages.length === 0 ? (
                 <div style={{ display: 'flex', gap: '1rem', maxWidth: '80%' }}>
-                  <img src={activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
+                  <img 
+                    src={activeChatData.avatar} 
+                    alt="Avatar" 
+                    style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover', cursor: 'pointer' }} 
+                    onClick={() => setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar })}
+                  />
                   <div>
                     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1rem', borderRadius: '0 1rem 1rem 1rem', color: 'var(--text-main)' }}>
                       {activeChatData.preview}
@@ -517,7 +533,12 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   const isMe = msg.sender_id === currentUserId;
                   return (
                     <div key={idx} style={{ display: 'flex', gap: '1rem', maxWidth: '80%', alignSelf: isMe ? 'flex-end' : 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row' }}>
-                      <img src={isMe ? (currentUserAvatar || `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff`) : activeChatData.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
+                      <img 
+                        src={isMe ? (currentUserAvatar || `https://ui-avatars.com/api/?name=Me&background=6366f1&color=fff`) : activeChatData.avatar} 
+                        alt="Avatar" 
+                        style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover', cursor: isMe ? 'default' : 'pointer' }} 
+                        onClick={() => { if (!isMe) setViewingProfile({ name: activeChatData.name, avatar: activeChatData.avatar }); }}
+                      />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                         <div style={{ 
                           background: (isMe && !msg.content.startsWith('[IMAGE]')) ? 'var(--primary)' : 'var(--surface)', 
@@ -766,6 +787,22 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Avatar Profile Modal */}
+      {viewingProfile && (
+        <div className="modal-backdrop" onClick={() => setViewingProfile(null)}>
+          <div className="modal-content modal-bounce" onClick={e => e.stopPropagation()} style={{ textAlign: 'center', padding: '2.5rem 2rem', maxWidth: '350px', position: 'relative' }}>
+            <button className="modal-close" onClick={() => setViewingProfile(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <X size={24} />
+            </button>
+            <a href={viewingProfile.avatar} target="_blank" rel="noopener noreferrer">
+               <img src={viewingProfile.avatar} alt={viewingProfile.name} style={{ width: '180px', height: '180px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1.5rem', display: 'block', cursor: 'zoom-in', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }} />
+            </a>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{viewingProfile.name}</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('clickImageToViewLarge') || 'Klik gambar untuk papar penuh'}</p>
           </div>
         </div>
       )}
