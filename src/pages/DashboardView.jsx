@@ -76,7 +76,24 @@ export function DashboardView({ onContact, currentUser }) {
     <div className="page-bg-common bg-dashboard">
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>{t('loadingReports')}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <div className="skeleton" style={{ width: '150px', height: '20px', marginBottom: '1rem' }} />
+            <div className="grid-cards" style={{ gap: '0.75rem' }}>
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="skeleton" style={{ height: '120px', width: '100%' }} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="skeleton" style={{ width: '150px', height: '20px', marginBottom: '1rem' }} />
+            <div className="grid-cards" style={{ gap: '0.75rem' }}>
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="skeleton" style={{ height: '120px', width: '100%' }} />
+              ))}
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div style={{ marginBottom: '0.75rem' }}>

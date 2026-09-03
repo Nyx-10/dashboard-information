@@ -19,9 +19,41 @@ import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
 import { AppContext } from './context/AppContext';
+import { ToastContainer } from './components/Toast';
 
 export default function App() {
   const navigate = useNavigate();
+  
+  // Global ripple effect listener
+  useEffect(() => {
+    const handleGlobalClick = (e) => {
+      const btn = e.target.closest('.btn-primary');
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+        const radius = diameter / 2;
+        
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        ripple.style.width = ripple.style.height = `${diameter}px`;
+        ripple.style.left = `${e.clientX - rect.left - radius}px`;
+        ripple.style.top = `${e.clientY - rect.top - radius}px`;
+        
+        const existingRipple = btn.querySelector('.ripple');
+        if (existingRipple) existingRipple.remove();
+        
+        btn.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      }
+    };
+    
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []);
+
   const [showLanding, setShowLanding] = useState(() => {
     return sessionStorage.getItem('showLanding') !== 'false';
   });
@@ -320,6 +352,7 @@ export default function App() {
     return (
       <LanguageContext.Provider value={{ lang, setLang, t }}>
         <LandingPage onGetStarted={() => setShowLanding(false)} />
+        <ToastContainer />
       </LanguageContext.Provider>
     );
   }
@@ -346,6 +379,7 @@ export default function App() {
     return (
       <LanguageContext.Provider value={{ lang, setLang, t }}>
         {authContent}
+        <ToastContainer />
       </LanguageContext.Provider>
     );
   }
@@ -408,6 +442,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
     </AppContext.Provider>
     </LanguageContext.Provider>

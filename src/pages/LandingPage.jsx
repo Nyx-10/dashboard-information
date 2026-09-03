@@ -238,13 +238,27 @@ export default function LandingPage({ onGetStarted }) {
                 key={i}
                 className={`landing-feature-card ${activeFeature === i ? 'landing-feature-active' : ''}`}
                 onMouseEnter={() => setActiveFeature(i)}
-                style={{ animationDelay: `${i * 0.1}s` }}
+                onMouseMove={(e) => {
+                  const card = e.currentTarget;
+                  const rect = card.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  const centerX = rect.width / 2;
+                  const centerY = rect.height / 2;
+                  const rotateX = ((y - centerY) / centerY) * -10;
+                  const rotateY = ((x - centerX) / centerX) * 10;
+                  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                }}
+                style={{ animationDelay: `${i * 0.1}s`, transition: 'transform 0.1s ease-out' }}
               >
-                <div className="landing-feature-icon" style={{ background: `${feature.color}15`, color: feature.color }}>
+                <div className="landing-feature-icon" style={{ background: `${feature.color}15`, color: feature.color, transform: 'translateZ(30px)' }}>
                   {feature.icon}
                 </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.desc}</p>
+                <h3 style={{ transform: 'translateZ(20px)' }}>{feature.title}</h3>
+                <p style={{ transform: 'translateZ(10px)' }}>{feature.desc}</p>
                 <div className="landing-feature-glow" style={{ background: feature.color }} />
               </div>
             ))}

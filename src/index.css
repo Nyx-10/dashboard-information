@@ -260,6 +260,63 @@ button {
   animation: pageSlideIn 0.35s ease-out;
 }
 
+/* ===== Toast Notification ===== */
+@keyframes toastSlideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-item {
+  animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ===== Dropdown Panel Slide-in ===== */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-slide-in {
+  transform-origin: top right;
+  animation: slideDown 0.25s ease-out forwards;
+}
+
+/* ===== Button Ripple Effect ===== */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0);
+  animation: ripple-anim 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-anim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ===== Skeleton Loading ===== */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, rgba(255,255,255,0.08) 50%, var(--surface) 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 0.5rem;
+}
+
+
 /* Layout */
 .app-container {
   display: flex;
