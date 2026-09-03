@@ -20,6 +20,7 @@ import { ResetPasswordView } from './pages/ResetPasswordView';
 import { supabase } from './supabaseClient';
 import { AppContext } from './context/AppContext';
 import { ToastContainer } from './components/Toast';
+import { ChatbotWidget } from './components/ChatbotWidget';
 
 export default function App() {
   const navigate = useNavigate();
@@ -443,6 +444,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <ChatbotWidget />
       <ToastContainer />
     </div>
     </AppContext.Provider>
