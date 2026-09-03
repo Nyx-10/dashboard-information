@@ -54,6 +54,8 @@ export const AdminAnalyticsView = ({ currentUser }) => {
     activeUsers: 0
   });
   const [chartData, setChartData] = useState([]);
+  const [allItems, setAllItems] = useState([]);
+  const [chartFilter, setChartFilter] = useState('month'); // 'day', 'week', 'month', 'year'
   const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
   const [togglingMaintenance, setTogglingMaintenance] = useState(false);
 
@@ -98,16 +100,76 @@ export const AdminAnalyticsView = ({ currentUser }) => {
         activeUsers: activeUsers || 0
       });
 
-      // Chart Data: Grouping items (lost/found) by month
+      // Chart Data: fetch and store
       const { data: items } = await supabase.from('items').select('created_at, type');
+      if (items) {
+        setAllItems(items);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!allItems || allItems.length === 0) {
+      setChartData([]);
+      return;
+    }
+
+    const now = new Date();
+    let aggregatedData = [];
+
+    if (chartFilter === 'day') {
+      // Last 7 days
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        aggregatedData.push({
+          name: days[d.getDay()],
+          dateString: d.toDateString(),
+          Lost: 0,
+          Found: 0
+        });
+      }
+
+      allItems.forEach(item => {
+        const itemDate = new Date(item.created_at);
+        const idx = aggregatedData.findIndex(d => d.dateString === itemDate.toDateString());
+        if (idx !== -1) {
+          if (item.type === 'lost') aggregatedData[idx].Lost += 1;
+          if (item.type === 'found') aggregatedData[idx].Found += 1;
+        }
+      });
+    } else if (chartFilter === 'week') {
+      // Last 4 weeks
+      for (let i = 3; i >= 0; i--) {
+        aggregatedData.push({
+          name: `Week ${4 - i}`,
+          weekIndex: i, // 0 is current week, 1 is 1 week ago
+          Lost: 0,
+          Found: 0
+        });
+      }
       
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      allItems.forEach(item => {
+        const itemDate = new Date(item.created_at);
+        const diffTime = now.getTime() - itemDate.getTime();
+        const diffWeeks = Math.floor(diffTime / oneWeek);
+        
+        if (diffWeeks >= 0 && diffWeeks <= 3) {
+          const idx = aggregatedData.findIndex(d => d.weekIndex === diffWeeks);
+          if (idx !== -1) {
+            if (item.type === 'lost') aggregatedData[idx].Lost += 1;
+            if (item.type === 'found') aggregatedData[idx].Found += 1;
+          }
+        }
+      });
+    } else if (chartFilter === 'month') {
+      // Last 6 months
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      
-      let aggregatedData = [];
       for (let i = 5; i >= 0; i--) {
-        let d = new Date(currentYear, currentMonth - i, 1);
+        let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         aggregatedData.push({
           name: monthNames[d.getMonth()],
           year: d.getFullYear(),
@@ -117,22 +179,38 @@ export const AdminAnalyticsView = ({ currentUser }) => {
         });
       }
 
-      if (items) {
-        items.forEach(item => {
-          const itemDate = new Date(item.created_at);
-          const idx = aggregatedData.findIndex(d => d.monthIndex === itemDate.getMonth() && d.year === itemDate.getFullYear());
-          if (idx !== -1) {
-            if (item.type === 'lost') aggregatedData[idx].Lost += 1;
-            if (item.type === 'found') aggregatedData[idx].Found += 1;
-          }
+      allItems.forEach(item => {
+        const itemDate = new Date(item.created_at);
+        const idx = aggregatedData.findIndex(d => d.monthIndex === itemDate.getMonth() && d.year === itemDate.getFullYear());
+        if (idx !== -1) {
+          if (item.type === 'lost') aggregatedData[idx].Lost += 1;
+          if (item.type === 'found') aggregatedData[idx].Found += 1;
+        }
+      });
+    } else if (chartFilter === 'year') {
+      // Last 5 years
+      for (let i = 4; i >= 0; i--) {
+        let y = now.getFullYear() - i;
+        aggregatedData.push({
+          name: y.toString(),
+          year: y,
+          Lost: 0,
+          Found: 0
         });
       }
 
-      setChartData(aggregatedData);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
+      allItems.forEach(item => {
+        const itemDate = new Date(item.created_at);
+        const idx = aggregatedData.findIndex(d => d.year === itemDate.getFullYear());
+        if (idx !== -1) {
+          if (item.type === 'lost') aggregatedData[idx].Lost += 1;
+          if (item.type === 'found') aggregatedData[idx].Found += 1;
+        }
+      });
     }
-  };
+
+    setChartData(aggregatedData);
+  }, [chartFilter, allItems]);
 
   const statCards = [
     { label: t('totalUsers'), value: stats.totalUsers, icon: <Users size={24} color="#3B82F6" /> },
@@ -218,7 +296,32 @@ export const AdminAnalyticsView = ({ currentUser }) => {
 
       {/* Analytics Chart */}
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', height: '400px' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '1.5rem' }}>Items Reported (Last 6 Months)</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>
+            {t('itemsReported') || 'Items Reported'} 
+            <span style={{ fontSize: '0.875rem', fontWeight: 400, color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
+              ({chartFilter === 'day' ? 'Last 7 Days' : chartFilter === 'week' ? 'Last 4 Weeks' : chartFilter === 'month' ? 'Last 6 Months' : 'Last 5 Years'})
+            </span>
+          </h3>
+          <select 
+            value={chartFilter} 
+            onChange={(e) => setChartFilter(e.target.value)}
+            style={{ 
+              padding: '0.4rem 0.75rem', 
+              borderRadius: '0.5rem', 
+              border: '1px solid var(--border)', 
+              background: 'var(--surface)', 
+              color: 'var(--text-main)',
+              fontSize: '0.875rem',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="day">Day (Last 7 Days)</option>
+            <option value="week">Week (Last 4 Weeks)</option>
+            <option value="month">Month (Last 6 Months)</option>
+            <option value="year">Year (Last 5 Years)</option>
+          </select>
+        </div>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
