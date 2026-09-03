@@ -89,7 +89,7 @@ export function ChatbotWidget() {
   return (
     <div className="chatbot-container">
       {isOpen && (
-        <div className="chatbot-window glass-panel modal-bounce">
+        <div className="chatbot-window modal-bounce">
           <div className="chatbot-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', padding: '0.5rem', borderRadius: '50%', color: 'white', display: 'flex', boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)' }}>

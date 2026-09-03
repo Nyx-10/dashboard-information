@@ -1046,7 +1046,7 @@ nav .nav-link:nth-of-type(8) { animation-delay: 0.45s; }
   flex-direction: column;
   overflow: hidden;
   transform-origin: bottom right;
-  background: var(--bg-main) !important;
+  background: var(--surface) !important;
   border: 1px solid var(--border);
   box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3) !important;
   border-radius: 1.5rem !important;
