@@ -103,6 +103,9 @@ export function ProfileView({ onContact, currentUser }) {
          currentUser.avatar_url = publicUrl;
       }
 
+      // Forceful dispatch to ensure all components sync instantly
+      window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: publicUrl }));
+
       alert('Gambar profil berjaya ditukar!');
     } catch (err) {
       console.error(err);

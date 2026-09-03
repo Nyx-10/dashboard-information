@@ -18,6 +18,18 @@ export function Topbar({
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [avatarUrl, setAvatarUrl] = React.useState(user?.avatar_url);
+
+  React.useEffect(() => {
+    setAvatarUrl(user?.avatar_url);
+  }, [user?.avatar_url]);
+
+  React.useEffect(() => {
+    const handleAvatarUpdate = (e) => setAvatarUrl(e.detail);
+    window.addEventListener('avatarUpdated', handleAvatarUpdate);
+    return () => window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+  }, []);
+
   const isSearchActive = location.pathname.startsWith('/search');
 
   return (
@@ -117,7 +129,7 @@ export function Topbar({
           <LogOut size={16} /> <span className="hide-on-mobile">{t('logout')}</span>
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-          <img src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff`} alt="User" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+          <img src={avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=4F46E5&color=fff`} alt="User" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
           <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
               {user?.name || 'User'}
