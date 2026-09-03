@@ -3,6 +3,19 @@ import { Search, AlertCircle, Image as ImageIcon, Upload, X, Check } from 'lucid
 import { LanguageContext } from '../context/LanguageContext';
 import { supabase } from '../supabaseClient';
 
+function TypingIndicator({ avatar }) {
+  return (
+    <div className="typing-indicator">
+      <img src={avatar} alt="Typing" style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} />
+      <div className="typing-dots">
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+      </div>
+    </div>
+  );
+}
+
 export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = new Set() }) {
   const { t } = useContext(LanguageContext);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -18,7 +31,10 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const [searchQuery, setSearchQuery] = useState('');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const typingChannelRef = useRef(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -108,6 +124,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   useEffect(() => {
     if (activeChat && currentUserId) {
       fetchMessages(currentUserId, activeChat);
+      setIsOtherTyping(false);
       
       const channel = supabase.channel('public:messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
@@ -119,6 +136,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
             // Jika mesej masuk dari orang lain sewaktu chat sedang aktif, tanda sebagai 'read' terus
             if (newMsg.sender_id === activeChat) {
               supabase.from('messages').update({ is_read: true }).eq('id', newMsg.id).then();
+              setIsOtherTyping(false); // Stop typing indicator when message arrives
             }
             setMessages(prev => [...prev, newMsg]);
             scrollToBottom();
@@ -129,8 +147,24 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         })
         .subscribe();
 
+      // Typing indicator channel
+      const sortedIds = [currentUserId, activeChat].sort();
+      const typingChannel = supabase.channel(`typing:${sortedIds[0]}:${sortedIds[1]}`)
+        .on('broadcast', { event: 'typing' }, ({ payload }) => {
+          if (payload.userId !== currentUserId) {
+            setIsOtherTyping(true);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => setIsOtherTyping(false), 2500);
+          }
+        })
+        .subscribe();
+      
+      typingChannelRef.current = typingChannel;
+
       return () => {
         supabase.removeChannel(channel);
+        supabase.removeChannel(typingChannel);
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       };
     }
   }, [activeChat, currentUserId]);
@@ -296,6 +330,20 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
     }
   };
 
+  const lastTypingBroadcast = useRef(0);
+  const broadcastTyping = () => {
+    const now = Date.now();
+    if (now - lastTypingBroadcast.current < 1500) return; // Throttle: max once per 1.5s
+    lastTypingBroadcast.current = now;
+    if (typingChannelRef.current && currentUserId) {
+      typingChannelRef.current.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: { userId: currentUserId }
+      });
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !activeChat || !currentUserId) return;
@@ -391,7 +439,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                       {chat.preview?.startsWith('[IMAGE]') ? '📷 Image' : chat.preview}
                     </p>
                     {chat.unreadCount > 0 && chat.id !== activeChat && (
-                      <span style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', marginLeft: '8px' }}>
+                      <span className="unread-badge-pulse" style={{ background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: 700, minWidth: '18px', height: '18px', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', marginLeft: '8px' }}>
                         {chat.unreadCount}
                       </span>
                     )}
@@ -487,6 +535,9 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   );
                 })
               )}
+              {isOtherTyping && activeChatData && (
+                <TypingIndicator avatar={activeChatData.avatar} />
+              )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -515,7 +566,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 placeholder={uploadingImage ? "Uploading image..." : "Type a message..."}
                 style={{ flex: 1, borderRadius: '2rem' }} 
                 value={newMessage}
-                onChange={e => setNewMessage(e.target.value)}
+                onChange={e => { setNewMessage(e.target.value); broadcastTyping(); }}
                 disabled={uploadingImage}
               />
               <button type="submit" className="btn-primary" style={{ borderRadius: '2rem', padding: '0.5rem 1.5rem' }} disabled={!newMessage.trim() || uploadingImage}>

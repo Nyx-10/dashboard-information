@@ -151,6 +151,115 @@ button {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+/* ===== 1. Staggered Card Entrance ===== */
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.grid-cards > * {
+  opacity: 0;
+  animation: cardEntrance 0.45s ease-out forwards;
+}
+
+.grid-cards > *:nth-child(1)  { animation-delay: 0.04s; }
+.grid-cards > *:nth-child(2)  { animation-delay: 0.08s; }
+.grid-cards > *:nth-child(3)  { animation-delay: 0.12s; }
+.grid-cards > *:nth-child(4)  { animation-delay: 0.16s; }
+.grid-cards > *:nth-child(5)  { animation-delay: 0.20s; }
+.grid-cards > *:nth-child(6)  { animation-delay: 0.24s; }
+.grid-cards > *:nth-child(7)  { animation-delay: 0.28s; }
+.grid-cards > *:nth-child(8)  { animation-delay: 0.32s; }
+.grid-cards > *:nth-child(9)  { animation-delay: 0.36s; }
+.grid-cards > *:nth-child(10) { animation-delay: 0.40s; }
+.grid-cards > *:nth-child(11) { animation-delay: 0.44s; }
+.grid-cards > *:nth-child(12) { animation-delay: 0.48s; }
+.grid-cards > *:nth-child(13) { animation-delay: 0.52s; }
+.grid-cards > *:nth-child(14) { animation-delay: 0.56s; }
+.grid-cards > *:nth-child(15) { animation-delay: 0.60s; }
+.grid-cards > *:nth-child(16) { animation-delay: 0.64s; }
+
+/* ===== 2. Notification Badge Pulse ===== */
+@keyframes notifPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.notif-pulse {
+  animation: notifPulse 1.8s ease-in-out infinite;
+}
+
+/* Unread badge pulse in sidebar & messages */
+@keyframes unreadBadgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.unread-badge-pulse {
+  animation: unreadBadgePulse 2s ease-in-out infinite;
+}
+
+/* ===== 3. Typing Indicator ===== */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0 0.5rem 0;
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.65rem 1rem;
+  border-radius: 0 1rem 1rem 1rem;
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+/* ===== Page Transition ===== */
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-bg-common {
+  animation: pageSlideIn 0.35s ease-out;
+}
+
 /* Layout */
 .app-container {
   display: flex;

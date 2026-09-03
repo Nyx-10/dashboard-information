@@ -60,7 +60,7 @@ export function Topbar({
             }
           }}>
             <Bell size={24} />
-            {hasUnreadNotifications && <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
+            {hasUnreadNotifications && <span className="notif-pulse" style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%' }}></span>}
           </button>
           {showNotifications && (
             <div className="glass-panel" style={{ position: 'absolute', right: '-80px', top: '110%', width: '300px', zIndex: 999, padding: '0', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
