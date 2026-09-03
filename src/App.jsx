@@ -314,6 +314,7 @@ export default function App() {
 
   const contextValue = {
     user,
+    setUser,
     notifications,
     hasUnreadNotifications,
     totalUnreadMessages,

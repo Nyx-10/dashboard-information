@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Settings, Sun, Moon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
+import { AppContext } from '../context/AppContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
 
 export function ProfileView({ onContact, currentUser }) {
   const { lang, setLang, t } = useContext(LanguageContext);
+  const { setUser: setGlobalUser } = useContext(AppContext);
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
   const [userItems, setUserItems] = useState([]);
@@ -94,8 +96,10 @@ export function ProfileView({ onContact, currentUser }) {
 
       setUser(prev => ({ ...prev, avatar_url: publicUrl }));
       
-      // Attempt to update global currentUser via prop if possible
-      if (currentUser) {
+      // Update global context state so Topbar re-renders
+      if (setGlobalUser) {
+        setGlobalUser(prev => ({ ...prev, avatar_url: publicUrl }));
+      } else if (currentUser) {
          currentUser.avatar_url = publicUrl;
       }
 
