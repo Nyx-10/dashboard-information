@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { MessageCircle, X, Send, Bot, Sparkles } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export function ChatbotWidget() {
   const { t } = useContext(LanguageContext);
@@ -13,7 +14,7 @@ export function ChatbotWidget() {
     {
       id: 1,
       sender: 'bot',
-      text: 'Hai! Saya **AdtecBot** 🤖\n\nSaya pembantu pintar anda. Ada apa-apa soalan mengenai cara melaporkan barang hilang, atau anda sedang mencari sesuatu?',
+      text: 'Hai! Saya **AdtecBot** ??\n\nSaya kini dikuasakan oleh AI (Artificial Intelligence)! Cuba tanya saya apa-apa tentang sistem ini.',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -30,26 +31,46 @@ export function ChatbotWidget() {
     }
   }, [messages, isOpen, isTyping]);
 
-  const generateBotResponse = (userInput) => {
-    const text = userInput.toLowerCase();
-    if (text.includes('hilang') || text.includes('hilangkan')) {
-      return 'Untuk melaporkan barang yang hilang, anda boleh klik butang **"Missing Item"** (ikon +) di menu sebelah kiri. Pilih kategori **"Lost Item"** dan isikan butiran seperti nama barang, lokasi akhir dan gambar jika ada.';
-    } else if (text.includes('jumpa') || text.includes('dijumpai')) {
-      return 'Wah, bagusnya anda jumpa barang! 🎉\nSila klik butang **"Missing Item"** (ikon +) dan pilih kategori **"Found Item"** supaya pemiliknya boleh menuntut barang tersebut.';
-    } else if (text.includes('admin') || text.includes('pejabat')) {
-      return 'Jika anda mempunyai isu teknikal atau pertanyaan lanjut, anda boleh mesej **Super Admin** atau terus rujuk kepada Pejabat HEP Adtec Melaka.';
-    } else if (text.includes('nama') && text.includes('saya')) {
-      return `Nama anda ialah ${user?.name || 'Pengguna'}. Boleh saya bantu perkara lain?`;
-    } else if (text.includes('hai') || text.includes('hello') || text.includes('salam')) {
-      return 'Hai! Selamat datang ke platform Lost & Found Adtec Melaka. Ada apa-apa yang boleh saya bantu?';
-    } else if (text.includes('terima kasih') || text.includes('tq')) {
-      return 'Sama-sama! Gembira dapat membantu. 😊';
+  const generateBotResponse = async (userInput) => {
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      
+      if (!apiKey) {
+        return 'Sistem AI masih belum diaktifkan (API Key tiada). Sila masukkan API Key ke dalam fail .env ??';
+      }
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const prompt = \
+Anda ialah AdtecBot, sebuah pembantu maya yang mesra, profesional, dan pintar untuk sistem web "Lost & Found" (Barang Hilang & Jumpa) di institusi ADTEC Melaka.
+Tugas anda adalah menjawab pertanyaan pelajar atau staf mengenai cara menggunakan sistem, cara melapor barang hilang, dan perkara berkaitan.
+
+Maklumat Sistem:
+1. Jika pengguna mahu melaporkan barang hilang, suruh mereka klik butang '+' (Missing Item) di menu kiri dan pilih kategori 'Lost Item'. Isikan nama, lokasi, dan gambar.
+2. Jika pengguna menjumpai barang, suruh mereka klik butang '+' (Missing Item) dan pilih 'Found Item'.
+3. Sistem ada fungsi 'Messages' (Mesej) untuk berbual dengan pengguna lain (secara 1 lawan 1) jika mereka mahu menghubungi orang yang terjumpa barang.
+4. Terdapat fungsi carian pintar (Smart Search) di bahagian atas untuk mencari barang dengan pantas.
+5. Jika masalah teknikal, pengguna boleh mesej 'Super Admin' atau rujuk Pejabat HEP ADTEC Melaka.
+6. Nama pengguna yang sedang bercakap dengan anda sekarang ialah: \.
+
+Gaya bahasa:
+Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra. 
+JANGAN beri jawapan terlalu panjang. Jawab dengan ringkas dan padat (maksimum 2-3 perenggan pendek).
+
+Mesej pengguna: "\"
+\;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } catch (error) {
+      console.error("AI Error:", error);
+      return "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. ?? Pastikan API Key dimasukkan dengan betul.";
     }
-    
-    return 'Maaf, buat masa ini saya masih dalam proses pembelajaran (Beta). 😅\n\nSila gunakan kata kunci seperti **hilang**, **jumpa**, atau **admin** untuk saya bantu anda dengan lebih baik.';
   };
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -64,16 +85,15 @@ export function ChatbotWidget() {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const botResponse = generateBotResponse(userMsg.text);
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        sender: 'bot',
-        text: botResponse,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
-      setIsTyping(false);
-    }, 1200);
+    const botResponse = await generateBotResponse(userMsg.text);
+    
+    setMessages(prev => [...prev, {
+      id: Date.now() + 1,
+      sender: 'bot',
+      text: botResponse,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
+    setIsTyping(false);
   };
 
   const formatText = (text) => {
@@ -100,7 +120,7 @@ export function ChatbotWidget() {
                   AdtecBot <Sparkles size={14} color="#fcd34d" />
                 </h3>
                 <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span style={{ width: 6, height: 6, background: '#10B981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px #10B981' }}></span> Sentiasa Online
+                  <span style={{ width: 6, height: 6, background: '#10B981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px #10B981' }}></span> Sentiasa Online (AI)
                 </span>
               </div>
             </div>
@@ -156,7 +176,7 @@ export function ChatbotWidget() {
               type="text" 
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Tanya sesuatu..." 
+              placeholder="Tanya sesuatu kepada AI..." 
               className="chatbot-input"
             />
             <button type="submit" className="chatbot-send-btn" disabled={!input.trim() || isTyping}>
@@ -166,7 +186,7 @@ export function ChatbotWidget() {
         </div>
       )}
 
-      <button className={`chatbot-fab ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)} title="Bantuan AdtecBot">
+      <button className={\chatbot-fab \\} onClick={() => setIsOpen(!isOpen)} title="Bantuan AdtecBot AI">
         {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
       </button>
     </div>
