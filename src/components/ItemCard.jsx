@@ -7,11 +7,11 @@ export function ItemCard({ item, onContact, currentUser, onDelete }) {
   const currentUserId = currentUser ? currentUser.id : null;
 
   return (
-    <div className="item-card">
-      <div style={{ position: 'relative' }}>
+    <div className="item-card item-card-wrapper">
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
         {item.image && (
           <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
-            <img src={item.image} alt={item.title} className="item-image" style={{ cursor: 'zoom-in' }} />
+            <img src={item.image} alt={item.title} className="item-image item-card-image" style={{ cursor: 'zoom-in' }} />
           </a>
         )}
         <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>

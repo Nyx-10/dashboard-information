@@ -7,10 +7,10 @@ export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
   const currentUserId = currentUser ? currentUser.id : null;
 
   return (
-    <div className="item-card" style={{ flexDirection: 'row', borderRadius: '0.5rem', alignItems: 'stretch' }}>
+    <div className="item-card item-card-wrapper" style={{ flexDirection: 'row', borderRadius: '0.5rem', alignItems: 'stretch', overflow: 'hidden' }}>
       {item.image && (
-        <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '120px', flexShrink: 0 }}>
-          <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }} />
+        <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '120px', flexShrink: 0, overflow: 'hidden' }}>
+          <img className="item-card-image" src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }} />
         </a>
       )}
       <div style={{ padding: '0.75rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>

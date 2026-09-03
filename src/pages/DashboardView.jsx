@@ -105,7 +105,10 @@ export function DashboardView({ onContact, currentUser }) {
                 ))}
               </div>
             ) : (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('noInfoYet')}</p>
+              <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--surface)', borderRadius: '1rem', border: '1px dashed var(--border)' }}>
+                <div className="floating-icon" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📭</div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('noInfoYet')}</p>
+              </div>
             )}
           </div>
 
@@ -118,7 +121,10 @@ export function DashboardView({ onContact, currentUser }) {
                 ))}
               </div>
             ) : (
-              <p style={{ color: 'var(--text-muted)' }}>{t('noReportsYet')}</p>
+              <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--surface)', borderRadius: '1rem', border: '1px dashed var(--border)' }}>
+                <div className="floating-icon" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🔍</div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('noReportsYet')}</p>
+              </div>
             )}
           </div>
         </>

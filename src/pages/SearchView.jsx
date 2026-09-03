@@ -98,12 +98,16 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-          <h3>{t('loadingReports')}</h3>
+        <div className="grid-cards" style={{ gap: '0.75rem' }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="skeleton" style={{ height: '250px', width: '100%' }} />
+          ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-          <Search size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+        <div style={{ textAlign: 'center', padding: '5rem 2rem', color: 'var(--text-muted)', background: 'var(--surface)', borderRadius: '1rem', border: '1px dashed var(--border)' }}>
+          <div className="floating-icon" style={{ display: 'inline-block', marginBottom: '1rem' }}>
+            <Search size={48} style={{ opacity: 0.5 }} />
+          </div>
           <h3>{t('noItemsFound')}</h3>
         </div>
       ) : (
