@@ -793,8 +793,17 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       {/* Avatar Profile Modal */}
       {viewingProfile && (
-        <div className="modal-backdrop" onClick={() => setViewingProfile(null)}>
-          <div className="modal-content modal-bounce" onClick={e => e.stopPropagation()} style={{ textAlign: 'center', padding: '2.5rem 2rem', maxWidth: '350px', position: 'relative' }}>
+        <div className="modal-backdrop" onClick={() => setViewingProfile(null)} style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div className="glass-panel modal-bounce" onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', borderRadius: '1rem', textAlign: 'center', padding: '2.5rem 2rem', width: '100%', maxWidth: '350px', position: 'relative' }}>
             <button className="modal-close" onClick={() => setViewingProfile(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
               <X size={24} />
             </button>
