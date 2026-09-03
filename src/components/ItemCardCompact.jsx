@@ -2,12 +2,12 @@ import React, { useContext } from 'react';
 import { MapPin, Calendar, Trash2, Share2 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 
-export function ItemCardCompact({ item, onContact, currentUser, onDelete }) {
+export function ItemCardCompact({ item, onContact, currentUser, onDelete, isDeleting }) {
   const { t } = useContext(LanguageContext);
   const currentUserId = currentUser ? currentUser.id : null;
 
   return (
-    <div className="item-card item-card-wrapper" style={{ flexDirection: 'row', borderRadius: '0.5rem', alignItems: 'stretch', overflow: 'hidden' }}>
+    <div className={`item-card item-card-wrapper ${isDeleting ? 'item-delete-leave' : ''}`} style={{ flexDirection: 'row', borderRadius: '0.5rem', alignItems: 'stretch', overflow: 'hidden' }}>
       {item.image && (
         <a href={item.image} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '120px', flexShrink: 0, overflow: 'hidden' }}>
           <img className="item-card-image" src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }} />
