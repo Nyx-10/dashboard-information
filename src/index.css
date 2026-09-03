@@ -350,6 +350,38 @@ button {
   100% { background-color: transparent; transform: scale(1); }
 }
 
+/* Maintenance Button Animations */
+@keyframes maintenancePulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.maintenance-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.maintenance-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.maintenance-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.maintenance-btn-active {
+  animation: maintenancePulse 2s infinite;
+}
+
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
 /* ===== Page Transition ===== */
 @keyframes pageSlideIn {
   from { opacity: 0; transform: translateY(12px); }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Users, FileText, CheckCircle, Activity, Shield, Download, FileDown } from 'lucide-react';
+import { Users, FileText, CheckCircle, Activity, Shield, Download, FileDown, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { LanguageContext } from '../context/LanguageContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
@@ -55,6 +55,7 @@ export const AdminAnalyticsView = ({ currentUser }) => {
   });
   const [chartData, setChartData] = useState([]);
   const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
+  const [togglingMaintenance, setTogglingMaintenance] = useState(false);
 
   const normalizedRole = currentUser?.role ? currentUser.role.toLowerCase().replace(/\s+/g, '') : '';
   const isSuperAdmin = Boolean(
@@ -251,6 +252,7 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             onClick={async () => {
               const confirmed = window.confirm(t('confirmMaintenanceToggle') || `Adakah anda pasti untuk menukar status Maintenance Mode?`);
               if (confirmed) {
+                setTogglingMaintenance(true);
                 try {
                   const { data } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
                   let currentStatus = false;
@@ -268,12 +270,26 @@ export const AdminAnalyticsView = ({ currentUser }) => {
                      alert("Failed to change status: " + err.message);
                   }
                 }
+                setTogglingMaintenance(false);
               }
             }}
-            className="btn-primary" 
-            style={{ background: isMaintenanceActive ? '#EF4444' : '#10B981', padding: '0.75rem 1.5rem', fontWeight: 600, border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '0.5rem' }}
+            disabled={togglingMaintenance}
+            className={`btn-primary maintenance-btn ${isMaintenanceActive ? 'maintenance-btn-active' : ''}`}
+            style={{ 
+              background: isMaintenanceActive ? '#EF4444' : '#10B981', 
+              padding: '0.75rem 1.5rem', 
+              fontWeight: 600, 
+              border: 'none', 
+              color: '#fff', 
+              cursor: togglingMaintenance ? 'not-allowed' : 'pointer', 
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
           >
-             {isMaintenanceActive ? (t('maintenanceTurnOff') || 'Matikan (Off)') : (t('maintenanceTurnOn') || 'Aktifkan (On)')}
+             {togglingMaintenance ? <Loader size={18} className="spin-animation" /> : <Shield size={18} />}
+             {togglingMaintenance ? (t('processing') || 'Memproses...') : (isMaintenanceActive ? (t('maintenanceTurnOff') || 'Matikan (Off)') : (t('maintenanceTurnOn') || 'Aktifkan (On)'))}
           </button>
         </div>
       )}
