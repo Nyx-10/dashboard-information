@@ -208,49 +208,50 @@ export const AdminUsersView = ({ currentUser }) => {
       dateStr = until.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    setUsers((prev) => prev.map((u) => (u.id === suspendTargetUser.id ? { ...u, status: 'Suspended', suspendedUntil } : u)));
+    const targetId = suspendTargetUser.id;
+    setSuspendTargetUser(null);
+    setFlashingRowId(targetId);
+    setFlashType('red');
+    
+    setTimeout(async () => {
+      setUsers((prev) => prev.map((u) => (u.id === targetId ? { ...u, status: 'Suspended', suspendedUntil } : u)));
 
-    try {
-      const { error } = await supabase.from('profiles').update({
-        status: 'Suspended',
-        suspended_until: suspendedUntil
-      }).eq('id', suspendTargetUser.id);
+      try {
+        const { error } = await supabase.from('profiles').update({
+          status: 'Suspended',
+          suspended_until: suspendedUntil
+        }).eq('id', targetId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      const logText = days > 0 
-        ? t('logSuspendDays').replace('{email}', suspendTargetUser.email).replace('{days}', days).replace('{date}', dateStr)
-        : t('logSuspendPermanent').replace('{email}', suspendTargetUser.email);
+        const logText = days > 0 
+          ? t('logSuspendDays').replace('{email}', suspendTargetUser.email).replace('{days}', days).replace('{date}', dateStr)
+          : t('logSuspendPermanent').replace('{email}', suspendTargetUser.email);
 
-      logAction(logText);
+        logAction(logText);
 
-      // Send email notification to the suspended user
-      if (suspendTargetUser.email) {
-        let msg = t('emailAccountSuspendedMsg1');
-        if (days > 0) {
-          msg += t('emailAccountSuspendedMsgDays').replace('{days}', days).replace('{date}', dateStr);
-        } else {
-          msg += t('emailAccountSuspendedMsgPermanent');
+        if (suspendTargetUser.email) {
+          let msg = t('emailAccountSuspendedMsg1');
+          if (days > 0) {
+            msg += t('emailAccountSuspendedMsgDays').replace('{days}', days).replace('{date}', dateStr);
+          } else {
+            msg += t('emailAccountSuspendedMsgPermanent');
+          }
+          await fetch('/api/send-notification-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: suspendTargetUser.email,
+              title: t('emailAccountSuspendedTitle'),
+              message: msg
+            })
+          }).catch(console.error);
         }
-        await fetch('/api/send-notification-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: suspendTargetUser.email,
-            title: t('emailAccountSuspendedTitle'),
-            message: msg
-          })
-        }).catch(console.error);
+      } catch (e) {
+        alert((t('alertFailedSuspend') || 'Failed to suspend user: ') + e.message);
+        fetchUsers();
       }
-
-      setFlashingRowId(suspendTargetUser.id);
-      setFlashType('red');
-      setSuspendTargetUser(null);
-      setTimeout(() => setFlashingRowId(null), 600);
-    } catch (e) {
-      alert((t('alertFailedSuspend') || 'Failed to suspend user: ') + e.message);
-      fetchUsers();
-    }
+    }, 600);
   };
 
   const handleDeleteUser = async (userId) => {
