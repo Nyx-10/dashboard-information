@@ -46,6 +46,8 @@ export const AdminUsersView = ({ currentUser }) => {
   const [suspendTargetUser, setSuspendTargetUser] = useState(null);
   const [suspendDaysOption, setSuspendDaysOption] = useState('7');
   const [customDaysVal, setCustomDaysVal] = useState('');
+  const [flashingRowId, setFlashingRowId] = useState(null);
+  const [flashType, setFlashType] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -158,28 +160,32 @@ export const AdminUsersView = ({ currentUser }) => {
   };
 
   const handleUnsuspend = async (user) => {
-    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: 'Active', suspendedUntil: null } : u)));
-    try {
-      const { error } = await supabase.from('profiles').update({ status: 'Active', suspended_until: null }).eq('id', user.id);
-      if (error) throw error;
-      
-      logAction(t('logUnsuspend').replace('{email}', user.email));
-
-      if (user.email) {
-        await fetch('/api/send-notification-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: user.email,
-            title: t('emailAccountActivatedTitle'),
-            message: t('emailAccountActivatedMsg')
-          })
-        }).catch(console.error);
+    setFlashingRowId(user.id);
+    setFlashType('green');
+    setTimeout(async () => {
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: 'Active', suspendedUntil: null } : u)));
+      try {
+        const { error } = await supabase.from('profiles').update({ status: 'Active', suspended_until: null }).eq('id', user.id);
+        if (error) throw error;
+        
+        logAction(t('logUnsuspend').replace('{email}', user.email));
+        if (user.email) {
+          await fetch('/api/send-notification-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              title: t('emailAccountActivatedTitle'),
+              message: t('emailAccountActivatedMsg')
+            })
+          }).catch(console.error);
+        }
+      } catch (e) {
+        alert((t('alertFailedSuspend') || 'Failed to activate user: ') + e.message);
+        fetchUsers();
       }
-    } catch (e) {
-      alert((t('alertFailedSuspend') || 'Failed to activate user: ') + e.message);
-      fetchUsers();
-    }
+      setFlashingRowId(null);
+    }, 600);
   };
 
   const handleConfirmSuspend = async () => {
@@ -237,7 +243,10 @@ export const AdminUsersView = ({ currentUser }) => {
         }).catch(console.error);
       }
 
+      setFlashingRowId(suspendTargetUser.id);
+      setFlashType('red');
       setSuspendTargetUser(null);
+      setTimeout(() => setFlashingRowId(null), 600);
     } catch (e) {
       alert((t('alertFailedSuspend') || 'Failed to suspend user: ') + e.message);
       fetchUsers();
@@ -247,7 +256,10 @@ export const AdminUsersView = ({ currentUser }) => {
   const handleDeleteUser = async (userId) => {
     const userToDelete = users.find(u => u.id === userId);
     if (!window.confirm(t('confirmDeleteUser'))) return;
-    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    setFlashingRowId(userId);
+    setFlashType('red');
+    setTimeout(async () => {
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
     try {
       const { error } = await supabase.rpc('delete_user_completely', { target_user_id: userId });
       
@@ -265,6 +277,8 @@ export const AdminUsersView = ({ currentUser }) => {
       alert(t('alertFailedDelete') + e.message);
       fetchUsers();
     }
+    setFlashingRowId(null);
+    }, 600);
   };
 
   const filteredUsers = users.filter((u) => u.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -350,7 +364,7 @@ export const AdminUsersView = ({ currentUser }) => {
       </div>
       
       <div className="glass-panel" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('nameLabel') || 'Name'}</th>
@@ -366,7 +380,14 @@ export const AdminUsersView = ({ currentUser }) => {
             ) : filteredUsers.map((user, index) => {
               const canEdit = canModifyUser(user);
               return (
-              <tr key={user.id} style={{ borderBottom: index === users.length - 1 ? 'none' : '1px solid var(--border)' }}>
+              <tr 
+                key={user.id} 
+                className={flashingRowId === user.id ? (flashType === 'red' ? 'row-flash-red' : 'row-flash-green') : ''}
+                style={{ 
+                  borderBottom: index === users.length - 1 ? 'none' : '1px solid var(--border)',
+                  animationDelay: `${index * 0.05}s`
+                }}
+              >
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{user.name} {currentUser?.id === user.id && '(You)'}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{user.email}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-main)' }}>{user.role}</td>
@@ -567,6 +588,8 @@ export const AdminReportsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [reports, setReports] = useState([]);
   const [selectedProofImage, setSelectedProofImage] = useState(null);
+  const [flashingRowId, setFlashingRowId] = useState(null);
+  const [flashType, setFlashType] = useState(null);
   
   useEffect(() => {
     fetchReports();
@@ -600,49 +623,54 @@ export const AdminReportsView = ({ currentUser }) => {
   };
 
   const updateReportStatus = async (id, newStatus) => {
-    try {
-      const { error } = await supabase
-        .from('user_reports')
-        .update({ status: newStatus })
-        .eq('id', id);
-      if (error) throw error;
-      
-      const report = reports.find(r => r.id === id);
-      if (report && currentUser?.email) {
-        await supabase.from('audit_logs').insert({
-          action: t('logReportStatus').replace('{email}', report.reportedEmail || id).replace('{status}', newStatus),
-          user_email: currentUser.email
-        });
-
-        // Insert smart notification for the reporter
-        if (report.reporter_id) {
-          await supabase.from('notifications').insert({
-            user_id: report.reporter_id,
-            title: t('notifReportStatusTitle'),
-            message: t('notifReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus),
-            type: 'report'
+    setFlashingRowId(id);
+    setFlashType(newStatus === 'Rejected' ? 'red' : 'green');
+    setTimeout(async () => {
+      try {
+        const { error } = await supabase
+          .from('user_reports')
+          .update({ status: newStatus })
+          .eq('id', id);
+        if (error) throw error;
+        
+        const report = reports.find(r => r.id === id);
+        if (report && currentUser?.email) {
+          await supabase.from('audit_logs').insert({
+            action: t('logReportStatus').replace('{email}', report.reportedEmail || id).replace('{status}', newStatus),
+            user_email: currentUser.email
           });
 
-          // Fetch reporter email
-          const { data: reporterProfile } = await supabase.from('profiles').select('email').eq('id', report.reporter_id).single();
-          if (reporterProfile?.email) {
-            await fetch('/api/send-notification-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: reporterProfile.email,
-                title: t('emailReportStatusTitle'),
-                message: t('emailReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus)
-              })
-            }).catch(console.error);
+          // Insert smart notification for the reporter
+          if (report.reporter_id) {
+            await supabase.from('notifications').insert({
+              user_id: report.reporter_id,
+              title: t('notifReportStatusTitle'),
+              message: t('notifReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus),
+              type: 'report'
+            });
+
+            // Fetch reporter email
+            const { data: reporterProfile } = await supabase.from('profiles').select('email').eq('id', report.reporter_id).single();
+            if (reporterProfile?.email) {
+              await fetch('/api/send-notification-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: reporterProfile.email,
+                  title: t('emailReportStatusTitle'),
+                  message: t('emailReportStatusMsg').replace('{name}', report.reportedName || report.itemName).replace('{status}', newStatus)
+                })
+              }).catch(console.error);
+            }
           }
         }
+        
+        fetchReports();
+      } catch (e) {
+        alert(t('alertFailedUpdateStatus') + e.message);
       }
-      
-      fetchReports();
-    } catch (e) {
-      alert(t('alertFailedUpdateStatus') + e.message);
-    }
+      setFlashingRowId(null);
+    }, 600);
   };
 
   return (
@@ -653,7 +681,7 @@ export const AdminReportsView = ({ currentUser }) => {
       </div>
 
       <div className="glass-panel" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('reportDetails') || 'Report Details'}</th>
@@ -667,7 +695,14 @@ export const AdminReportsView = ({ currentUser }) => {
             {reports.length === 0 ? (
                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noReportsFound') || 'No reports found.'}</td></tr>
             ) : reports.map((report, index) => (
-              <tr key={report.id} style={{ borderBottom: index === reports.length - 1 ? 'none' : '1px solid var(--border)' }}>
+              <tr 
+                key={report.id} 
+                className={flashingRowId === report.id ? (flashType === 'red' ? 'row-flash-red' : 'row-flash-green') : ''}
+                style={{ 
+                  borderBottom: index === reports.length - 1 ? 'none' : '1px solid var(--border)',
+                  animationDelay: `${index * 0.05}s`
+                }}
+              >
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{report.itemName}</td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{report.type}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>

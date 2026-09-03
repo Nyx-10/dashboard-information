@@ -5,6 +5,46 @@ import { LanguageContext } from '../context/LanguageContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+function AnimatedNumber({ value }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    // Parse numeric part and suffix
+    const strVal = String(value);
+    const numMatch = strVal.match(/[\d.]+/);
+    if (!numMatch) {
+      setCount(value);
+      return;
+    }
+    
+    const target = parseFloat(numMatch[0]);
+    if (isNaN(target)) {
+      setCount(value);
+      return;
+    }
+
+    let start = 0;
+    const duration = 1000; // 1 second
+    const step = target / (duration / 16);
+    
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  const strVal = String(value);
+  const suffix = strVal.replace(/[\d.]+/, '');
+  return <span>{count}{suffix}</span>;
+}
 export const AdminAnalyticsView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [stats, setStats] = useState({
@@ -167,7 +207,9 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             </div>
             <div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 500 }}>{stat.label}</p>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>{stat.value}</h3>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                <AnimatedNumber value={stat.value} />
+              </h3>
             </div>
           </div>
         ))}
@@ -295,7 +337,7 @@ export const AdminAuditLogsView = () => {
       </div>
 
       <div className="glass-panel" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.875rem' }}>{t('action')}</th>
@@ -307,7 +349,13 @@ export const AdminAuditLogsView = () => {
             {logs.length === 0 ? (
                <tr><td colSpan="3" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noLogRecords')}</td></tr>
             ) : logs.map((log, index) => (
-              <tr key={log.id} style={{ borderBottom: index === logs.length - 1 ? 'none' : '1px solid var(--border)' }}>
+              <tr 
+                key={log.id} 
+                style={{ 
+                  borderBottom: index === logs.length - 1 ? 'none' : '1px solid var(--border)',
+                  animationDelay: `${index * 0.05}s`
+                }}
+              >
                 <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)' }}>
                   <Shield size={16} color="var(--primary)" />
                   {log.action}
