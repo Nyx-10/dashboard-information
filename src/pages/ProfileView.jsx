@@ -160,7 +160,7 @@ export function ProfileView({ onContact, currentUser }) {
   };
 
   const handleDelete = async (itemId) => {
-    const confirmDelete = window.confirm(t ? 'Adakah anda pasti untuk menandakan laporan ini sebagai Selesai?' : 'Are you sure you want to mark this report as Resolved?');
+    const confirmDelete = window.confirm(t('confirmResolveReport') || 'Are you sure you want to mark this report as Resolved?');
     if (!confirmDelete) return;
 
     setDeletingItemId(itemId);

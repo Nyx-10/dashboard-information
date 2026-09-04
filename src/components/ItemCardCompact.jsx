@@ -52,7 +52,7 @@ export function ItemCardCompact({ item, onContact, currentUser, onDelete, isDele
         {onDelete && currentUser && (item.created_by === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'superadmin') && item.status !== 'resolved' && (
             <button className="btn-primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', background: isResolveAction ? '#d1fae5' : '#fee2e2', color: isResolveAction ? '#059669' : '#ef4444', border: isResolveAction ? '1px solid #34d399' : '1px solid #f87171', cursor: 'pointer', marginTop: '0.25rem' }} onClick={() => onDelete(item.id)}>
               {isResolveAction ? <CheckCircle size={12} /> : <Trash2 size={12} />}
-              {isResolveAction ? 'Selesai' : t('deleteBtn')}
+              {isResolveAction ? (t('markResolved') || 'Selesai') : t('deleteBtn')}
             </button>
         )}
       </div>
