@@ -160,20 +160,20 @@ export function ProfileView({ onContact, currentUser }) {
   };
 
   const handleDelete = async (itemId) => {
-    const confirmDelete = window.confirm(t ? t('logoutConfirm')?.replace('Log Out', 'Delete') || 'Are you sure you want to delete this report?' : 'Are you sure?');
+    const confirmDelete = window.confirm(t ? 'Adakah anda pasti untuk menandakan laporan ini sebagai Selesai?' : 'Are you sure you want to mark this report as Resolved?');
     if (!confirmDelete) return;
 
     setDeletingItemId(itemId);
     try {
-      const { error } = await supabase.from('items').update({ status: 'deleted' }).eq('id', itemId);
+      const { error } = await supabase.from('items').update({ status: 'resolved' }).eq('id', itemId);
       if (error) throw error;
       setTimeout(() => {
-        setUserItems(userItems.filter(item => item.id !== itemId));
+        setUserItems(userItems.map(item => item.id === itemId ? { ...item, status: 'resolved' } : item));
         setDeletingItemId(null);
       }, 500);
     } catch (error) {
-      console.error('Error deleting item:', error.message);
-      alert('Gagal memadam laporan.');
+      console.error('Error resolving item:', error.message);
+      alert('Gagal mengemas kini laporan.');
       setDeletingItemId(null);
     }
   };
@@ -360,7 +360,7 @@ export function ProfileView({ onContact, currentUser }) {
             ) : (
               <div className="grid-cards">
                 {filteredItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} isDeleting={deletingItemId === item.id} />
+                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={handleDelete} isDeleting={deletingItemId === item.id} isResolveAction={true} />
                 ))}
               </div>
             )}

@@ -31,6 +31,7 @@ export function DashboardView({ onContact, currentUser }) {
           .from('items')
           .select('*')
           .neq('status', 'deleted')
+          .neq('status', 'resolved')
           .eq('type', 'info')
           .order('created_at', { ascending: false })
           .limit(8),
@@ -38,6 +39,7 @@ export function DashboardView({ onContact, currentUser }) {
           .from('items')
           .select('*')
           .neq('status', 'deleted')
+          .neq('status', 'resolved')
           .neq('type', 'info')
           .order('created_at', { ascending: false })
           .limit(8)

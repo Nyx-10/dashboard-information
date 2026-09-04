@@ -32,6 +32,7 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
         .from('items')
         .select('*')
         .neq('status', 'deleted')
+        .neq('status', 'resolved')
         .order('created_at', { ascending: false });
         
       if (error) throw error;
