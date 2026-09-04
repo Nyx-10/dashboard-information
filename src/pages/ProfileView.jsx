@@ -309,10 +309,6 @@ export function ProfileView({ onContact, currentUser }) {
                 <input type="checkbox" style={{ width: '1.2rem', height: '1.2rem' }} checked={profileData.email_notifs} onChange={e => setProfileData({...profileData, email_notifs: e.target.checked})} />
                 <span>Terima e-mel apabila ada mesej baru masuk.</span>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
-                <input type="checkbox" style={{ width: '1.2rem', height: '1.2rem' }} checked={profileData.match_notifs} onChange={e => setProfileData({...profileData, match_notifs: e.target.checked})} />
-                <span>Beritahu saya jika ada pengguna terjumpa barang mirip laporan saya.</span>
-              </label>
             </div>
 
             <button className="btn-primary" onClick={handleSaveProfile} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
