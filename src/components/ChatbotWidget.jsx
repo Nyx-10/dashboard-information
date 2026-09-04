@@ -39,7 +39,7 @@ export function ChatbotWidget() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.7-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 
       const prompt = `
 Anda ialah AdtecBot, sebuah pembantu maya yang mesra, profesional, dan pintar untuk sistem web "Lost & Found" (Barang Hilang & Jumpa) di institusi ADTEC Melaka.
