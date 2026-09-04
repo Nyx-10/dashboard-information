@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, PlusCircle, User, LayoutDashboard, 
-  MessageSquare, Settings, Calendar, Bot
+  MessageSquare, Settings, Calendar, Bot, Sparkles
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
@@ -67,10 +67,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </button>
           
           <button 
-            className={`nav-link w-full text-left ${isChatbotOpen ? 'active' : ''}`} 
+            className={`nav-link w-full text-left ai-nav-btn ${isChatbotOpen ? 'active' : ''}`} 
             onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
           >
-            <Bot size={20} /> <span style={{ flex: 1 }}>AdtecBot AI</span>
+            <Bot size={20} className="ai-bot-icon" /> 
+            <span style={{ flex: 1, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              AdtecBot AI <Sparkles size={14} className="ai-sparkles-icon" color={isChatbotOpen ? "#fcd34d" : "#ec4899"} />
+            </span>
           </button>
 
           {(user?.role === 'superadmin' || user?.role === 'admin') && (

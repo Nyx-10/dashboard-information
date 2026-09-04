@@ -1170,3 +1170,56 @@ nav .nav-link:nth-of-type(8) { animation-delay: 0.45s; }
   background: var(--border);
   color: var(--text-muted);
 }
+
+/* AdtecBot UI Animation Styles */
+.ai-nav-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+.ai-nav-btn:hover {
+  background: linear-gradient(90deg, rgba(79, 70, 229, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  border-left-color: #ec4899;
+  transform: translateX(4px);
+}
+.ai-nav-btn.active {
+  background: linear-gradient(90deg, #4F46E5 0%, #ec4899 100%) !important;
+  color: white !important;
+  border-left-color: #fcd34d !important;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+}
+.ai-nav-btn .ai-bot-icon {
+  animation: ai-float-bot 3s ease-in-out infinite;
+}
+.ai-nav-btn.active .ai-bot-icon {
+  animation: ai-pulse-bot 2s infinite;
+}
+.ai-sparkles-icon {
+  animation: ai-twinkle 1.5s infinite alternate;
+}
+@keyframes ai-float-bot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes ai-pulse-bot {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes ai-twinkle {
+  0% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1.1) rotate(15deg); }
+}
+.ai-nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: ai-scan-light 3s infinite linear;
+}
+@keyframes ai-scan-light {
+  0% { left: -100%; }
+  50%, 100% { left: 200%; }
+}
