@@ -66,7 +66,7 @@ Mesej pengguna: "${userInput}"
       return response.text();
     } catch (error) {
       console.error("AI Error:", error);
-      return "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. ?? Pastikan API Key dimasukkan dengan betul.";
+      return "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: " + error.message;
     }
   };
 
