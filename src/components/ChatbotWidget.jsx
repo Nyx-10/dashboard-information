@@ -196,7 +196,7 @@ AdtecBot:`;
             </button>
           </form>
           <div style={{ textAlign: 'center', padding: '0.5rem', background: 'var(--surface)', borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: '0.75rem' }}>
-            <a href="mailto:admin@adtec.edu.my" style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+            <a href="mailto:adam.darwish.it@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
               Bot tidak dapat membantu? <span style={{ color: '#818CF8', fontWeight: 600 }}>Hubungi Admin</span>
             </a>
           </div>
