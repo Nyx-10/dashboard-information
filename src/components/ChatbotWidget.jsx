@@ -30,7 +30,7 @@ export function ChatbotWidget() {
     }
   }, [messages, isOpen, isTyping]);
 
-  const generateBotResponse = async (userInput) => {
+  const generateBotResponse = async (userInput, currentMessages) => {
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
@@ -41,10 +41,19 @@ export function ChatbotWidget() {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 
+      let historyText = "";
+      if (currentMessages && currentMessages.length > 0) {
+        // limit memory to last 8 messages to save tokens and keep context fresh
+        const recentMessages = currentMessages.slice(-8);
+        recentMessages.forEach(m => {
+          historyText += `${m.sender === 'user' ? 'Pengguna' : 'AdtecBot'}: ${m.text}\n`;
+        });
+      }
+
       const prompt = `
 Anda ialah AdtecBot, sebuah pembantu maya yang mesra, profesional, dan pintar untuk "Sistem Dashboard ADTEC Melaka".
 Sistem ini berfungsi sebagai pusat maklumat rasmi (information hub) bagi warga institusi, DAN JUGA menyediakan kemudahan "Lost & Found" (Barang Hilang & Jumpa).
-Tugas anda adalah menjawab pertanyaan pelajar atau staf mengenai fungsi sistem, maklumat institusi, cara melapor barang hilang, dan apa-apa perkara berkaitan ADTEC Melaka. Jika anda tidak tahu maklumat terperinci, galakkan mereka merujuk laman web rasmi atau pejabat pentadbiran.
+Tugas anda adalah menjawab SEBARANG soalan yang diajukan oleh pengguna tanpa sebarang had topik. Anda boleh menjawab soalan berkaitan sistem, ADTEC Melaka, sains, teknologi, nasihat, perbualan santai, dan apa sahaja topik umum seperti sebuah AI (Google Gemini) yang serba tahu. Jika anda tidak tahu maklumat terperinci tentang spesifik ADTEC, barulah suruh mereka rujuk pentadbiran.
 
 Maklumat Sistem:
 1. Jika pengguna mahu melaporkan barang hilang, suruh mereka klik butang '+' (Missing Item) di menu kiri dan pilih kategori 'Lost Item'. Isikan nama, lokasi, dan gambar.
@@ -58,8 +67,11 @@ Gaya bahasa:
 Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra. 
 JANGAN beri jawapan terlalu panjang. Jawab dengan ringkas dan padat (maksimum 2-3 perenggan pendek).
 
-Mesej pengguna: "${userInput}"
-`;
+Sejarah Perbualan:
+${historyText}
+
+Mesej terbaru pengguna: "${userInput}"
+AdtecBot:`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -85,7 +97,7 @@ Mesej pengguna: "${userInput}"
     setInput('');
     setIsTyping(true);
 
-    const botResponse = await generateBotResponse(userMsg.text);
+    const botResponse = await generateBotResponse(userMsg.text, messages);
     
     setMessages(prev => [...prev, {
       id: Date.now() + 1,
