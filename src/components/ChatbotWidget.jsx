@@ -13,7 +13,7 @@ export function ChatbotWidget() {
     {
       id: 1,
       sender: 'bot',
-      text: 'Hai! Saya **AdtecBot** ??\n\nSaya kini dikuasakan oleh AI (Artificial Intelligence)! Cuba tanya saya apa-apa tentang sistem ini.',
+      text: 'Hai! Saya **AdtecBot** ✨. Ada apa-apa soalan tentang sistem ini?',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
