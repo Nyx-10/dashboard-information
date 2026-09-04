@@ -20,7 +20,7 @@ function UserProfileModal({ profile, onClose, t }) {
         // Fetch full profile info
         const { data: pData } = await supabase.from('profiles').select('*').eq('id', profile.id).single();
         if (pData) {
-          setProfileData(prev => ({ ...prev, role: pData.role, email: pData.email }));
+          setProfileData(prev => ({ ...prev, role: pData.role, email: pData.email, department: pData.department }));
         }
 
         // Fetch their reports
@@ -62,6 +62,11 @@ function UserProfileModal({ profile, onClose, t }) {
              <img src={profileData.avatar} alt={profileData.name} style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1rem', display: 'block', cursor: 'zoom-in', boxShadow: 'var(--shadow-md)' }} />
           </a>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{profileData.name}</h2>
+          {profileData.department && (
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>
+              🎓 {profileData.department}
+            </p>
+          )}
           {profileData.role && (
             <span style={{ fontSize: '0.8rem', background: 'var(--primary)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '1rem', display: 'inline-block' }}>
               {profileData.role === 'superadmin' ? 'Super Admin' : profileData.role === 'admin' ? 'Admin' : 'User'}
