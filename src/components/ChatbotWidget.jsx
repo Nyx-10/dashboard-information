@@ -6,8 +6,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export function ChatbotWidget() {
   const { t } = useContext(LanguageContext);
-  const { user } = useContext(AppContext);
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, isChatbotOpen: isOpen, setIsChatbotOpen: setIsOpen } = useContext(AppContext);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([
@@ -191,9 +190,6 @@ Mesej pengguna: "${userInput}"
         </div>
       )}
 
-      <button className={`chatbot-fab ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)} title="Bantuan AdtecBot AI">
-        {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
-      </button>
     </div>
   );
 }

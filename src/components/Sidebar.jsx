@@ -2,14 +2,14 @@ import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, PlusCircle, User, LayoutDashboard, 
-  MessageSquare, Settings, Calendar
+  MessageSquare, Settings, Calendar, Bot
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { t } = useContext(LanguageContext);
-  const { user, setActiveChatUser, totalUnreadMessages } = useContext(AppContext);
+  const { user, setActiveChatUser, totalUnreadMessages, isChatbotOpen, setIsChatbotOpen } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -66,6 +66,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
             )}
           </button>
           
+          <button 
+            className={`nav-link w-full text-left ${isChatbotOpen ? 'active' : ''}`} 
+            onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+          >
+            <Bot size={20} /> <span style={{ flex: 1 }}>AdtecBot AI</span>
+          </button>
+
           {(user?.role === 'superadmin' || user?.role === 'admin') && (
             <>
               <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', padding: '0 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('adminPanel')}</div>

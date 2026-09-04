@@ -79,6 +79,7 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   const [activeChatUser, setActiveChatUser] = useState(null);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -321,6 +322,8 @@ export default function App() {
     totalUnreadMessages,
     activeChatUser,
     setActiveChatUser,
+    isChatbotOpen,
+    setIsChatbotOpen,
     onlineUsers,
     setLastSeenNotifTime
   };
