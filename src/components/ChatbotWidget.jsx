@@ -50,7 +50,7 @@ Maklumat Sistem:
 2. Jika pengguna menjumpai barang, suruh mereka klik butang '+' (Missing Item) dan pilih 'Found Item'.
 3. Sistem ada fungsi 'Messages' (Mesej) untuk berbual dengan pengguna lain (secara 1 lawan 1) jika mereka mahu menghubungi orang yang terjumpa barang.
 4. Terdapat fungsi carian pintar (Smart Search) di bahagian atas untuk mencari barang dengan pantas.
-5. Jika masalah teknikal, pengguna boleh mesej 'Super Admin' atau rujuk Pejabat HEP ADTEC Melaka.
+5. Jika masalah teknikal atau bot tidak dapat membantu, suruh pengguna tekan pautan 'Hubungi Admin' di bahagian bawah kotak sembang ini untuk menghantar e-mel secara terus kepada Admin.
 6. Nama pengguna yang sedang bercakap dengan anda sekarang ialah: ${user?.name || 'Pelajar/Staf'}.
 
 Gaya bahasa:
