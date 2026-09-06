@@ -12,7 +12,7 @@ export function ProfileView({ onContact, currentUser }) {
   const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
-  const [profileData, setProfileData] = useState({ phone: '', department: '', email_notifs: true, match_notifs: true });
+  const [profileData, setProfileData] = useState({ department: '', email_notifs: true, match_notifs: true });
   const [userItems, setUserItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,7 +47,6 @@ export function ProfileView({ onContact, currentUser }) {
 
         if (pData) {
            setProfileData({
-             phone: pData.phone || '',
              department: pData.department || '',
              email_notifs: pData.email_notifs !== false,
              match_notifs: pData.match_notifs !== false
@@ -128,7 +127,6 @@ export function ProfileView({ onContact, currentUser }) {
     try {
       setSaving(true);
       const { error } = await supabase.from('profiles').update({
-        phone: profileData.phone,
         department: profileData.department,
         email_notifs: profileData.email_notifs,
         match_notifs: profileData.match_notifs
@@ -303,11 +301,7 @@ export function ProfileView({ onContact, currentUser }) {
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <UserIcon size={20} className="text-primary" /> Kemas Kini Maklumat
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Nombor Telefon</label>
-                <input type="text" className="input-field" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} placeholder="Contoh: 012-3456789" />
-              </div>
+            <div style={{ maxWidth: '450px', marginBottom: '2rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Jabatan / Kursus</label>
                 <input type="text" className="input-field" value={profileData.department} onChange={e => setProfileData({...profileData, department: e.target.value})} placeholder="Contoh: Kejuruteraan Komputer" />
