@@ -1,16 +1,50 @@
-# dashboard-information
+﻿# Dashboard ADTEC Melaka (PROTON Institute)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Sistem Pengurusan Maklumat Digital, Lost & Found Pintar, serta Komuniti untuk Pusat Latihan Teknologi Tinggi (ADTEC) Melaka / Institut Teknologi Automotif Termaju PROTON.
 
-Currently, two official plugins are available:
+## 📁 Struktur Direktori (Folder Structure)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```text
+Dashboard-information-web/
+├── api/                  # Express & Node.js backend (Pengesahan OTP, e-mel, dan integrasi Gemini AI)
+├── database/             # Skrip SQL, migrasi skema pangkalan data & polisi RLS Supabase
+├── docs/                 # Dokumen rujukan dalaman (diabaikan oleh git)
+├── public/               # Aset statik (imej latar belakang, ikon, favicon, PWA manifest)
+├── scripts/              # Skrip utiliti pembangun (cth: semakan pengguna pangkalan data)
+├── src/                  # Kod sumber aplikasi React (Vite + React 19)
+│   ├── assets/           # Ikon SVG dan logo
+│   ├── components/       # Komponen UI boleh guna semula (Topbar, Sidebar, Chatbot, Toast, Kad)
+│   ├── context/          # Context API (Bahasa, Tema, Global State)
+│   └── pages/            # Halaman paparan utama sistem (Landing, Dashboard, Auth, Profil, dsb.)
+├── index.html            # Entri HTML utama aplikasi
+├── package.json          # Senarai kebergantungan (dependencies) & skrip npm
+├── vercel.json           # Konfigurasi deployment ke pelayan Vercel
+└── vite.config.js        # Konfigurasi Vite & PWA
+```
 
-## React Compiler
+## 🚀 Pemasangan & Menjalankan Projek (Getting Started)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Pasang Kebergantungan (Install Dependencies)
+```bash
+npm install
+```
 
-## Expanding the Oxlint configuration
+### 2. Konfigurasi Fail `.env`
+Pastikan pembolehubah persekitaran (environment variables) diisi dengan nilai yang sah:
+```env
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_GEMINI_API_KEY=...
+EMAIL_USER=...
+EMAIL_PASS=...
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 3. Jalankan Pelayan Pembangunan (Development Server)
+```bash
+npm run dev
+```
+
+### 4. Membina Versi Pengeluaran (Production Build)
+```bash
+npm run build
+```
