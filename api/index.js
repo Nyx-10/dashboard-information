@@ -282,7 +282,8 @@ app.post('/api/send-message-notification', async (req, res) => {
       : (content && content.length > 250 ? content.substring(0, 250) + '...' : (content || 'Mesej baharu'));
 
     const subject = `💬 Mesej Baharu daripada ${senderDisplay} - Dashboard ADTEC Melaka`;
-    const frontendUrl = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = req.body.origin || req.headers.origin || process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+    const chatLink = senderId ? `${frontendUrl}/messages?chat=${senderId}` : `${frontendUrl}/messages`;
 
     const htmlContent = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
@@ -309,10 +310,14 @@ app.post('/api/send-message-notification', async (req, res) => {
           </div>
 
           <!-- Action Button -->
-          <div style="text-align: center; margin-bottom: 28px;">
-            <a href="${frontendUrl}/messages" style="display: inline-block; background: #4F46E5; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
-              Buka & Balas Mesej
+          <div style="text-align: center; margin-bottom: 24px;">
+            <a href="${chatLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #4F46E5; color: #ffffff; text-decoration: none; padding: 14px 36px; border-radius: 10px; font-size: 15px; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
+              💬 Buka & Balas Mesej
             </a>
+            <p style="font-size: 12px; color: #64748b; margin-top: 14px; word-break: break-all; line-height: 1.5;">
+              Sekiranya butang di atas tidak berfungsi, klik atau salin pautan ini untuk terus ke website:<br>
+              <a href="${chatLink}" target="_blank" rel="noopener noreferrer" style="color: #4F46E5; text-decoration: underline; font-weight: 500;">${chatLink}</a>
+            </p>
           </div>
 
           <!-- Divider -->
@@ -326,7 +331,7 @@ app.post('/api/send-message-notification', async (req, res) => {
       </div>
     `;
 
-    const plainText = `Hai ${targetName},\n\nAnda mempunyai satu mesej baharu daripada ${senderDisplay}:\n\n"${cleanContent}"\n\nSila log masuk ke ${frontendUrl}/messages untuk melihat dan membalas mesej ini.\n\nDashboard ADTEC Melaka`;
+    const plainText = `Hai ${targetName},\n\nAnda mempunyai satu mesej baharu daripada ${senderDisplay}:\n\n"${cleanContent}"\n\nSila klik pautan ini untuk terus membuka website dan membalas mesej:\n${chatLink}\n\nDashboard ADTEC Melaka`;
 
     // Pastikan HANYA penerima (targetEmail) yang menerima e-mel ini. Tiada CC dan tiada BCC.
     const info = await transporter.sendMail({

@@ -226,6 +226,30 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
     }
   }, [initialChatUser, currentUserId]);
 
+  // Buka chat secara automatik jika pautan dari e-mel mempunyai parameter ?chat=USER_ID
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const targetChatId = searchParams.get('chat');
+    if (targetChatId && currentUserId && targetChatId !== currentUserId) {
+      setActiveChat(targetChatId);
+      supabase.from('profiles').select('id, username, avatar_url').eq('id', targetChatId).single().then(({ data }) => {
+        if (data) {
+          setChats(prev => {
+            if (prev.some(c => c.id === targetChatId)) return prev;
+            return [{
+              id: data.id,
+              name: data.username || 'Pengguna',
+              time: t('justNow'),
+              preview: 'Mesej baharu...',
+              avatar: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'Pengguna')}&background=4F46E5&color=fff`,
+              unreadCount: 0
+            }, ...prev];
+          });
+        }
+      });
+    }
+  }, [currentUserId]);
+
   useEffect(() => {
     if (activeChat && currentUserId) {
       fetchMessages(currentUserId, activeChat);
@@ -436,7 +460,8 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
           recipientId: activeChat,
           senderId: currentUserId,
           senderName: currentUserName,
-          content: messageContent
+          content: messageContent,
+          origin: window.location.origin
         })
       }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
 
@@ -492,7 +517,8 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
           recipientId: activeChat,
           senderId: currentUserId,
           senderName: currentUserName,
-          content: messageContent
+          content: messageContent,
+          origin: window.location.origin
         })
       }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
 

@@ -58,6 +58,10 @@ export default function App() {
   }, []);
 
   const [showLanding, setShowLanding] = useState(() => {
+    // Jika pengguna membuka pautan terus (seperti /messages, /reset-password), jangan sekat dengan Landing Page
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      return false;
+    }
     return sessionStorage.getItem('showLanding') !== 'false';
   });
 
@@ -242,13 +246,16 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Apabila pengguna klik link dari email, URL akan mempunyai /reset-password
+    // Apabila pengguna klik link dari email, URL mungkin /reset-password atau /messages
     if (window.location.pathname === '/reset-password') {
       setShowLanding(false);
       setIsAuthenticated(false);
       setAuthMode('reset-password');
       setIsCheckingAuth(false);
     } else {
+      if (window.location.pathname !== '/' && window.location.pathname !== '') {
+        setShowLanding(false);
+      }
       checkUser();
     }
   }, []);
@@ -374,8 +381,24 @@ export default function App() {
     if (authMode === 'login' || authMode === 'signup') {
       authContent = <DoubleSliderAuthView 
           initialMode={authMode}
-          onLogin={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} 
-          onSignup={(userData) => { setIsAuthenticated(true); setUser(userData); navigate('/home'); }} 
+          onLogin={(userData) => { 
+            setIsAuthenticated(true); 
+            setUser(userData); 
+            if (window.location.pathname && window.location.pathname !== '/' && window.location.pathname !== '/login') {
+              navigate(window.location.pathname + window.location.search);
+            } else {
+              navigate('/home'); 
+            }
+          }} 
+          onSignup={(userData) => { 
+            setIsAuthenticated(true); 
+            setUser(userData); 
+            if (window.location.pathname && window.location.pathname !== '/' && window.location.pathname !== '/login') {
+              navigate(window.location.pathname + window.location.search);
+            } else {
+              navigate('/home'); 
+            }
+          }} 
           onForgotPassword={() => setAuthMode('forgot-password')} 
           onBackToHome={() => setShowLanding(true)}
           onMaintenanceMode={() => setShowMaintenanceScreen(true)}
