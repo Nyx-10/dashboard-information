@@ -903,6 +903,47 @@ html {
   gap: 1.25rem;
 }
 
+.mockup-search-input {
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  outline: none;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.mockup-search-input::placeholder {
+  color: #64748B;
+}
+
+.mockup-item-img-wrap {
+  width: 100%;
+  height: 140px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.mockup-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.mockup-item-card:hover .mockup-item-img {
+  transform: scale(1.05);
+}
+
+.mockup-item-desc {
+  font-size: 0.825rem;
+  color: var(--lux-text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.1rem;
+}
+
 .mockup-item-card {
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.07);
