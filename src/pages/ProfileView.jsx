@@ -313,7 +313,22 @@ export function ProfileView({ onContact, currentUser }) {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
-                <input type="checkbox" style={{ width: '1.2rem', height: '1.2rem' }} checked={profileData.email_notifs} onChange={e => setProfileData({...profileData, email_notifs: e.target.checked})} />
+                <input 
+                  type="checkbox" 
+                  style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }} 
+                  checked={profileData.email_notifs} 
+                  onChange={async (e) => {
+                    const isChecked = e.target.checked;
+                    setProfileData(prev => ({ ...prev, email_notifs: isChecked }));
+                    if (user?.id) {
+                      try {
+                        await supabase.from('profiles').update({ email_notifs: isChecked }).eq('id', user.id);
+                      } catch (err) {
+                        console.error('Ralat mengemas kini tetapan email_notifs:', err);
+                      }
+                    }
+                  }} 
+                />
                 <span>Terima e-mel apabila ada mesej baru masuk.</span>
               </label>
             </div>

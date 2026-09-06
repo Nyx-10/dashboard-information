@@ -154,7 +154,7 @@ app.post('/api/forgot-password', async (req, res) => {
 });
 
 app.post('/api/send-notification-email', async (req, res) => {
-  const { email, title, message } = req.body;
+  const { email, title, message, html } = req.body;
 
   if (!email || !title || !message) {
     return res.status(400).json({ message: 'Maklumat tidak lengkap.' });
@@ -174,13 +174,134 @@ app.post('/api/send-notification-email', async (req, res) => {
       to: email,
       subject: title,
       text: message,
-      html: `<b>${title}</b><br><br><p>${message}</p>`,
+      html: html || `<b>${title}</b><br><br><p>${message}</p>`,
     });
 
     res.status(200).json({ success: true, message: 'Notifikasi e-mel berjaya dihantar.' });
   } catch (error) {
     console.error('Ralat menghantar e-mel notifikasi:', error);
     res.status(500).json({ message: 'Gagal menghantar e-mel.' });
+  }
+});
+
+app.post('/api/send-message-notification', async (req, res) => {
+  const { recipientId, senderName, content, recipientEmail } = req.body;
+
+  if (!recipientId && !recipientEmail) {
+    return res.status(400).json({ message: 'Maklumat penerima diperlukan.' });
+  }
+
+  try {
+    let targetEmail = recipientEmail;
+    let targetName = 'Pengguna';
+    let emailNotifsEnabled = true;
+
+    if (recipientId) {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('email, username, email_notifs')
+        .eq('id', recipientId)
+        .single();
+
+      if (error || !profile) {
+        console.warn(`[NOTIF] Profil penerima ID ${recipientId} tidak ditemui.`);
+        return res.status(404).json({ message: 'Profil penerima tidak ditemui.' });
+      }
+
+      targetEmail = profile.email;
+      targetName = profile.username || 'Pengguna';
+      emailNotifsEnabled = profile.email_notifs !== false;
+    }
+
+    // Jika pengguna TIDAK mahu terima e-mel (email_notifs === false)
+    if (!emailNotifsEnabled) {
+      console.log(`[NOTIF] Pengguna ${targetEmail} telah mematikan pilihan terima notifikasi e-mel.`);
+      return res.status(200).json({ 
+        success: true, 
+        sent: false, 
+        message: 'Pengguna telah mematikan pilihan terima notifikasi e-mel.' 
+      });
+    }
+
+    if (!targetEmail) {
+      return res.status(400).json({ message: 'E-mel penerima tidak sah atau tidak dijumpai.' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const isImage = content && content.startsWith('[IMAGE]');
+    const cleanContent = isImage 
+      ? '📷 [Gambar Dihantar]' 
+      : (content && content.length > 250 ? content.substring(0, 250) + '...' : (content || 'Mesej baharu'));
+
+    const senderDisplay = senderName || 'Seorang pengguna';
+    const subject = `💬 Mesej Baharu daripada ${senderDisplay} - Dashboard ADTEC Melaka`;
+    const frontendUrl = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+
+    const htmlContent = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px 24px; text-align: center;">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="ADTEC Melaka" style="width: 48px; height: 48px; border-radius: 8px; margin-bottom: 12px; background: white; padding: 2px;" />
+          <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Dashboard ADTEC Melaka</h1>
+          <p style="color: rgba(255, 255, 255, 0.85); margin: 6px 0 0; font-size: 13px;">Pusat Maklumat & Sistem Lost & Found Pintar</p>
+        </div>
+
+        <!-- Body Content -->
+        <div style="padding: 32px 28px; color: #1e293b;">
+          <p style="font-size: 16px; margin: 0 0 16px; color: #0f172a;">Hai <strong>${targetName}</strong>,</p>
+          <p style="font-size: 14px; line-height: 1.6; margin: 0 0 20px; color: #475569;">
+            Anda mempunyai satu mesej baharu daripada <strong style="color: #4F46E5;">${senderDisplay}</strong> di Dashboard ADTEC Melaka:
+          </p>
+
+          <!-- Message Box -->
+          <div style="background-color: #f8fafc; border-left: 4px solid #4F46E5; border-radius: 8px; padding: 18px 20px; margin: 0 0 28px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Pratonton Mesej</div>
+            <div style="font-size: 14px; color: #0f172a; line-height: 1.5; font-style: italic;">
+              "${cleanContent}"
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div style="text-align: center; margin-bottom: 28px;">
+            <a href="${frontendUrl}/messages" style="display: inline-block; background: #4F46E5; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
+              Buka & Balas Mesej
+            </a>
+          </div>
+
+          <!-- Divider -->
+          <div style="height: 1px; background-color: #f1f5f9; margin-bottom: 20px;"></div>
+
+          <!-- Footer Note -->
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+            🔔 Anda menerima e-mel ini kerana anda telah mengaktifkan tetapan <strong>"Terima e-mel apabila ada mesej baru masuk"</strong> di profil anda. Sekiranya anda tidak lagi ingin menerima pemberitahuan e-mel, anda boleh mematikannya pada bila-bila masa di menu Tetapan Profil.
+          </p>
+        </div>
+      </div>
+    `;
+
+    const plainText = `Hai ${targetName},\n\nAnda mempunyai satu mesej baharu daripada ${senderDisplay}:\n\n"${cleanContent}"\n\nSila log masuk ke ${frontendUrl}/messages untuk melihat dan membalas mesej ini.\n\nDashboard ADTEC Melaka`;
+
+    const info = await transporter.sendMail({
+      from: `"Dashboard ADTEC Melaka" <${process.env.EMAIL_USER}>`,
+      to: targetEmail,
+      subject: subject,
+      text: plainText,
+      html: htmlContent,
+    });
+
+    console.log(`[EMAIL] Notifikasi mesej dihantar kepada: ${targetEmail} (MessageId: ${info.messageId})`);
+
+    res.status(200).json({ success: true, sent: true, messageId: info.messageId });
+  } catch (error) {
+    console.error('Ralat menghantar e-mel notifikasi mesej:', error);
+    res.status(500).json({ message: 'Gagal menghantar e-mel: ' + error.message });
   }
 });
 

@@ -129,6 +129,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
   const typingTimeoutRef = useRef(null);
   const typingChannelRef = useRef(null);
 
+  const [currentUserName, setCurrentUserName] = useState('');
   const [currentUserAvatar, setCurrentUserAvatar] = useState(null);
   const [viewingProfile, setViewingProfile] = useState(null);
 
@@ -136,10 +137,11 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         setCurrentUserId(user.id);
-        const { data: profile } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).single();
+        const { data: profile } = await supabase.from('profiles').select('avatar_url, username').eq('id', user.id).single();
         if (profile?.avatar_url) {
           setCurrentUserAvatar(profile.avatar_url);
         }
+        setCurrentUserName(profile?.username || user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0] || 'Pengguna');
         fetchChats(user.id);
       }
     });
@@ -425,6 +427,18 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         }]);
 
       if (error) throw error;
+
+      // Hantar notifikasi e-mel kepada penerima jika penerima aktifkan pilihan terima e-mel
+      fetch('/api/send-message-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientId: activeChat,
+          senderName: currentUserName,
+          content: messageContent
+        })
+      }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+
     } catch (error) {
       alert(t('alertFailedUpload') + error.message);
     } finally {
@@ -469,6 +483,17 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       if (error) throw error;
       
+      // Hantar notifikasi e-mel kepada penerima jika penerima aktifkan pilihan terima e-mel
+      fetch('/api/send-message-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientId: activeChat,
+          senderName: currentUserName,
+          content: messageContent
+        })
+      }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+
       // Update the chat preview on the sidebar immediately
       setChats(prev => {
         return prev.map(c => {
