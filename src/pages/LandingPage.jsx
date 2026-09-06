@@ -233,10 +233,8 @@ export default function LandingPage({ onGetStarted }) {
 
           {/* Main Title */}
           <h1 className="landing-hero-title animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            {isMs ? 'Pusat Maklumat Digital &' : 'Next-Generation Information &'}
-            <br />
             <span className="landing-hero-gradient">
-              {isMs ? 'Sistem Lost & Found Pintar' : 'Smart Lost & Found Ecosystem'}
+              Dashboard ADTEC Melaka
             </span>
           </h1>
 
