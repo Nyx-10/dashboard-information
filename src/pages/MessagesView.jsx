@@ -434,6 +434,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recipientId: activeChat,
+          senderId: currentUserId,
           senderName: currentUserName,
           content: messageContent
         })
@@ -489,6 +490,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recipientId: activeChat,
+          senderId: currentUserId,
           senderName: currentUserName,
           content: messageContent
         })

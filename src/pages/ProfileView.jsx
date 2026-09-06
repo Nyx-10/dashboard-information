@@ -12,12 +12,13 @@ export function ProfileView({ onContact, currentUser }) {
   const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
-  const [profileData, setProfileData] = useState({ department: '', email_notifs: true, match_notifs: true });
+  const [profileData, setProfileData] = useState({ department: '', email_notifs: false, match_notifs: true });
   const [userItems, setUserItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [notifSaved, setNotifSaved] = useState(false);
   
   // Tabs state
   const [activeTab, setActiveTab] = useState('profile'); // profile, reports, security
@@ -48,7 +49,7 @@ export function ProfileView({ onContact, currentUser }) {
         if (pData) {
            setProfileData({
              department: pData.department || '',
-             email_notifs: pData.email_notifs !== false,
+             email_notifs: pData.email_notifs === true,
              match_notifs: pData.match_notifs !== false
            });
         }
@@ -323,13 +324,16 @@ export function ProfileView({ onContact, currentUser }) {
                     if (user?.id) {
                       try {
                         await supabase.from('profiles').update({ email_notifs: isChecked }).eq('id', user.id);
+                        setNotifSaved(true);
+                        setTimeout(() => setNotifSaved(false), 2500);
                       } catch (err) {
                         console.error('Ralat mengemas kini tetapan email_notifs:', err);
                       }
                     }
                   }} 
                 />
-                <span>Terima e-mel apabila ada mesej baru masuk.</span>
+                <span style={{ fontWeight: 500 }}>Terima e-mel apabila ada mesej baru masuk.</span>
+                {notifSaved && <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 600 }}>✓ Disimpan</span>}
               </label>
             </div>
 

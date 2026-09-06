@@ -185,47 +185,88 @@ app.post('/api/send-notification-email', async (req, res) => {
 });
 
 app.post('/api/send-message-notification', async (req, res) => {
-  const { recipientId, senderName, content, recipientEmail } = req.body;
+  const { recipientId, senderId, senderName, content, recipientEmail } = req.body;
 
   if (!recipientId && !recipientEmail) {
     return res.status(400).json({ message: 'Maklumat penerima diperlukan.' });
   }
 
-  try {
-    let targetEmail = recipientEmail;
-    let targetName = 'Pengguna';
-    let emailNotifsEnabled = true;
+  // 1. Pastikan PENGIRIM tidak sesekali menerima e-mel untuk mesej yang dihantar sendiri
+  if (senderId && recipientId && String(senderId) === String(recipientId)) {
+    console.log(`[NOTIF] Pengirim (${senderId}) sama dengan penerima (${recipientId}). Tiada e-mel dihantar.`);
+    return res.status(200).json({ 
+      success: true, 
+      sent: false, 
+      message: 'Pengirim tidak akan menerima notifikasi e-mel mesej sendiri.' 
+    });
+  }
 
+  try {
+    // 2. Dapatkan rekod profil penerima secara tepat dari database
+    let recipientProfile = null;
     if (recipientId) {
-      const { data: profile, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('email, username, email_notifs')
+        .select('id, email, username, email_notifs')
         .eq('id', recipientId)
         .single();
-
-      if (error || !profile) {
-        console.warn(`[NOTIF] Profil penerima ID ${recipientId} tidak ditemui.`);
-        return res.status(404).json({ message: 'Profil penerima tidak ditemui.' });
-      }
-
-      targetEmail = profile.email;
-      targetName = profile.username || 'Pengguna';
-      emailNotifsEnabled = profile.email_notifs !== false;
+      if (!error && data) recipientProfile = data;
+    } else if (recipientEmail) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, username, email_notifs')
+        .eq('email', recipientEmail)
+        .single();
+      if (!error && data) recipientProfile = data;
     }
 
-    // Jika pengguna TIDAK mahu terima e-mel (email_notifs === false)
-    if (!emailNotifsEnabled) {
-      console.log(`[NOTIF] Pengguna ${targetEmail} telah mematikan pilihan terima notifikasi e-mel.`);
+    if (!recipientProfile) {
+      console.warn(`[NOTIF] Profil penerima tidak ditemui.`);
+      return res.status(404).json({ message: 'Profil penerima tidak ditemui.' });
+    }
+
+    // 3. Pastikan HANYA hantar jika penerima klik/aktifkan "Terima e-mel apabila ada mesej baru masuk" (email_notifs === true)
+    if (recipientProfile.email_notifs !== true) {
+      console.log(`[NOTIF] Penerima (${recipientProfile.email}) tidak mengaktifkan tetapan terima e-mel (email_notifs is not true).`);
       return res.status(200).json({ 
         success: true, 
         sent: false, 
-        message: 'Pengguna telah mematikan pilihan terima notifikasi e-mel.' 
+        message: 'Penerima tidak mengaktifkan pilihan terima notifikasi e-mel.' 
       });
     }
+
+    const targetEmail = recipientProfile.email;
+    const targetName = recipientProfile.username || 'Warga ADTEC';
 
     if (!targetEmail) {
       return res.status(400).json({ message: 'E-mel penerima tidak sah atau tidak dijumpai.' });
     }
+
+    // 4. Semak profil pengirim untuk memastikan bukan akaun/e-mel yang sama
+    let senderDisplay = senderName;
+    if (senderId) {
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('id, email, username')
+        .eq('id', senderId)
+        .single();
+
+      if (senderProfile) {
+        if (senderProfile.email && senderProfile.email.trim().toLowerCase() === targetEmail.trim().toLowerCase()) {
+          console.log(`[NOTIF] E-mel pengirim sama dengan penerima (${targetEmail}). Tiada e-mel dihantar.`);
+          return res.status(200).json({ 
+            success: true, 
+            sent: false, 
+            message: 'E-mel penerima sama dengan pengirim; dielakkan daripada menghantar salinan ke akaun sendiri.' 
+          });
+        }
+        if (senderProfile.username) {
+          senderDisplay = senderProfile.username;
+        }
+      }
+    }
+
+    senderDisplay = senderDisplay || 'Pengguna ADTEC';
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -240,7 +281,6 @@ app.post('/api/send-message-notification', async (req, res) => {
       ? '📷 [Gambar Dihantar]' 
       : (content && content.length > 250 ? content.substring(0, 250) + '...' : (content || 'Mesej baharu'));
 
-    const senderDisplay = senderName || 'Seorang pengguna';
     const subject = `💬 Mesej Baharu daripada ${senderDisplay} - Dashboard ADTEC Melaka`;
     const frontendUrl = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
@@ -248,9 +288,9 @@ app.post('/api/send-message-notification', async (req, res) => {
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px 24px; text-align: center;">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="ADTEC Melaka" style="width: 48px; height: 48px; border-radius: 8px; margin-bottom: 12px; background: white; padding: 2px;" />
+          <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="ADTEC Melaka" style="height: 48px; border-radius: 8px; margin-bottom: 12px; background: white; padding: 4px;" />
           <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Dashboard ADTEC Melaka</h1>
-          <p style="color: rgba(255, 255, 255, 0.85); margin: 6px 0 0; font-size: 13px;">Pusat Maklumat & Sistem Lost & Found Pintar</p>
+          <p style="color: rgba(255, 255, 255, 0.85); margin: 6px 0 0; font-size: 13px;">Pusat Maklumat & Sistem Lost & Found Pintar (PROTON Institute)</p>
         </div>
 
         <!-- Body Content -->
@@ -280,7 +320,7 @@ app.post('/api/send-message-notification', async (req, res) => {
 
           <!-- Footer Note -->
           <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-            🔔 Anda menerima e-mel ini kerana anda telah mengaktifkan tetapan <strong>"Terima e-mel apabila ada mesej baru masuk"</strong> di profil anda. Sekiranya anda tidak lagi ingin menerima pemberitahuan e-mel, anda boleh mematikannya pada bila-bila masa di menu Tetapan Profil.
+            🔔 E-mel ini dihantar khas kepada <strong>${targetEmail}</strong> kerana anda telah mengaktifkan tetapan <strong>"Terima e-mel apabila ada mesej baru masuk"</strong>. Anda boleh menukar pilihan ini pada bila-bila masa di menu <a href="${frontendUrl}/profile" style="color: #4F46E5;">Tetapan Profil</a>.
           </p>
         </div>
       </div>
@@ -288,6 +328,7 @@ app.post('/api/send-message-notification', async (req, res) => {
 
     const plainText = `Hai ${targetName},\n\nAnda mempunyai satu mesej baharu daripada ${senderDisplay}:\n\n"${cleanContent}"\n\nSila log masuk ke ${frontendUrl}/messages untuk melihat dan membalas mesej ini.\n\nDashboard ADTEC Melaka`;
 
+    // Pastikan HANYA penerima (targetEmail) yang menerima e-mel ini. Tiada CC dan tiada BCC.
     const info = await transporter.sendMail({
       from: `"Dashboard ADTEC Melaka" <${process.env.EMAIL_USER}>`,
       to: targetEmail,
@@ -296,9 +337,9 @@ app.post('/api/send-message-notification', async (req, res) => {
       html: htmlContent,
     });
 
-    console.log(`[EMAIL] Notifikasi mesej dihantar kepada: ${targetEmail} (MessageId: ${info.messageId})`);
+    console.log(`[EMAIL] Notifikasi mesej HANYA dihantar kepada penerima sah: ${targetEmail} (MessageId: ${info.messageId})`);
 
-    res.status(200).json({ success: true, sent: true, messageId: info.messageId });
+    res.status(200).json({ success: true, sent: true, recipient: targetEmail, messageId: info.messageId });
   } catch (error) {
     console.error('Ralat menghantar e-mel notifikasi mesej:', error);
     res.status(500).json({ message: 'Gagal menghantar e-mel: ' + error.message });
