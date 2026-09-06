@@ -73,7 +73,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
                 type="email" 
                 required 
                 className="input-field" 
-                placeholder="student@adtec.edu.my" 
+                placeholder="user@adtec.gov.my" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
               />

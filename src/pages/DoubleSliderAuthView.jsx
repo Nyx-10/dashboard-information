@@ -293,7 +293,7 @@ export function DoubleSliderAuthView({
               <button className="ds-ghost-btn" style={{ borderColor: 'var(--text-main)', color: 'var(--text-main)' }} onClick={() => setIsRightPanelActive(false)}>{t ? t('signInBtn') : 'Sign In'}</button>
             </div>
             <div className="ds-overlay-panel ds-overlay-right">
-              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>{t ? t('overlayHelloTitle') : 'Hello, Friend!'}</h1>
+              <h1 style={{ color: 'var(--text-main)', fontSize: '32px', marginBottom: '15px' }}>{t ? t('overlayHelloTitle') : 'Hello, Adtec People!'}</h1>
               <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '14px', lineHeight: '1.5' }}>
                 {t ? t('overlayHelloDesc') : 'Enter your personal details and start your journey with us'}
               </p>

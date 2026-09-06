@@ -649,7 +649,7 @@ export default function LandingPage({ onGetStarted }) {
                 <p>
                   {isMs 
                     ? 'Laporan mewajibkan muat naik bukti visual dan diawasi oleh pentadbir bagi mengelakkan laporan palsu serta menjamin kesahihan setiap tuntutan barang.'
-                    : 'System enforces visual photo uploads and admin oversight to eliminate fraudulent reports and protect student belongings.'}
+                    : 'System enforces visual photo uploads and admin oversight to eliminate fraudulent reports and protect user belongings.'}
                 </p>
                 <div className="bento-security-pills">
                   <div className="sec-pill">
@@ -771,7 +771,7 @@ export default function LandingPage({ onGetStarted }) {
               <p>
                 {isMs 
                   ? 'Sistem dan komuniti akan mengesan padanan. Anda boleh menyemak senarai laporan dengan fungsi carian pintar bila-bila masa.'
-                  : 'Our system indexes the report immediately while students and AI search algorithms identify possible matches.'}
+                  : 'Our system indexes the report immediately while campus users and AI search algorithms identify possible matches.'}
               </p>
             </div>
 
