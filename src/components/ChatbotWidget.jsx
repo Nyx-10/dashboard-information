@@ -62,7 +62,12 @@ Maklumat Sistem:
 4. Terdapat fungsi carian pintar (Smart Search) di bahagian atas untuk mencari barang dengan pantas.
 5. Jika masalah teknikal atau bot tidak dapat membantu, suruh pengguna tekan pautan 'Hubungi Admin' di bahagian bawah kotak sembang ini untuk menghantar e-mel secara terus kepada Admin.
 6. Nama pengguna yang sedang bercakap dengan anda sekarang ialah: ${user?.name || 'Pelajar/Staf'}.
-7. Laman web rasmi ADTEC Melaka ialah: https://adtecmelaka.jtm.gov.my/ (Pastikan anda HANYA memberikan link ini jika ditanya mengenai laman web ADTEC).
+7. Mengenai Laman Web & Portal ADTEC Melaka:
+   - Portal Utama Jabatan Tenaga Manusia (JTM): https://www.jtm.gov.my
+   - Portal e-Sijil ADTEC Melaka: https://esijil.jtm.gov.my/adtecmelaka/
+   - Portal Kampus: https://adtecselandar.edu.my/
+   - Lokasi: Pusat Latihan Teknologi Tinggi (ADTEC) Melaka, Jalan Selandar / Batang Melaka, 77500 Selandar, Melaka.
+   - PENTING: JANGAN SEKALI-KALI memberikan link "adtecmelaka.jtm.gov.my" kerana domain tersebut rosak/tidak wujud. Berikan pautan portal rasmi JTM (https://www.jtm.gov.my) atau portal kampus (https://adtecselandar.edu.my/).
 
 Gaya bahasa:
 Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra. 
@@ -110,10 +115,48 @@ AdtecBot:`;
   };
 
   const formatText = (text) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    const regex = /(\[.*?\]\(https?:\/\/[^\s\)]+\)|\*\*.*?\*\*|https?:\/\/[^\s]+)/g;
+    const parts = text.split(regex);
     return parts.map((part, i) => {
+      if (!part) return null;
       if (part.startsWith('**') && part.endsWith('**')) {
         return <strong key={i} style={{ color: 'inherit' }}>{part.slice(2, -2)}</strong>;
+      }
+      const linkMatch = part.match(/^\[(.*?)\]\((https?:\/\/[^\s\)]+)\)$/);
+      if (linkMatch) {
+        return (
+          <a
+            key={i}
+            href={linkMatch[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#818CF8', textDecoration: 'underline', wordBreak: 'break-all' }}
+          >
+            {linkMatch[1]}
+          </a>
+        );
+      }
+      if (part.startsWith('http://') || part.startsWith('https://')) {
+        let cleanUrl = part;
+        let trailingPunct = '';
+        const punctMatch = cleanUrl.match(/[.,!?)]+$/);
+        if (punctMatch) {
+          trailingPunct = punctMatch[0];
+          cleanUrl = cleanUrl.slice(0, -trailingPunct.length);
+        }
+        return (
+          <span key={i}>
+            <a
+              href={cleanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#818CF8', textDecoration: 'underline', wordBreak: 'break-all' }}
+            >
+              {cleanUrl}
+            </a>
+            {trailingPunct}
+          </span>
+        );
       }
       return <span key={i}>{part}</span>;
     });
