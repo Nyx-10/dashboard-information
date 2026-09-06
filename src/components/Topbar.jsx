@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Bell, LogOut, Menu, MessageSquare, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Search, Bell, LogOut, Menu, MessageSquare, AlertCircle, CheckCircle, Info, Sun, Moon } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 
 export function Topbar({
   sidebarOpen,
@@ -15,6 +16,7 @@ export function Topbar({
 }) {
   const { t } = useContext(LanguageContext);
   const { user, hasUnreadNotifications, setLastSeenNotifTime, notifications, setActiveChatUser } = useContext(AppContext);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +63,30 @@ export function Topbar({
         ) : null}
       </div>
       
-      <div className="topbar-right-gap" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <div className="topbar-right-gap" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <button 
+          style={{ 
+            color: 'var(--text-muted)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '0.35rem', 
+            borderRadius: '0.5rem', 
+            background: 'transparent', 
+            border: 'none', 
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease'
+          }} 
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Tukar ke Light Mode' : 'Tukar ke Dark Mode'}
+        >
+          {theme === 'dark' ? (
+            <Sun size={22} style={{ color: '#F59E0B' }} />
+          ) : (
+            <Moon size={22} style={{ color: '#6366F1' }} />
+          )}
+        </button>
+
         <div style={{ position: 'relative' }}>
           <button style={{ position: 'relative', color: 'var(--text-muted)' }} onClick={() => {
             setShowNotifications(!showNotifications);

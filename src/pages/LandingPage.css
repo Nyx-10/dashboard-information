@@ -23,6 +23,33 @@ html {
   --lux-text-dim: #64748B;
 }
 
+[data-theme="light"] .landing-root {
+  --lux-surface: rgba(255, 255, 255, 0.88);
+  --lux-surface-hover: rgba(255, 255, 255, 0.96);
+  --lux-border: rgba(0, 0, 0, 0.08);
+  --lux-border-highlight: rgba(0, 0, 0, 0.14);
+  --lux-text-main: #0F172A;
+  --lux-text-muted: #475569;
+  --lux-text-dim: #64748B;
+}
+
+[data-theme="light"] .landing-nav {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .landing-nav-link {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .landing-nav-link:hover {
+  color: #0F172A !important;
+}
+
+[data-theme="light"] .glass-card {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04) inset;
+}
+
 .landing-root {
   min-height: 100vh;
   background-color: transparent;

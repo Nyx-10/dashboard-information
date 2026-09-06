@@ -2,12 +2,14 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Settings, Sun, Moon, Edit2, Shield, Bell, Activity, Save, Key, User as UserIcon, List, CheckCircle, Clock } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import { ItemCardCompact } from '../components/ItemCardCompact';
 import { supabase } from '../supabaseClient';
 
 export function ProfileView({ onContact, currentUser }) {
   const { lang, setLang, t } = useContext(LanguageContext);
   const { setUser: setGlobalUser } = useContext(AppContext);
+  const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
   const [profileData, setProfileData] = useState({ phone: '', department: '', email_notifs: true, match_notifs: true });
@@ -226,14 +228,25 @@ export function ProfileView({ onContact, currentUser }) {
               <button className="btn-primary" style={{ background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border)' }} onClick={() => setShowSettings(!showSettings)}>
                 <Settings size={18} /> {t('languageSettings')}
               </button>
-              <button className="btn-primary" style={{ background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border)' }} onClick={() => {
-                const html = document.documentElement;
-                const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-              }}>
-                {document.documentElement.getAttribute('data-theme') === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-                {' '}{document.documentElement.getAttribute('data-theme') === 'light' ? (t('darkMode') || 'Dark Mode') : (t('lightMode') || 'Light Mode')}
+              <button 
+                className="btn-primary" 
+                style={{ 
+                  background: 'var(--surface)', 
+                  color: 'var(--text-main)', 
+                  border: '1px solid var(--border)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }} 
+                onClick={toggleTheme}
+                title={theme === 'dark' ? 'Tukar ke Light Mode' : 'Tukar ke Dark Mode'}
+              >
+                {theme === 'dark' ? <Moon size={18} style={{ color: '#6366F1' }} /> : <Sun size={18} style={{ color: '#F59E0B' }} />}
+                {' '}{theme === 'dark' ? (t('darkMode') || 'Dark Mode') : (t('lightMode') || 'Light Mode')}
               </button>
 
               {showSettings && (

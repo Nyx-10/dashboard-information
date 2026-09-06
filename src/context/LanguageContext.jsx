@@ -56,7 +56,8 @@ export const dict = {
     emailReportStatusTitle: 'Your Report Status Has Been Updated',
     emailReportStatusMsg: 'Your report against user {name} has been reviewed by Admin and is now: {status}. Thank you for helping the ADTEC Melaka community.',
     suspendPreviewPermanent: '🔒 Account will be permanently suspended until manually reactivated.',
-    suspendPreviewDays: '⏰ Account will be suspended until: {date} (System will automatically unsuspend after period ends)', resetPasswordTitle: 'Set New Password', resetPasswordDesc: 'Please enter your new password below.', resetPasswordSuccess: 'Password successfully changed! You can now login using your new password.', newPasswordLabel: 'New Password', confirmNewPasswordLabel: 'Confirm Password', changePasswordBtn: 'Change Password', invalidLink: 'Invalid or expired link.', sessionNotFound: 'Session not found. Please request a new reset link from the login page.', resetFailed: 'Failed to change password. Please try again.'
+    suspendPreviewDays: '⏰ Account will be suspended until: {date} (System will automatically unsuspend after period ends)', resetPasswordTitle: 'Set New Password', resetPasswordDesc: 'Please enter your new password below.', resetPasswordSuccess: 'Password successfully changed! You can now login using your new password.', newPasswordLabel: 'New Password', confirmNewPasswordLabel: 'Confirm Password', changePasswordBtn: 'Change Password', invalidLink: 'Invalid or expired link.', sessionNotFound: 'Session not found. Please request a new reset link from the login page.', resetFailed: 'Failed to change password. Please try again.',
+    darkMode: 'Dark Mode', lightMode: 'Light Mode'
   },
   ms: {
     dashboard: 'Papan Pemuka', searchItems: 'Cari Barang', missingItem: 'Barang Hilang & Info Kolej', messages: 'Mesej',
@@ -113,6 +114,7 @@ export const dict = {
     emailReportStatusTitle: 'Status Laporan Anda Telah Dikemas Kini',
     emailReportStatusMsg: 'Laporan anda terhadap pengguna {name} telah disemak oleh Admin dan kini berstatus: {status}. Terima kasih kerana membantu komuniti ADTEC Melaka.',
     suspendPreviewPermanent: '🔒 Akaun akan digantung secara kekal sehingga diaktifkan semula secara manual.',
-    suspendPreviewDays: '⏰ Akaun akan digantung sehingga: {date} (Sistem akan automatik unsuspend selepas tempoh tamat)', resetPasswordTitle: 'Set Kata Laluan Baharu', resetPasswordDesc: 'Sila masukkan kata laluan baru anda di bawah.', resetPasswordSuccess: 'Kata laluan berjaya ditukar! Anda kini boleh log masuk menggunakan kata laluan baharu anda.', newPasswordLabel: 'Kata Laluan Baharu', confirmNewPasswordLabel: 'Sahkan Kata Laluan', changePasswordBtn: 'Tukar Kata Laluan', invalidLink: 'Pautan tidak sah atau telah luput.', sessionNotFound: 'Sesi tidak dijumpai. Sila mohon pautan reset yang baru dari halaman log masuk.', resetFailed: 'Gagal menukar kata laluan. Sila cuba lagi.'
+    suspendPreviewDays: '⏰ Akaun akan digantung sehingga: {date} (Sistem akan automatik unsuspend selepas tempoh tamat)', resetPasswordTitle: 'Set Kata Laluan Baharu', resetPasswordDesc: 'Sila masukkan kata laluan baru anda di bawah.', resetPasswordSuccess: 'Kata laluan berjaya ditukar! Anda kini boleh log masuk menggunakan kata laluan baharu anda.', newPasswordLabel: 'Kata Laluan Baharu', confirmNewPasswordLabel: 'Sahkan Kata Laluan', changePasswordBtn: 'Tukar Kata Laluan', invalidLink: 'Pautan tidak sah atau telah luput.', sessionNotFound: 'Sesi tidak dijumpai. Sila mohon pautan reset yang baru dari halaman log masuk.', resetFailed: 'Gagal menukar kata laluan. Sila cuba lagi.',
+    darkMode: 'Dark Mode', lightMode: 'Light Mode'
   }
 };
