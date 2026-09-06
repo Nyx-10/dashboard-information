@@ -21,6 +21,7 @@ import { supabase } from './supabaseClient';
 import { AppContext } from './context/AppContext';
 import { ToastContainer } from './components/Toast';
 import { ChatbotWidget } from './components/ChatbotWidget';
+import { GlobalAtmosphere } from './components/GlobalAtmosphere';
 
 export default function App() {
   const navigate = useNavigate();
@@ -330,23 +331,27 @@ export default function App() {
 
   if (isCheckingAuth) {
     return (
-      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="spinner" style={{ width: '40px', height: '40px', borderColor: 'rgba(79, 70, 229, 0.3)', borderLeftColor: 'var(--primary)' }}></div>
+      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
+        <GlobalAtmosphere />
+        <div className="spinner" style={{ width: '40px', height: '40px', borderColor: 'rgba(79, 70, 229, 0.3)', borderLeftColor: 'var(--primary)', position: 'relative', zIndex: 10 }}></div>
       </div>
     );
   }
 
   if (showMaintenanceScreen) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem' }}>
-        <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>{t('systemUnderMaintenance') || 'Sistem Sedang Diselenggara'}</h1>
-        <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
-          {t('maintenanceReturnMsg') || 'Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.'}
-        </p>
-        <button onClick={() => setShowMaintenanceScreen(false)} className="btn-primary" style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}>
-           {t('returnToLogin') || 'Kembali ke Log Masuk'}
-        </button>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
+        <GlobalAtmosphere />
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
+          <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>{t('systemUnderMaintenance') || 'Sistem Sedang Diselenggara'}</h1>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
+            {t('maintenanceReturnMsg') || 'Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.'}
+          </p>
+          <button onClick={() => setShowMaintenanceScreen(false)} className="btn-primary" style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}>
+             {t('returnToLogin') || 'Kembali ke Log Masuk'}
+          </button>
+        </div>
       </div>
     );
   }
@@ -356,6 +361,7 @@ export default function App() {
   if (showLanding) {
     return (
       <LanguageContext.Provider value={{ lang, setLang, t }}>
+        <GlobalAtmosphere />
         <LandingPage onGetStarted={() => setShowLanding(false)} />
         <ToastContainer />
       </LanguageContext.Provider>
@@ -383,6 +389,7 @@ export default function App() {
     }
     return (
       <LanguageContext.Provider value={{ lang, setLang, t }}>
+        <GlobalAtmosphere />
         {authContent}
         <ToastContainer />
       </LanguageContext.Provider>
@@ -392,6 +399,7 @@ export default function App() {
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
       <AppContext.Provider value={contextValue}>
+      <GlobalAtmosphere />
       <div className="app-container">
         {/* Sidebar */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

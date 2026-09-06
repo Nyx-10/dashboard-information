@@ -21,7 +21,6 @@ export default function LandingPage({ onGetStarted }) {
   const [latestLostItem, setLatestLostItem] = useState(null);
   const [latestFoundItem, setLatestFoundItem] = useState(null);
   const [openFaq, setOpenFaq] = useState(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const heroRef = useRef(null);
 
   const isMs = lang === 'ms';
@@ -84,15 +83,6 @@ export default function LandingPage({ onGetStarted }) {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Track cursor position for luxury spotlight glow
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   // Format relative time helper
@@ -227,21 +217,6 @@ export default function LandingPage({ onGetStarted }) {
 
   return (
     <div className="landing-root">
-      {/* Luxury Ambient Spotlight follows cursor */}
-      <div 
-        className="landing-spotlight" 
-        style={{
-          background: `radial-gradient(700px circle at ${mousePos.x}px ${mousePos.y}px, rgba(99, 102, 241, 0.08), transparent 75%)`
-        }} 
-      />
-
-      {/* Atmospheric Background Layers */}
-      <div className="landing-bg">
-        <div className="landing-bg-orb landing-bg-orb-1" />
-        <div className="landing-bg-orb landing-bg-orb-2" />
-        <div className="landing-bg-orb landing-bg-orb-3" />
-        <div className="landing-bg-grid" />
-      </div>
 
       {/* Navigation Header */}
       <nav className={`landing-nav ${scrollY > 30 ? 'landing-nav-scrolled' : ''}`}>

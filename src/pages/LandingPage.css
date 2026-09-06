@@ -25,7 +25,7 @@ html {
 
 .landing-root {
   min-height: 100vh;
-  background-color: var(--lux-bg);
+  background-color: transparent;
   color: var(--lux-text-main);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
