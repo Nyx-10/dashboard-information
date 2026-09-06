@@ -72,9 +72,7 @@ export function SignupView({ onSignup, onSwitch }) {
         >
           <option value="ms">Melayu</option>
           <option value="en">English</option>
-          <option value="zh">中文</option>
-          <option value="ta">தமிழ்</option>
-        </select>
+          </select>
       </div>
 
       <style>

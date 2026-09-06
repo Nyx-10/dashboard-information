@@ -182,9 +182,7 @@ export function DoubleSliderAuthView({
         >
           <option value="ms">Melayu</option>
           <option value="en">English</option>
-          <option value="zh">中文</option>
-          <option value="ta">தமிழ்</option>
-        </select>
+          </select>
       </div>
 
       <div className={`ds-container glass-panel ${isRightPanelActive ? 'right-panel-active' : ''}`}>

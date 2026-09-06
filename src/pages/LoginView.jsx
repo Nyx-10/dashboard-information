@@ -110,9 +110,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, o
         >
           <option value="ms">Melayu</option>
           <option value="en">English</option>
-          <option value="zh">中文</option>
-          <option value="ta">தமிழ்</option>
-        </select>
+          </select>
       </div>
       <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />

@@ -143,9 +143,7 @@ export default function LandingPage({ onGetStarted }) {
             >
               <option value="ms" style={{ color: 'black' }}>Melayu</option>
               <option value="en" style={{ color: 'black' }}>English</option>
-              <option value="zh" style={{ color: 'black' }}>中文</option>
-              <option value="ta" style={{ color: 'black' }}>தமிழ்</option>
-            </select>
+              </select>
             <button className="landing-nav-cta" onClick={onGetStarted}>
               {t('loginBtn')} <ArrowRight size={16} />
             </button>
