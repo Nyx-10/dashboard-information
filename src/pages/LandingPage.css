@@ -896,11 +896,17 @@ html {
   min-width: 260px;
 }
 
-/* Cards Grid inside Mockup */
+/* Cards Grid inside Mockup (Strict 3 columns) */
 .mockup-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
+}
+
+@media (max-width: 992px) {
+  .mockup-items-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mockup-search-input {

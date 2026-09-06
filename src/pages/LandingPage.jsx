@@ -180,7 +180,7 @@ export default function LandingPage({ onGetStarted }) {
 
   const sourceItems = dbItems.length > 0 ? dbItems : fallbackItems;
 
-  // Filter items by tab and search query
+  // Filter items by tab and search query - strictly limit to 3 latest items
   const filteredMockupItems = sourceItems.filter(item => {
     const matchesTab = activeMockupTab === 'all' 
       ? true 
@@ -195,7 +195,7 @@ export default function LandingPage({ onGetStarted }) {
       (item.description && item.description.toLowerCase().includes(query));
 
     return matchesTab && matchesSearch;
-  });
+  }).slice(0, 3);
 
   // FAQ Items
   const faqItems = [
@@ -445,7 +445,7 @@ export default function LandingPage({ onGetStarted }) {
               </div>
               <div className="mockup-window-badge">
                 <span className="status-live-dot"></span>
-                {isMs ? `${dbItems.length} Rekod Dimuatkan` : `${dbItems.length} Live Records`}
+                {isMs ? '3 Laporan Terbaharu' : '3 Latest Records'}
               </div>
             </div>
 
