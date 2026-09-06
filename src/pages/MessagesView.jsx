@@ -634,8 +634,26 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
           <>
             {/* Chat Header */}
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <button className="mobile-only-btn" onClick={() => setActiveChat(null)} style={{ display: 'none', background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer', marginRight: '-0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <button 
+                  className="mobile-only-btn" 
+                  onClick={() => setActiveChat(null)} 
+                  aria-label="Kembali"
+                  style={{ 
+                    display: 'none', 
+                    background: 'transparent', 
+                    border: 'none', 
+                    color: 'var(--text-main)', 
+                    fontSize: '1.5rem', 
+                    cursor: 'pointer',
+                    width: '40px',
+                    height: '40px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    touchAction: 'manipulation'
+                  }}
+                >
                   &larr;
                 </button>
                 <img 
@@ -730,7 +748,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSendMessage} style={{ padding: '1.25rem', background: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <form onSubmit={handleSendMessage} style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', background: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <div style={{ position: 'relative' }}>
                 <input 
                   type="file" 
@@ -742,7 +760,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 <button 
                   type="button" 
                   onClick={() => document.getElementById('chat-image-upload').click()} 
-                  style={{ background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}
+                  style={{ background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)', touchAction: 'manipulation' }}
                   disabled={uploadingImage}
                 >
                   {uploadingImage ? <span className="spinner" style={{ width: '16px', height: '16px' }} /> : <ImageIcon size={20} />}
@@ -757,7 +775,7 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                 onChange={e => { setNewMessage(e.target.value); broadcastTyping(); }}
                 disabled={uploadingImage}
               />
-              <button type="submit" className="btn-primary" style={{ borderRadius: '2rem', padding: '0.5rem 1.5rem' }} disabled={!newMessage.trim() || uploadingImage}>
+              <button type="submit" className="btn-primary" style={{ borderRadius: '2rem', padding: '0.6rem 1.25rem', whiteSpace: 'nowrap', touchAction: 'manipulation' }} disabled={!newMessage.trim() || uploadingImage}>
                 {t('send')}
               </button>
             </form>

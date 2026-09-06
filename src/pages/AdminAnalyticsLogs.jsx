@@ -295,8 +295,8 @@ export const AdminAnalyticsView = ({ currentUser }) => {
       </div>
 
       {/* Analytics Chart */}
-      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', height: '400px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="glass-panel" style={{ padding: 'clamp(1rem, 3vw, 2rem)', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>
             {t('itemsReported') || 'Items Reported'} 
             <span style={{ fontSize: '0.875rem', fontWeight: 400, color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
@@ -322,19 +322,21 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             <option value="year">Year (Last 5 Years)</option>
           </select>
         </div>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-            <XAxis dataKey="name" stroke="var(--text-muted)" />
-            <YAxis stroke="var(--text-muted)" allowDecimals={false} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-main)', borderRadius: '0.5rem' }} 
-              itemStyle={{ color: 'var(--text-main)' }}
-            />
-            <Bar dataKey="Lost" name="Lost Items" fill="#EF4444" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Found" name="Found Items" fill="#10B981" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: '320px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="name" stroke="var(--text-muted)" />
+              <YAxis stroke="var(--text-muted)" allowDecimals={false} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-main)', borderRadius: '0.5rem' }} 
+                itemStyle={{ color: 'var(--text-main)' }}
+              />
+              <Bar dataKey="Lost" name="Lost Items" fill="#EF4444" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Found" name="Found Items" fill="#10B981" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Maintenance Mode Toggle Section - Only for Super Admin */}
@@ -455,7 +457,7 @@ export const AdminAuditLogsView = () => {
         }}>{t('exportLogs')}</button>
       </div>
 
-      <div className="glass-panel" style={{ overflowX: 'auto' }}>
+      <div className="glass-panel table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.02)' }}>

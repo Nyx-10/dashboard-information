@@ -123,8 +123,7 @@ export function AddItemView({ onSuccess }) {
 
   return (
     <div className="page-bg-common bg-add-item">
-      <div style={{ maxWidth: '600px', margin: '0 auto' }} className="glass-panel">
-        <div style={{ padding: '2rem' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: 'clamp(1rem, 4vw, 2rem)' }} className="glass-panel">
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{t('reportTitle')}</h1>
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -212,7 +211,6 @@ export function AddItemView({ onSuccess }) {
           </button>
         </form>
       </div>
-    </div>
     </div>
   );
 }

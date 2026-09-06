@@ -33,7 +33,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
   };
 
   return (
-    <div className="bg-auth" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <div className="bg-auth" style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '3.5rem 1rem 2rem' }}>
       <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
         <select 
           value={lang} 
@@ -52,7 +52,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
           }
         `}
       </style>
-      <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center', animation: 'slideUpFadeIn 0.5s ease-out forwards' }}>
+      <div className="glass-panel" style={{ padding: 'clamp(1.5rem, 5vw, 2.5rem)', width: '100%', maxWidth: '420px', textAlign: 'center', animation: 'slideUpFadeIn 0.5s ease-out forwards' }}>
         <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Adtec Melaka Logo" style={{ height: '60px', margin: '0 auto 1rem', display: 'block' }} />
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('forgotTitle') : 'Lupa Kata Laluan'}</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
