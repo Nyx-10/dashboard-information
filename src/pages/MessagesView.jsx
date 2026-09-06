@@ -452,18 +452,24 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       if (error) throw error;
 
-      // Hantar notifikasi e-mel kepada penerima jika penerima aktifkan pilihan terima e-mel
-      fetch('/api/send-message-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientId: activeChat,
-          senderId: currentUserId,
-          senderName: currentUserName,
-          content: messageContent,
-          origin: window.location.origin
-        })
-      }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+      // Hantar notifikasi e-mel kepada penerima HANYA jika penerima OFFLINE dan aktifkan tetapan
+      const isRecipientOnline = onlineUsers && onlineUsers.has(activeChat);
+      if (!isRecipientOnline) {
+        fetch('/api/send-message-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientId: activeChat,
+            senderId: currentUserId,
+            senderName: currentUserName,
+            content: messageContent,
+            origin: window.location.origin,
+            isRecipientOnline: false
+          })
+        }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+      } else {
+        console.log(`[CHAT] Penerima (${activeChat}) sedang ONLINE di dalam sistem. E-mel tidak dihantar.`);
+      }
 
     } catch (error) {
       alert(t('alertFailedUpload') + error.message);
@@ -509,18 +515,24 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
 
       if (error) throw error;
       
-      // Hantar notifikasi e-mel kepada penerima jika penerima aktifkan pilihan terima e-mel
-      fetch('/api/send-message-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientId: activeChat,
-          senderId: currentUserId,
-          senderName: currentUserName,
-          content: messageContent,
-          origin: window.location.origin
-        })
-      }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+      // Hantar notifikasi e-mel kepada penerima HANYA jika penerima OFFLINE dan aktifkan tetapan
+      const isRecipientOnline = onlineUsers && onlineUsers.has(activeChat);
+      if (!isRecipientOnline) {
+        fetch('/api/send-message-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientId: activeChat,
+            senderId: currentUserId,
+            senderName: currentUserName,
+            content: messageContent,
+            origin: window.location.origin,
+            isRecipientOnline: false
+          })
+        }).catch(err => console.error('Ralat menghantar notifikasi e-mel mesej:', err));
+      } else {
+        console.log(`[CHAT] Penerima (${activeChat}) sedang ONLINE di dalam sistem. E-mel tidak dihantar.`);
+      }
 
       // Update the chat preview on the sidebar immediately
       setChats(prev => {

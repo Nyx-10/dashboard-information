@@ -184,14 +184,39 @@ app.post('/api/send-notification-email', async (req, res) => {
   }
 });
 
+// Langganan kehadiran Supabase Realtime untuk menyemak status pengguna online
+const onlineUsersSet = new Set();
+try {
+  const presenceChannel = supabase.channel('online-users');
+  presenceChannel
+    .on('presence', { event: 'sync' }, () => {
+      const state = presenceChannel.presenceState();
+      onlineUsersSet.clear();
+      Object.keys(state).forEach(id => onlineUsersSet.add(id));
+    })
+    .subscribe();
+} catch (e) {
+  console.warn('Backend presence channel error:', e.message);
+}
+
 app.post('/api/send-message-notification', async (req, res) => {
-  const { recipientId, senderId, senderName, content, recipientEmail } = req.body;
+  const { recipientId, senderId, senderName, content, recipientEmail, isRecipientOnline } = req.body;
 
   if (!recipientId && !recipientEmail) {
     return res.status(400).json({ message: 'Maklumat penerima diperlukan.' });
   }
 
-  // 1. Pastikan PENGIRIM tidak sesekali menerima e-mel untuk mesej yang dihantar sendiri
+  // 1. Sekiranya penerima sedang ONLINE, BATALKAN notifikasi e-mel serta-merta
+  if (isRecipientOnline === true || (recipientId && onlineUsersSet.has(recipientId))) {
+    console.log(`[NOTIF] Penerima (${recipientId}) disahkan sedang ONLINE. E-mel tidak dihantar.`);
+    return res.status(200).json({ 
+      success: true, 
+      sent: false, 
+      message: 'Penerima sedang online di dalam sistem; notifikasi e-mel tidak diperlukan.' 
+    });
+  }
+
+  // 2. Pastikan PENGIRIM tidak sesekali menerima e-mel untuk mesej yang dihantar sendiri
   if (senderId && recipientId && String(senderId) === String(recipientId)) {
     console.log(`[NOTIF] Pengirim (${senderId}) sama dengan penerima (${recipientId}). Tiada e-mel dihantar.`);
     return res.status(200).json({ 
