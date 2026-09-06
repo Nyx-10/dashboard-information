@@ -365,6 +365,28 @@ html {
   .landing-nav-links { display: none; }
 }
 
+@media (max-width: 480px) {
+  .landing-brand-tag {
+    display: none;
+  }
+  .landing-brand-title {
+    font-size: 1rem;
+  }
+  .landing-nav-actions {
+    gap: 0.5rem;
+  }
+  .landing-nav-cta {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+  .landing-nav-inner {
+    padding: 0 1rem;
+  }
+  .landing-hero {
+    padding: 6rem 1rem 4rem;
+  }
+}
+
 /* --------------------------------------------------------------------------
    HERO SECTION
    -------------------------------------------------------------------------- */
@@ -456,7 +478,7 @@ html {
 
 /* Headline */
 .landing-hero-title {
-  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+  font-size: clamp(1.85rem, 5.5vw, 4.5rem);
   font-weight: 850;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -933,6 +955,37 @@ html {
 @media (max-width: 992px) {
   .mockup-items-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .mockup-top-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .mockup-tabs {
+    overflow-x: auto;
+    width: 100%;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.25rem;
+  }
+  .mockup-tab {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  .mockup-search-bar {
+    min-width: unset;
+    width: 100%;
+  }
+  .mockup-window-body {
+    padding: 1rem;
+  }
+  .mockup-window-address {
+    display: none;
   }
 }
 

@@ -167,7 +167,7 @@ export function DoubleSliderAuthView({
   };
 
   return (
-    <div className="bg-auth" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <div className="bg-auth" style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {/* Top Controls */}
       <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', zIndex: 1000 }}>
         <button onClick={onBackToHome} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 500 }}>
@@ -238,7 +238,7 @@ export function DoubleSliderAuthView({
                   {signupLoading ? '...' : (t ? t('signUpBtn') : 'Sign Up')}
                 </button>
                 <div className="mobile-auth-switch" style={{ marginTop: '1rem', fontSize: '13px', display: 'none' }}>
-                  {t ? t('alreadyHaveAccount') || 'Already have an account? ' : 'Already have an account? '}
+                  {t ? (t('alreadyAccount') || t('alreadyHaveAccount') || 'Already have an account? ') : 'Already have an account? '}
                   <span onClick={() => setIsRightPanelActive(false)} style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>{t ? t('signInBtn') : 'Sign In'}</span>
                 </div>
               </>
@@ -276,7 +276,7 @@ export function DoubleSliderAuthView({
               {loginLoading ? '...' : (t ? t('signInBtn') : 'Sign In')}
             </button>
             <div className="mobile-auth-switch" style={{ marginTop: '1rem', fontSize: '13px', display: 'none' }}>
-              {t ? t('dontHaveAccount') || 'Don\'t have an account? ' : 'Don\'t have an account? '}
+              {t ? (t('noAccount') || t('dontHaveAccount') || 'Don\'t have an account? ') : 'Don\'t have an account? '}
               <span onClick={() => setIsRightPanelActive(true)} style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>{t ? t('signUpBtn') : 'Sign Up'}</span>
             </div>
           </form>

@@ -22,6 +22,7 @@ import { AppContext } from './context/AppContext';
 import { ToastContainer } from './components/Toast';
 import { ChatbotWidget } from './components/ChatbotWidget';
 import { GlobalAtmosphere } from './components/GlobalAtmosphere';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
   const navigate = useNavigate();
@@ -456,6 +457,7 @@ export default function App() {
         </div>
       )}
       <ChatbotWidget />
+      <MobileBottomNav />
       <ToastContainer />
     </div>
     </AppContext.Provider>

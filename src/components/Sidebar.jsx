@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, PlusCircle, User, LayoutDashboard, 
-  MessageSquare, Settings, Calendar, Bot, Sparkles
+  MessageSquare, Settings, Calendar, Bot, Sparkles, X
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
@@ -38,9 +38,20 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
         />
       )}
       <aside className={`sidebar ${sidebarOpen ? '' : 'sidebar-collapsed'}`}>
-        <div className="sidebar-header">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="Logo" style={{ width: '28px', height: '28px', borderRadius: '4px' }} />
-          <span>Adtec Melaka</span>
+        <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="Logo" style={{ width: '28px', height: '28px', borderRadius: '4px' }} />
+            <span>Adtec Melaka</span>
+          </div>
+          {setSidebarOpen && (
+            <button 
+              className="sidebar-close-btn"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X size={20} />
+            </button>
+          )}
         </div>
         
         <nav style={{ flex: 1 }}>
