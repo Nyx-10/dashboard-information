@@ -165,98 +165,90 @@ AdtecBot:`;
     });
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="chatbot-container">
-      {isOpen ? (
-        <div className="chatbot-window modal-bounce">
-          <div className="chatbot-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', padding: '0.5rem', borderRadius: '50%', color: 'white', display: 'flex', boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)' }}>
-                <Bot size={20} />
+      <div className="chatbot-window modal-bounce">
+        <div className="chatbot-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', padding: '0.5rem', borderRadius: '50%', color: 'white', display: 'flex', boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)' }}>
+              <Bot size={20} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'white', display: 'flex', alignItems: 'center', gap: '0.25rem', margin: 0, textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
+                AdtecBot <Sparkles size={14} color="#fcd34d" />
+              </h3>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <span style={{ width: 6, height: 6, background: '#10B981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px #10B981' }}></span> Sentiasa Online (AI)
+              </span>
+            </div>
+          </div>
+          <button className="chatbot-close-btn" onClick={() => setIsOpen(false)}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="chatbot-messages-container">
+          {messages.map((msg) => {
+            const isBot = msg.sender === 'bot';
+            return (
+              <div key={msg.id} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignSelf: isBot ? 'flex-start' : 'flex-end', flexDirection: isBot ? 'row' : 'row-reverse', maxWidth: '85%' }}>
+                {isBot && (
+                  <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginTop: '0.25rem' }}>
+                    <Bot size={16} />
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: isBot ? 'flex-start' : 'flex-end' }}>
+                  <div className={isBot ? 'chatbot-bubble-bot' : 'chatbot-bubble-user'}>
+                    {msg.text.split('\n').map((line, idx) => (
+                      <React.Fragment key={idx}>
+                        {formatText(line)}
+                        {idx !== msg.text.split('\n').length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', padding: '0 0.25rem' }}>
+                    {msg.time}
+                  </span>
+                </div>
               </div>
-              <div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'white', display: 'flex', alignItems: 'center', gap: '0.25rem', margin: 0, textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
-                  AdtecBot <Sparkles size={14} color="#fcd34d" />
-                </h3>
-                <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span style={{ width: 6, height: 6, background: '#10B981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px #10B981' }}></span> Sentiasa Online (AI)
-                </span>
+            );
+          })}
+          
+          {isTyping && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignSelf: 'flex-start', maxWidth: '85%' }}>
+              <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginTop: '0.25rem' }}>
+                <Bot size={16} />
+              </div>
+              <div className="chatbot-bubble-bot typing-indicator-bubble" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '1rem' }}>
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
               </div>
             </div>
-            <button className="chatbot-close-btn" onClick={() => setIsOpen(false)}>
-              <X size={20} />
-            </button>
-          </div>
-
-          <div className="chatbot-messages-container">
-            {messages.map((msg) => {
-              const isBot = msg.sender === 'bot';
-              return (
-                <div key={msg.id} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignSelf: isBot ? 'flex-start' : 'flex-end', flexDirection: isBot ? 'row' : 'row-reverse', maxWidth: '85%' }}>
-                  {isBot && (
-                    <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginTop: '0.25rem' }}>
-                      <Bot size={16} />
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: isBot ? 'flex-start' : 'flex-end' }}>
-                    <div className={isBot ? 'chatbot-bubble-bot' : 'chatbot-bubble-user'}>
-                      {msg.text.split('\n').map((line, idx) => (
-                        <React.Fragment key={idx}>
-                          {formatText(line)}
-                          {idx !== msg.text.split('\n').length - 1 && <br />}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.25rem', padding: '0 0.25rem' }}>
-                      {msg.time}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-            
-            {isTyping && (
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignSelf: 'flex-start', maxWidth: '85%' }}>
-                <div style={{ background: 'linear-gradient(135deg, #4F46E5, #ec4899)', width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginTop: '0.25rem' }}>
-                  <Bot size={16} />
-                </div>
-                <div className="chatbot-bubble-bot typing-indicator-bubble" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '1rem' }}>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          <form onSubmit={handleSend} className="chatbot-input-area">
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Tanya sesuatu kepada AI..." 
-              className="chatbot-input"
-            />
-            <button type="submit" className="chatbot-send-btn" disabled={!input.trim() || isTyping}>
-              <Send size={18} />
-            </button>
-          </form>
-          <div style={{ textAlign: 'center', padding: '0.5rem', background: 'var(--surface)', borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: '0.75rem' }}>
-            <a href="mailto:adam.darwish.it@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-              Bot tidak dapat membantu? <span style={{ color: '#818CF8', fontWeight: 600 }}>Hubungi Admin</span>
-            </a>
-          </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      ) : (
-        <button 
-          className="chatbot-fab" 
-          onClick={() => setIsOpen(true)}
-          aria-label="Buka Chatbot"
-        >
-          <MessageCircle size={28} />
-        </button>
-      )}
+
+        <form onSubmit={handleSend} className="chatbot-input-area">
+          <input 
+            type="text" 
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Tanya sesuatu kepada AI..." 
+            className="chatbot-input"
+          />
+          <button type="submit" className="chatbot-send-btn" disabled={!input.trim() || isTyping}>
+            <Send size={18} />
+          </button>
+        </form>
+        <div style={{ textAlign: 'center', padding: '0.5rem', background: 'var(--surface)', borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: '0.75rem' }}>
+          <a href="mailto:adam.darwish.it@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+            Bot tidak dapat membantu? <span style={{ color: '#818CF8', fontWeight: 600 }}>Hubungi Admin</span>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
