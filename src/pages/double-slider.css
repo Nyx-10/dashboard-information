@@ -216,6 +216,8 @@
   transition: all 0.3s cubic-bezier(0.68, -0.15, 0.27, 1.15);
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .ds-form .btn-primary::after {
@@ -227,11 +229,19 @@
   transition: transform 0.5s ease;
 }
 
-.ds-form .btn-primary:hover::after {
-  transform: translateX(100%);
+@media (hover: hover) {
+  .ds-form .btn-primary:hover::after {
+    transform: translateX(100%);
+  }
+
+  .ds-form .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+  }
 }
 
-.ds-form .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+.ds-form .btn-primary:active {
+  transform: translateY(1px) !important;
+  box-shadow: none !important;
+  transition: none !important;
 }
