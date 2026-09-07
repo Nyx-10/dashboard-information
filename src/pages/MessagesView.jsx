@@ -640,7 +640,6 @@ export function MessagesView({ initialChatUser, onMessagesRead, onlineUsers = ne
                   onClick={() => setActiveChat(null)} 
                   aria-label="Kembali"
                   style={{ 
-                    display: 'none', 
                     background: 'transparent', 
                     border: 'none', 
                     color: 'var(--text-main)', 

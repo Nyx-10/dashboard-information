@@ -25,6 +25,7 @@ export function MobileBottomNav() {
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
       <button 
+        type="button"
         className={`mobile-nav-item ${isActive('/home') ? 'active' : ''}`}
         onClick={() => handleNav('/home')}
       >
@@ -33,6 +34,7 @@ export function MobileBottomNav() {
       </button>
 
       <button 
+        type="button"
         className={`mobile-nav-item ${isActive('/search') ? 'active' : ''}`}
         onClick={() => handleNav('/search')}
       >
@@ -41,6 +43,7 @@ export function MobileBottomNav() {
       </button>
 
       <button 
+        type="button"
         className={`mobile-nav-item mobile-nav-center ${isActive('/add') ? 'active' : ''}`}
         onClick={() => handleNav('/add')}
       >
@@ -51,6 +54,7 @@ export function MobileBottomNav() {
       </button>
 
       <button 
+        type="button"
         className={`mobile-nav-item ${isActive('/messages') ? 'active' : ''}`}
         onClick={() => handleNav('/messages', true)}
       >
@@ -66,6 +70,7 @@ export function MobileBottomNav() {
       </button>
 
       <button 
+        type="button"
         className={`mobile-nav-item ${isActive('/profile') ? 'active' : ''}`}
         onClick={() => handleNav('/profile')}
       >

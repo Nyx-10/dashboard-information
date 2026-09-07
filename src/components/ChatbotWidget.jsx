@@ -167,7 +167,7 @@ AdtecBot:`;
 
   return (
     <div className="chatbot-container">
-      {isOpen && (
+      {isOpen ? (
         <div className="chatbot-window modal-bounce">
           <div className="chatbot-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -248,8 +248,15 @@ AdtecBot:`;
             </a>
           </div>
         </div>
+      ) : (
+        <button 
+          className="chatbot-fab" 
+          onClick={() => setIsOpen(true)}
+          aria-label="Buka Chatbot"
+        >
+          <MessageCircle size={28} />
+        </button>
       )}
-
     </div>
   );
 }
