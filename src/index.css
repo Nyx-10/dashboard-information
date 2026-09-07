@@ -92,11 +92,24 @@ body::before, body::after {
   transition: opacity 0.3s ease;
 }
 
-/* Disable mouse spotlight on touch devices for maximum GPU performance */
-@media (hover: none) and (pointer: coarse) {
+/* Disable mouse spotlight, heavy background animations, and expensive filters on mobile for maximum GPU performance */
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
   .app-spotlight,
-  .app-spotlight-top {
+  .app-spotlight-top,
+  .app-bg-orb,
+  .app-bg-grid {
     display: none !important;
+  }
+
+  /* Disable backdrop-filter on mobile to fix scroll lag and heavy UI */
+  .sidebar,
+  .topbar,
+  .mobile-bottom-nav,
+  .glass-panel,
+  .item-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: var(--surface) !important;
   }
 }
 
