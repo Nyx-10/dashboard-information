@@ -42,6 +42,7 @@ const badgeStyle = (status) => {
 export const AdminUsersView = ({ currentUser }) => {
   const { t } = useContext(LanguageContext);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [suspendTargetUser, setSuspendTargetUser] = useState(null);
   const [suspendDaysOption, setSuspendDaysOption] = useState('7');
@@ -55,6 +56,7 @@ export const AdminUsersView = ({ currentUser }) => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -103,6 +105,8 @@ export const AdminUsersView = ({ currentUser }) => {
     } catch (e) {
       console.error('Exception fetching profiles:', e);
       setUsers(mockUsers);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -376,7 +380,17 @@ export const AdminUsersView = ({ currentUser }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.length === 0 ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={`skel-${idx}`} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '1rem 1.5rem' }}><div className="skeleton" style={{ height: '20px', width: '80%', borderRadius: '4px' }}></div></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><div className="skeleton" style={{ height: '20px', width: '90%', borderRadius: '4px' }}></div></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><div className="skeleton" style={{ height: '20px', width: '60%', borderRadius: '4px' }}></div></td>
+                  <td style={{ padding: '1rem 1.5rem' }}><div className="skeleton" style={{ height: '24px', width: '80px', borderRadius: '12px' }}></div></td>
+                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}><div className="skeleton" style={{ height: '28px', width: '100px', borderRadius: '4px', display: 'inline-block' }}></div></td>
+                </tr>
+              ))
+            ) : filteredUsers.length === 0 ? (
                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('noUsersFound') || 'No users found.'}</td></tr>
             ) : filteredUsers.map((user, index) => {
               const canEdit = canModifyUser(user);

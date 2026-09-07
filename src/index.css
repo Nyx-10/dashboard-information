@@ -43,6 +43,25 @@
   --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 }
 
+/* Custom Color Themes */
+:root[data-color="blue"], [data-theme="dark"][data-color="blue"], [data-theme="light"][data-color="blue"] {
+  --primary: #3B82F6;
+  --primary-hover: #2563EB;
+}
+:root[data-color="green"], [data-theme="dark"][data-color="green"], [data-theme="light"][data-color="green"] {
+  --primary: #10B981;
+  --primary-hover: #059669;
+}
+:root[data-color="purple"], [data-theme="dark"][data-color="purple"], [data-theme="light"][data-color="purple"] {
+  --primary: #8B5CF6;
+  --primary-hover: #7C3AED;
+}
+:root[data-color="red"], [data-theme="dark"][data-color="red"], [data-theme="light"][data-color="red"] {
+  --primary: #EF4444;
+  --primary-hover: #DC2626;
+}
+
+
 * {
   margin: 0;
   padding: 0;

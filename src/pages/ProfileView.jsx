@@ -9,7 +9,7 @@ import { supabase } from '../supabaseClient';
 export function ProfileView({ onContact, currentUser }) {
   const { lang, setLang, t } = useContext(LanguageContext);
   const { setUser: setGlobalUser } = useContext(AppContext);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, colorTheme, setColorTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState(null);
   const [profileData, setProfileData] = useState({ department: '', email_notifs: false, match_notifs: true });
@@ -249,7 +249,7 @@ export function ProfileView({ onContact, currentUser }) {
               </button>
 
               {showSettings && (
-                <div className="glass-panel notif-dropdown-enter" style={{ position: 'absolute', top: '110%', left: 0, width: '200px', zIndex: 10, padding: '1rem', boxShadow: 'var(--shadow-lg)' }}>
+                <div className="glass-panel notif-dropdown-enter" style={{ position: 'absolute', top: '110%', left: 0, width: '220px', zIndex: 10, padding: '1rem', boxShadow: 'var(--shadow-lg)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
                       <input type="radio" name="lang" checked={lang === 'ms'} onChange={() => setLang('ms')} /> {t('malay')}
@@ -257,6 +257,17 @@ export function ProfileView({ onContact, currentUser }) {
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
                       <input type="radio" name="lang" checked={lang === 'en'} onChange={() => setLang('en')} /> {t('english')}
                     </label>
+                    
+                    <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 600 }}>{t('themeColor') || 'Warna Tema'}</p>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button onClick={() => setColorTheme('default')} style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#6366F1', border: colorTheme === 'default' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Default"></button>
+                        <button onClick={() => setColorTheme('blue')} style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#3B82F6', border: colorTheme === 'blue' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Blue"></button>
+                        <button onClick={() => setColorTheme('green')} style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#10B981', border: colorTheme === 'green' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Green"></button>
+                        <button onClick={() => setColorTheme('purple')} style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#8B5CF6', border: colorTheme === 'purple' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Purple"></button>
+                        <button onClick={() => setColorTheme('red')} style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#EF4444', border: colorTheme === 'red' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Red"></button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
