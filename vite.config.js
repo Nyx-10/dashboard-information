@@ -18,14 +18,14 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'https://adtecmelaka.gov.my/images/2021/04/23/logo_adtec_melaka.png',
+            src: '/app_icon.jpg',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/jpeg'
           },
           {
-            src: 'https://adtecmelaka.gov.my/images/2021/04/23/logo_adtec_melaka.png',
+            src: '/app_icon.jpg',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/jpeg'
           }
         ]
       }
