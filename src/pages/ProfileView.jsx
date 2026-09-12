@@ -78,14 +78,14 @@ export function ProfileView({ onContact, currentUser }) {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Saiz fail terlalu besar (maksimum 5MB).');
+      alert(t('alertFileSize') || 'Saiz fail terlalu besar (maksimum 5MB).');
       return;
     }
 
     try {
       setUploadingAvatar(true);
       const { data: { user: supabaseUser } } = await supabase.auth.getUser();
-      if (!supabaseUser) throw new Error('Sila log masuk semula.');
+      if (!supabaseUser) throw new Error(t('pleaseLoginAgain') || 'Sila log masuk semula.');
 
       const fileExt = file.name.split('.').pop();
       const fileName = `avatar_${supabaseUser.id}_${Date.now()}.${fileExt}`;
@@ -115,7 +115,7 @@ export function ProfileView({ onContact, currentUser }) {
          currentUser.avatar_url = publicUrl;
       }
       window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: publicUrl }));
-      alert('Gambar profil berjaya ditukar!');
+      alert(t('profilePicSuccess') || 'Gambar profil berjaya ditukar!');
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -135,10 +135,10 @@ export function ProfileView({ onContact, currentUser }) {
       }).eq('id', user.id);
       
       if (error) throw error;
-      alert('Profil berjaya disimpan!');
+      alert(t('profileSaveSuccess') || 'Profil berjaya disimpan!');
     } catch (e) {
       console.error(e);
-      alert('Ralat: Sila pastikan anda telah menjalankan script SQL (add_profile_features.sql) di pangkalan data Supabase.');
+      alert(t('profileSaveError') || 'Ralat: Sila pastikan anda telah menjalankan script SQL (add_profile_features.sql) di pangkalan data Supabase.');
     } finally {
       setSaving(false);
     }
@@ -148,13 +148,13 @@ export function ProfileView({ onContact, currentUser }) {
     e.preventDefault();
     const password = e.target.password.value;
     const confirm = e.target.confirm.value;
-    if (password !== confirm) return alert('Kata laluan tidak sepadan!');
-    if (password.length < 6) return alert('Kata laluan mestilah sekurang-kurangnya 6 aksara.');
+    if (password !== confirm) return alert(t('passwordMismatchError') || 'Kata laluan tidak sepadan!');
+    if (password.length < 6) return alert(t('passwordShortError') || 'Kata laluan mestilah sekurang-kurangnya 6 aksara.');
 
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      alert('Kata laluan berjaya ditukar!');
+      alert(t('passwordChangeSuccess') || 'Kata laluan berjaya ditukar!');
       e.target.reset();
     } catch (err) {
       alert(err.message);
@@ -175,7 +175,7 @@ export function ProfileView({ onContact, currentUser }) {
       }, 500);
     } catch (error) {
       console.error('Error resolving item:', error.message);
-      alert('Gagal mengemas kini laporan.');
+      alert(t('failedUpdateReport') || 'Gagal mengemas kini laporan.');
       setDeletingItemId(null);
     }
   };
@@ -200,7 +200,7 @@ export function ProfileView({ onContact, currentUser }) {
           <div 
             style={{ position: 'relative', cursor: 'pointer' }}
             onClick={() => !uploadingAvatar && fileInputRef.current?.click()}
-            title="Tukar Gambar Profil"
+            title={t('changeProfilePic') || "Tukar Gambar Profil"}
           >
             <img 
               className="profile-avatar" 
@@ -218,7 +218,7 @@ export function ProfileView({ onContact, currentUser }) {
               <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{user?.name || 'User Name'}</h1>
               {resolvedReports > 3 && (
                 <span style={{ background: '#f59e0b', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  🏅 Trusted Finder
+                  🏅 {t('trustedFinder') || 'Trusted Finder'}
                 </span>
               )}
             </div>
@@ -275,7 +275,7 @@ export function ProfileView({ onContact, currentUser }) {
                   transition: 'all 0.2s'
                 }} 
                 onClick={toggleTheme}
-                title={theme === 'dark' ? 'Tukar ke Light Mode' : 'Tukar ke Dark Mode'}
+                title={theme === 'dark' ? (t('switchToLightMode') || 'Tukar ke Light Mode') : (t('switchToDarkMode') || 'Tukar ke Dark Mode')}
               >
                 {theme === 'dark' ? <Moon size={18} style={{ color: '#6366F1' }} /> : <Sun size={18} style={{ color: '#F59E0B' }} />}
                 {' '}{theme === 'dark' ? (t('darkMode') || 'Dark Mode') : (t('lightMode') || 'Light Mode')}
@@ -289,30 +289,30 @@ export function ProfileView({ onContact, currentUser }) {
           <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <Activity size={32} style={{ color: '#3B82F6', margin: '0 auto 0.5rem' }} />
             <h3 style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{totalReports}</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Jumlah Laporan</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>{t('totalReports') || 'Jumlah Laporan'}</p>
           </div>
           <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <Clock size={32} style={{ color: '#F59E0B', margin: '0 auto 0.5rem' }} />
             <h3 style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{activeReports}</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Sedang Aktif (Pending)</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>{t('activePending') || 'Sedang Aktif (Pending)'}</p>
           </div>
           <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <CheckCircle size={32} style={{ color: '#10B981', margin: '0 auto 0.5rem' }} />
             <h3 style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{resolvedReports}</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Telah Diselesaikan</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>{t('resolved') || 'Telah Diselesaikan'}</p>
           </div>
         </div>
 
         {/* Main Tabs */}
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
           <button className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', border: 'none', color: activeTab === 'profile' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: activeTab === 'profile' ? 600 : 400, borderBottom: activeTab === 'profile' ? '2px solid var(--primary)' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', touchAction: 'manipulation' }}>
-            <UserIcon size={18} /> Profil & Notifikasi
+            <UserIcon size={18} /> {t('profileNotifs') || 'Profil & Notifikasi'}
           </button>
           <button className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => setActiveTab('reports')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', border: 'none', color: activeTab === 'reports' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: activeTab === 'reports' ? 600 : 400, borderBottom: activeTab === 'reports' ? '2px solid var(--primary)' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', touchAction: 'manipulation' }}>
-            <List size={18} /> Sejarah Laporan
+            <List size={18} /> {t('reportHistory') || 'Sejarah Laporan'}
           </button>
           <button className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', border: 'none', color: activeTab === 'security' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: activeTab === 'security' ? 600 : 400, borderBottom: activeTab === 'security' ? '2px solid var(--primary)' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', touchAction: 'manipulation' }}>
-            <Shield size={18} /> Keselamatan
+            <Shield size={18} /> {t('security') || 'Keselamatan'}
           </button>
         </div>
 
@@ -320,17 +320,17 @@ export function ProfileView({ onContact, currentUser }) {
         {activeTab === 'profile' && (
           <div className="glass-panel" style={{ padding: '2rem', animation: 'fadeIn 0.3s ease' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <UserIcon size={20} className="text-primary" /> Kemas Kini Maklumat
+              <UserIcon size={20} className="text-primary" /> {t('updateInfo') || 'Kemas Kini Maklumat'}
             </h3>
             <div style={{ maxWidth: '450px', marginBottom: '2rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Jabatan / Kursus</label>
-                <input type="text" className="input-field" value={profileData.department} onChange={e => setProfileData({...profileData, department: e.target.value})} placeholder="Contoh: Kejuruteraan Komputer" />
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('departmentCourse') || 'Jabatan / Kursus'}</label>
+                <input type="text" className="input-field" value={profileData.department} onChange={e => setProfileData({...profileData, department: e.target.value})} placeholder={t('deptPlaceholder') || "Contoh: Kejuruteraan Komputer"} />
               </div>
             </div>
 
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-              <Bell size={20} className="text-primary" /> Tetapan Notifikasi
+              <Bell size={20} className="text-primary" /> {t('notifSettings') || 'Tetapan Notifikasi'}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
@@ -352,13 +352,13 @@ export function ProfileView({ onContact, currentUser }) {
                     }
                   }} 
                 />
-                <span style={{ fontWeight: 500 }}>Terima e-mel apabila ada mesej baru masuk.</span>
-                {notifSaved && <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 600 }}>✓ Disimpan</span>}
+                <span style={{ fontWeight: 500 }}>{t('emailNotifDesc') || 'Terima e-mel apabila ada mesej baru masuk.'}</span>
+                {notifSaved && <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 600 }}>{t('savedTick') || '✓ Disimpan'}</span>}
               </label>
             </div>
 
             <button className="btn-primary" onClick={handleSaveProfile} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Profil'}
+              <Save size={18} /> {saving ? (t('saving') || 'Menyimpan...') : (t('saveProfile') || 'Simpan Profil')}
             </button>
           </div>
         )}
@@ -366,19 +366,19 @@ export function ProfileView({ onContact, currentUser }) {
         {activeTab === 'security' && (
           <div className="glass-panel" style={{ padding: '2rem', animation: 'fadeIn 0.3s ease' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Key size={20} className="text-primary" /> Tukar Kata Laluan
+              <Key size={20} className="text-primary" /> {t('changePasswordBtn') || 'Tukar Kata Laluan'}
             </h3>
             <form onSubmit={handleChangePassword} style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Kata Laluan Baru</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('newPasswordLabel') || 'Kata Laluan Baru'}</label>
                 <input type="password" name="password" className="input-field" required minLength={6} placeholder="********" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sahkan Kata Laluan Baru</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('confirmNewPasswordLabel') || 'Sahkan Kata Laluan Baru'}</label>
                 <input type="password" name="confirm" className="input-field" required minLength={6} placeholder="********" />
               </div>
               <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
-                Kemas Kini Kata Laluan
+                {t('updatePassword') || 'Kemas Kini Kata Laluan'}
               </button>
             </form>
           </div>
@@ -388,16 +388,16 @@ export function ProfileView({ onContact, currentUser }) {
           <div style={{ animation: 'fadeIn 0.3s ease' }}>
             {/* Sub-tabs for reports */}
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <button onClick={() => setActiveReportTab('all')} className={`btn-primary ${activeReportTab === 'all' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'all' ? 'var(--primary)' : 'transparent', color: activeReportTab === 'all' ? 'white' : 'var(--text-main)', border: '1px solid var(--primary)' }}>Semua</button>
-              <button onClick={() => setActiveReportTab('active')} className={`btn-primary ${activeReportTab === 'active' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'active' ? '#F59E0B' : 'transparent', color: activeReportTab === 'active' ? 'white' : 'var(--text-main)', border: '1px solid #F59E0B' }}>Aktif (Pending)</button>
-              <button onClick={() => setActiveReportTab('resolved')} className={`btn-primary ${activeReportTab === 'resolved' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'resolved' ? '#10B981' : 'transparent', color: activeReportTab === 'resolved' ? 'white' : 'var(--text-main)', border: '1px solid #10B981' }}>Selesai</button>
+              <button onClick={() => setActiveReportTab('all')} className={`btn-primary ${activeReportTab === 'all' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'all' ? 'var(--primary)' : 'transparent', color: activeReportTab === 'all' ? 'white' : 'var(--text-main)', border: '1px solid var(--primary)' }}>{t('all') || 'Semua'}</button>
+              <button onClick={() => setActiveReportTab('active')} className={`btn-primary ${activeReportTab === 'active' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'active' ? '#F59E0B' : 'transparent', color: activeReportTab === 'active' ? 'white' : 'var(--text-main)', border: '1px solid #F59E0B' }}>{t('activePending') || 'Aktif (Pending)'}</button>
+              <button onClick={() => setActiveReportTab('resolved')} className={`btn-primary ${activeReportTab === 'resolved' ? '' : 'btn-outline'}`} style={{ padding: '0.4rem 1rem', background: activeReportTab === 'resolved' ? '#10B981' : 'transparent', color: activeReportTab === 'resolved' ? 'white' : 'var(--text-main)', border: '1px solid #10B981' }}>{t('resolved') || 'Selesai'}</button>
             </div>
 
             {loading ? (
               <p style={{ color: 'var(--text-muted)' }}>{t('loadingReports')}</p>
             ) : filteredItems.length === 0 ? (
               <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Tiada laporan dijumpai untuk kategori ini.</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{t('noReportsForCategory') || 'Tiada laporan dijumpai untuk kategori ini.'}</p>
               </div>
             ) : (
               <div className="grid-cards">
