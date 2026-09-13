@@ -6,17 +6,24 @@ import App from './App.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { registerSW } from 'virtual:pwa-register'
 
+import { ErrorBoundary } from './components/ErrorBoundary.jsx'
+
 const updateSW = registerSW({
-  onNeedRefresh() {},
+  onNeedRefresh() {
+    // Automatically update the service worker and reload the page
+    updateSW(true);
+  },
   onOfflineReady() {},
 })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>,
 )
