@@ -153,6 +153,16 @@ export function ProfileView({ onContact, currentUser }) {
     }
   };
 
+  const handleThemeModeChange = async () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    toggleTheme();
+    try {
+      await supabase.auth.updateUser({ data: { theme: newTheme } });
+    } catch (e) {
+      console.error('Failed to save theme mode', e);
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     const password = e.target.password.value;
@@ -283,7 +293,7 @@ export function ProfileView({ onContact, currentUser }) {
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }} 
-                onClick={toggleTheme}
+                onClick={handleThemeModeChange}
                 title={theme === 'dark' ? (t('switchToLightMode') || 'Tukar ke Light Mode') : (t('switchToDarkMode') || 'Tukar ke Dark Mode')}
               >
                 {theme === 'dark' ? <Moon size={18} style={{ color: '#6366F1' }} /> : <Sun size={18} style={{ color: '#F59E0B' }} />}

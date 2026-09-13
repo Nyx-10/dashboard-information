@@ -27,7 +27,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
   const navigate = useNavigate();
-  const { colorTheme, setColorTheme } = useTheme();
+  const { colorTheme, setColorTheme, setTheme } = useTheme();
   
   // Global ripple effect listener
   useEffect(() => {
@@ -318,6 +318,10 @@ export default function App() {
           setColorTheme(session.user.user_metadata.colorTheme);
         } else {
           setColorTheme('default');
+        }
+
+        if (session.user.user_metadata?.theme) {
+          setTheme(session.user.user_metadata.theme);
         }
 
         setUser({ id: session.user.id, email: session.user.email, role, name, avatar_url: profile?.avatar_url });
