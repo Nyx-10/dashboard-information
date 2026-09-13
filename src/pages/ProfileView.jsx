@@ -144,6 +144,15 @@ export function ProfileView({ onContact, currentUser }) {
     }
   };
 
+  const handleColorThemeChange = async (newColor) => {
+    setColorTheme(newColor);
+    try {
+      await supabase.auth.updateUser({ data: { colorTheme: newColor } });
+    } catch (e) {
+      console.error('Failed to save color theme', e);
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     const password = e.target.password.value;
@@ -250,11 +259,11 @@ export function ProfileView({ onContact, currentUser }) {
                 {showColorSettings && (
                   <div className="glass-panel notif-dropdown-enter" style={{ position: 'absolute', top: '110%', left: 0, width: '200px', zIndex: 10, padding: '1rem', boxShadow: 'var(--shadow-lg)' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                      <button onClick={() => setColorTheme('default')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#6366F1', border: colorTheme === 'default' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Default"></button>
-                      <button onClick={() => setColorTheme('blue')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3B82F6', border: colorTheme === 'blue' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Blue"></button>
-                      <button onClick={() => setColorTheme('green')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#10B981', border: colorTheme === 'green' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Green"></button>
-                      <button onClick={() => setColorTheme('purple')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#8B5CF6', border: colorTheme === 'purple' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Purple"></button>
-                      <button onClick={() => setColorTheme('red')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EF4444', border: colorTheme === 'red' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Red"></button>
+                      <button onClick={() => handleColorThemeChange('default')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#6366F1', border: colorTheme === 'default' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Default"></button>
+                      <button onClick={() => handleColorThemeChange('blue')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3B82F6', border: colorTheme === 'blue' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Blue"></button>
+                      <button onClick={() => handleColorThemeChange('green')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#10B981', border: colorTheme === 'green' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Green"></button>
+                      <button onClick={() => handleColorThemeChange('purple')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#8B5CF6', border: colorTheme === 'purple' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Purple"></button>
+                      <button onClick={() => handleColorThemeChange('red')} style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EF4444', border: colorTheme === 'red' ? '2px solid var(--text-main)' : '2px solid transparent', cursor: 'pointer' }} title="Red"></button>
                     </div>
                   </div>
                 )}

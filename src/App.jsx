@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
+import { useTheme } from './context/ThemeContext';
 import './index.css';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
@@ -26,6 +27,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
   const navigate = useNavigate();
+  const { colorTheme, setColorTheme } = useTheme();
   
   // Global ripple effect listener
   useEffect(() => {
@@ -312,6 +314,12 @@ export default function App() {
           return;
         }
 
+        if (session.user.user_metadata?.colorTheme) {
+          setColorTheme(session.user.user_metadata.colorTheme);
+        } else {
+          setColorTheme('default');
+        }
+
         setUser({ id: session.user.id, email: session.user.email, role, name, avatar_url: profile?.avatar_url });
         setIsAuthenticated(true);
         setShowLanding(false);
@@ -424,7 +432,7 @@ export default function App() {
     <LanguageContext.Provider value={{ lang, setLang, t }}>
       <AppContext.Provider value={contextValue}>
       <GlobalAtmosphere />
-      <div className="app-container">
+      <div className="app-container" data-color={colorTheme}>
         {/* Sidebar */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -470,6 +478,7 @@ export default function App() {
                 setShowLogoutModal(false); 
                 setIsAuthenticated(false); 
                 setUser(null); 
+                setColorTheme('default');
                 navigate('/'); 
                 sessionStorage.removeItem('tempSession');
                 localStorage.removeItem('rememberMe');

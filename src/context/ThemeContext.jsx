@@ -17,11 +17,7 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   useEffect(() => {
-    if (colorTheme && colorTheme !== 'default') {
-      document.documentElement.setAttribute('data-color', colorTheme);
-    } else {
-      document.documentElement.removeAttribute('data-color');
-    }
+    // Instead of setting globally on document.documentElement, we will let App.jsx apply it to .app-container
     localStorage.setItem('colorTheme', colorTheme);
   }, [colorTheme]);
 
