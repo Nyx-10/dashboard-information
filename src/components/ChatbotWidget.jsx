@@ -39,8 +39,8 @@ export function ChatbotWidget() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Guna semula model 'gemini-3.1-flash-lite' (sebab 'gemini-3.1-flash' tidak dijumpai - 404)
-      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+      // Guna model 'gemini-1.5-flash' yang merupakan model utama dan paling stabil
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       let historyText = "";
       if (currentMessages && currentMessages.length > 0) {
