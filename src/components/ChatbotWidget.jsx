@@ -39,7 +39,8 @@ export function ChatbotWidget() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+      // Tukar kepada model 'gemini-3.1-flash' yang biasanya kurang sesak
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash" });
 
       let historyText = "";
       if (currentMessages && currentMessages.length > 0) {
@@ -82,9 +83,23 @@ ${historyText}
 Mesej terbaru pengguna: "${userInput}"
 AdtecBot:`;
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
+      // Tambah 'retry logic' untuk pengendalian ralat 503
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          return response.text();
+        } catch (apiError) {
+          retries--;
+          if (retries > 0 && apiError.message && apiError.message.includes('503')) {
+            console.warn("Ralat 503 dikesan, mencuba semula dalam 2 saat...");
+            await new Promise(resolve => setTimeout(resolve, 2000)); // tunggu 2 saat
+          } else {
+            throw apiError; // Lempar ke blok catch di bawah jika cubaan habis atau ralat lain
+          }
+        }
+      }
     } catch (error) {
       console.error("AI Error:", error);
       return "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: " + error.message;
