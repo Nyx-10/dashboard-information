@@ -5,14 +5,16 @@ export function MapView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+  // Senarai lokasi dengan koordinat (x = kiri ke kanan, y = atas ke bawah dalam peratus %)
+  // Nanti bila letak gambar peta sebenar, anda cuma perlu ubah nilai x dan y ini untuk letak pin di tempat yang betul.
   const locations = [
-    { id: 1, name: 'Pejabat Pentadbiran', type: 'office', desc: 'Pusat pengurusan utama institut.', icon: Building },
-    { id: 2, name: 'Bengkel Automotif', type: 'workshop', desc: 'Latihan automotif berteknologi tinggi.', icon: Layers },
-    { id: 3, name: 'Bengkel Pemesinan (CNC)', type: 'workshop', desc: 'Makmal pakar mesin CNC & mekanikal.', icon: Layers },
-    { id: 4, name: 'Dewan Makan', type: 'facility', desc: 'Kafeteria premium gaya hidup pelajar.', icon: Compass },
-    { id: 5, name: 'Asrama Mewah (Blok A & B)', type: 'hostel', desc: 'Penginapan eksklusif pelajar lelaki.', icon: Building },
-    { id: 6, name: 'Asrama Mewah (Blok C)', type: 'hostel', desc: 'Penginapan eksklusif pelajar perempuan.', icon: Building },
-    { id: 7, name: 'Perpustakaan Digital', type: 'facility', desc: 'Pusat sumber pintar dan santai.', icon: Compass },
+    { id: 1, name: 'Pejabat Pentadbiran', type: 'office', desc: 'Pusat pengurusan utama institut.', icon: Building, x: 20, y: 30 },
+    { id: 2, name: 'Bengkel Automotif', type: 'workshop', desc: 'Latihan automotif berteknologi tinggi.', icon: Layers, x: 60, y: 40 },
+    { id: 3, name: 'Bengkel Pemesinan (CNC)', type: 'workshop', desc: 'Makmal pakar mesin CNC & mekanikal.', icon: Layers, x: 75, y: 35 },
+    { id: 4, name: 'Dewan Makan', type: 'facility', desc: 'Kafeteria premium gaya hidup pelajar.', icon: Compass, x: 45, y: 70 },
+    { id: 5, name: 'Asrama Mewah (Blok A & B)', type: 'hostel', desc: 'Penginapan eksklusif pelajar lelaki.', icon: Building, x: 30, y: 80 },
+    { id: 6, name: 'Asrama Mewah (Blok C)', type: 'hostel', desc: 'Penginapan eksklusif pelajar perempuan.', icon: Building, x: 80, y: 80 },
+    { id: 7, name: 'Perpustakaan Digital', type: 'facility', desc: 'Pusat sumber pintar dan santai.', icon: Compass, x: 40, y: 20 },
   ];
 
   const filteredLocations = locations.filter(loc => 
@@ -108,7 +110,15 @@ export function MapView() {
             </div>
 
             {selectedLocation ? (
-              <div className="location-marker-container zoom-in">
+              <div 
+                className="location-marker-container zoom-in"
+                style={{ 
+                  position: 'absolute', 
+                  left: `${selectedLocation.x}%`, 
+                  top: `${selectedLocation.y}%`,
+                  transform: 'translate(-50%, -50%)' 
+                }}
+              >
                 <div className="marker-ring" style={{ borderColor: getTypeStyle(selectedLocation.type).color }}></div>
                 <div className="marker-pin" style={{ background: getTypeStyle(selectedLocation.type).gradient, boxShadow: `0 0 30px ${getTypeStyle(selectedLocation.type).glow}` }}>
                   <MapPin size={32} color="white" />
