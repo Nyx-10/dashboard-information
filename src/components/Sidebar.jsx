@@ -77,6 +77,10 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
             )}
           </button>
           
+          <button className={`nav-link w-full text-left ${isActive('/calendar') ? 'active' : ''}`} onClick={() => handleNav('/calendar')}>
+            <Calendar size={20} /> Jadual & Takwim
+          </button>
+          
           <button 
             className={`nav-link w-full text-left ai-nav-btn ${isChatbotOpen ? 'active' : ''}`} 
             onClick={() => setIsChatbotOpen(!isChatbotOpen)}
