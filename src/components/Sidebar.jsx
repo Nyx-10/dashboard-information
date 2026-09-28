@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, PlusCircle, User, LayoutDashboard, 
-  MessageSquare, Settings, Calendar, Bot, Sparkles, X, Map
+  MessageSquare, Settings, Calendar, Bot, Sparkles, X
 } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
@@ -75,10 +75,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 {totalUnreadMessages}
               </span>
             )}
-          </button>
-          
-          <button className={`nav-link w-full text-left ${isActive('/map') ? 'active' : ''}`} onClick={() => handleNav('/map')}>
-            <Map size={20} /> Peta Kampus
           </button>
           
           <button 

@@ -15,7 +15,6 @@ import { SearchView } from './pages/SearchView';
 import { AddItemView } from './pages/AddItemView';
 import { MessagesView } from './pages/MessagesView';
 import { ProfileView } from './pages/ProfileView';
-import { MapView } from './pages/MapView';
 import { DoubleSliderAuthView } from './pages/DoubleSliderAuthView';
 import { ForgotPasswordView } from './pages/ForgotPasswordView';
 import { ResetPasswordView } from './pages/ResetPasswordView';
@@ -463,7 +462,6 @@ export default function App() {
             <Route path="/admin-logs" element={<AdminAuditLogsView />} />
             <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
             <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} initialChatUser={activeChatUser} onlineUsers={onlineUsers} />} />
-            <Route path="/map" element={<MapView />} />
             <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
