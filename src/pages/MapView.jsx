@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Map as MapIcon, Search, MapPin, Navigation, Compass, Layers, Building } from 'lucide-react';
 
+// ---------------------------------------------------------
+// PENTING: LETAKKAN LINK GAMBAR PETA ADTEC MELAKA DI SINI
+const MAP_IMAGE_URL = 'https://www.transparenttextures.com/patterns/cubes.png'; 
+// (Boleh guna link gambar dari internet, atau fail tempatan seperti '/images/peta.jpg')
+// ---------------------------------------------------------
+
 export function MapView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -99,7 +105,15 @@ export function MapView() {
         </div>
 
         {/* Panel Kanan - Peta Pintar (Mockup Premium) */}
-        <div className="map-visual-panel">
+        <div 
+          className="map-visual-panel"
+          style={{ 
+            backgroundImage: `url('${MAP_IMAGE_URL}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
           <div className="map-viewport">
             <div className="map-overlay-grid"></div>
             
