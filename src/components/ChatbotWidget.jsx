@@ -83,8 +83,9 @@ ${historyText}
 Mesej terbaru pengguna: "${userInput}"
 AdtecBot:`;
 
-      // Tambah 'retry logic' untuk pengendalian ralat 503
-      let retries = 3;
+      // Tambah 'retry logic' untuk pengendalian ralat 503 dengan masa menunggu yang lebih lama
+      let retries = 4;
+      let waitTime = 3000; // Mula dengan 3 saat
       while (retries > 0) {
         try {
           const result = await model.generateContent(prompt);
@@ -93,8 +94,9 @@ AdtecBot:`;
         } catch (apiError) {
           retries--;
           if (retries > 0 && apiError.message && apiError.message.includes('503')) {
-            console.warn("Ralat 503 dikesan, mencuba semula dalam 2 saat...");
-            await new Promise(resolve => setTimeout(resolve, 2000)); // tunggu 2 saat
+            console.warn(`Ralat 503 dikesan, pelayan Google sibuk. Mencuba semula dalam ${waitTime/1000} saat...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            waitTime += 4000; // Masa menunggu bertambah (3s -> 7s -> 11s)
           } else {
             throw apiError; // Lempar ke blok catch di bawah jika cubaan habis atau ralat lain
           }
