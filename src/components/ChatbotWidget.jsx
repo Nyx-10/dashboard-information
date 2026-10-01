@@ -124,25 +124,29 @@ AdtecBot:`;
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    setIsTyping(true); // Guna isTyping untuk halang pengguna taip semasa bot sedang menjana
+    setIsTyping(true); // Tunjuk animasi typing (titik 3) sementara tunggu respons pertama
 
     const botMsgId = Date.now() + 1;
-    
-    // Letak mesej bot kosong terlebih dahulu
-    setMessages(prev => [...prev, {
-      id: botMsgId,
-      sender: 'bot',
-      text: '',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }]);
+    let isFirstChunk = true;
 
     await generateBotResponseStream(userMsg.text, messages, (currentText) => {
-      setMessages(prev => prev.map(msg => 
-        msg.id === botMsgId ? { ...msg, text: currentText } : msg
-      ));
+      if (isFirstChunk) {
+        setIsTyping(false); // Tutup animasi typing bila teks mula masuk
+        isFirstChunk = false;
+        setMessages(prev => [...prev, {
+          id: botMsgId,
+          sender: 'bot',
+          text: currentText,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
+      } else {
+        setMessages(prev => prev.map(msg => 
+          msg.id === botMsgId ? { ...msg, text: currentText } : msg
+        ));
+      }
     });
 
-    setIsTyping(false);
+    setIsTyping(false); // Pastikan typing ditutup jika ada ralat
   };
 
   const formatText = (text) => {
