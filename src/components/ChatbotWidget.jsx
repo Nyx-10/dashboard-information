@@ -30,21 +30,20 @@ export function ChatbotWidget() {
     }
   }, [messages, isOpen, isTyping]);
 
-  const generateBotResponse = async (userInput, currentMessages) => {
+  const generateBotResponseStream = async (userInput, currentMessages, onUpdate) => {
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
       if (!apiKey) {
-        return 'Sistem AI masih belum diaktifkan (API Key tiada). Sila masukkan API Key ke dalam fail .env ??';
+        onUpdate('Sistem AI masih belum diaktifkan (API Key tiada). Sila masukkan API Key ke dalam fail .env ??');
+        return;
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Guna model 'gemini-3.8-flash' yang merupakan model terkini dan disokong
       const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
 
       let historyText = "";
       if (currentMessages && currentMessages.length > 0) {
-        // limit memory to last 8 messages to save tokens and keep context fresh
         const recentMessages = currentMessages.slice(-8);
         recentMessages.forEach(m => {
           historyText += `${m.sender === 'user' ? 'Pengguna' : 'AdtecBot'}: ${m.text}\n`;
@@ -83,34 +82,38 @@ ${historyText}
 Mesej terbaru pengguna: "${userInput}"
 AdtecBot:`;
 
-      // Tambah 'retry logic' untuk pengendalian ralat 503 dengan masa menunggu yang lebih lama
       let retries = 4;
-      let waitTime = 3000; // Mula dengan 3 saat
+      let waitTime = 3000;
       while (retries > 0) {
         try {
-          const result = await model.generateContent(prompt);
-          const response = await result.response;
-          return response.text();
+          const result = await model.generateContentStream(prompt);
+          let fullText = '';
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            fullText += chunkText;
+            onUpdate(fullText);
+          }
+          return; // Selesai
         } catch (apiError) {
           retries--;
           if (retries > 0 && apiError.message && apiError.message.includes('503')) {
             console.warn(`Ralat 503 dikesan, pelayan Google sibuk. Mencuba semula dalam ${waitTime/1000} saat...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
-            waitTime += 4000; // Masa menunggu bertambah (3s -> 7s -> 11s)
+            waitTime += 4000;
           } else {
-            throw apiError; // Lempar ke blok catch di bawah jika cubaan habis atau ralat lain
+            throw apiError;
           }
         }
       }
     } catch (error) {
       console.error("AI Error:", error);
-      return "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: " + error.message;
+      onUpdate("Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: " + error.message);
     }
   };
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
 
     const userMsg = {
       id: Date.now(),
@@ -121,16 +124,24 @@ AdtecBot:`;
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    setIsTyping(true);
+    setIsTyping(true); // Guna isTyping untuk halang pengguna taip semasa bot sedang menjana
 
-    const botResponse = await generateBotResponse(userMsg.text, messages);
+    const botMsgId = Date.now() + 1;
     
+    // Letak mesej bot kosong terlebih dahulu
     setMessages(prev => [...prev, {
-      id: Date.now() + 1,
+      id: botMsgId,
       sender: 'bot',
-      text: botResponse,
+      text: '',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }]);
+
+    await generateBotResponseStream(userMsg.text, messages, (currentText) => {
+      setMessages(prev => prev.map(msg => 
+        msg.id === botMsgId ? { ...msg, text: currentText } : msg
+      ));
+    });
+
     setIsTyping(false);
   };
 
