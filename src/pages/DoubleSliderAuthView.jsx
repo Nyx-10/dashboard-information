@@ -104,7 +104,7 @@ export function DoubleSliderAuthView({
       const { data: settings } = await supabase.from('system_settings').select('is_maintenance_mode').eq('id', 1).single();
       if (settings?.is_maintenance_mode) {
          let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
-         if (normalizedRole !== 'admin' && normalizedRole !== 'superadmin') {
+         if (normalizedRole !== 'superadmin') {
             await supabase.auth.signOut();
             if (onMaintenanceMode) onMaintenanceMode();
             return;

@@ -307,8 +307,8 @@ export default function App() {
         // Normalize role for comparison
         let normalizedRole = role.toLowerCase().replace(/\s+/g, '');
 
-        // If maintenance is active and user is not admin, sign them out and show screen
-        if (maintenanceActive && normalizedRole !== 'admin' && normalizedRole !== 'superadmin') {
+        // If maintenance is active and user is not superadmin, sign them out and show screen
+        if (maintenanceActive && normalizedRole !== 'superadmin') {
           await supabase.auth.signOut();
           setShowMaintenanceScreen(true);
           return;
