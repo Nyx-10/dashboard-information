@@ -227,7 +227,9 @@ export const AdminAnalyticsView = ({ currentUser }) => {
           <p style={{ color: 'var(--text-muted)' }}>{t('monitorStats') || 'Monitor system statistics and download reports'}</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button 
+          {isSuperAdmin && (
+              <>
+<button 
             onClick={() => {
               const doc = new jsPDF();
               doc.text("Analytics Report", 14, 15);
@@ -246,7 +248,7 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             className="btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
           >
-            <FileDown size={16} /> Export (PDF)
+            <FileDown size={16} />{t('exportPDF') || 'Export (PDF)'}
           </button>
           <button 
             onClick={() => {
@@ -268,8 +270,10 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             className="btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
           >
-            <Download size={16} /> Export (CSV)
+            <Download size={16} />{t('exportCSV') || 'Export (CSV)'}
           </button>
+              </>
+            )}
         </div>
       </div>
 
@@ -403,7 +407,13 @@ export const AdminAnalyticsView = ({ currentUser }) => {
   );
 };
 
-export const AdminAuditLogsView = () => {
+export const AdminAuditLogsView = ({ currentUser }) => {
+  const normalizedRole = currentUser?.role ? currentUser.role.toLowerCase().replace(/\s+/g, '') : '';
+  const isSuperAdmin = Boolean(
+    normalizedRole === 'superadmin' ||
+    (currentUser?.email && currentUser.email.toLowerCase().includes('adam.darwish.it'))
+  );
+
   const { t } = useContext(LanguageContext);
   const [logs, setLogs] = useState([]);
 
@@ -441,7 +451,9 @@ export const AdminAuditLogsView = () => {
           <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('systemAuditLogs')}</h2>
           <p style={{ color: 'var(--text-muted)' }}>{t('adminActionRecords')}</p>
         </div>
-        <button className="btn-primary" onClick={() => {
+        {isSuperAdmin && (
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn-primary" onClick={() => {
           const csvHeader = 'Action Performed,User / Source,Timestamp\n';
           const csvRows = logs.map(log => `"${log.action}","${log.user_email}","${new Date(log.created_at).toLocaleString()}"`).join('\n');
           const csvContent = csvHeader + csvRows;
@@ -455,6 +467,20 @@ export const AdminAuditLogsView = () => {
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
         }}>{t('exportLogs')}</button>
+            <button className="btn-primary" style={{ background: '#EF4444', borderColor: '#EF4444' }} onClick={async () => {
+              if (window.confirm(t('confirmPurgeLogs') || 'Are you sure you want to permanently delete logs older than 30 days?')) {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const { error } = await supabase.from('audit_logs').delete().lt('created_at', thirtyDaysAgo.toISOString());
+                if (error) alert('Error purging logs: ' + error.message);
+                else {
+                  alert(t('purgeSuccess') || 'Old logs deleted successfully.');
+                  fetchLogs();
+                }
+              }
+            }}>{t('purgeOldLogs') || 'Purge Old Logs'}</button>
+          </div>
+        )}
       </div>
 
       <div className="glass-panel table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -493,3 +519,4 @@ export const AdminAuditLogsView = () => {
     </div>
   );
 };
+

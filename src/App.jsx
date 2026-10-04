@@ -459,7 +459,7 @@ export default function App() {
             <Route path="/admin-analytics" element={<AdminAnalyticsView currentUser={user} />} />
             <Route path="/admin-users" element={<AdminUsersView currentUser={user} />} />
             <Route path="/admin-reports" element={<AdminReportsView currentUser={user} />} />
-            <Route path="/admin-logs" element={<AdminAuditLogsView />} />
+            <Route path="/admin-logs" element={<AdminAuditLogsView currentUser={user} />} />
             <Route path="/add" element={<AddItemView onSuccess={() => navigate('/home')} />} />
             <Route path="/messages" element={<MessagesView onMessagesRead={fetchTotalUnreadMessages} initialChatUser={activeChatUser} onlineUsers={onlineUsers} />} />
             <Route path="/profile" element={<ProfileView onContact={handleContact} currentUser={user} />} />
@@ -500,3 +500,4 @@ export default function App() {
     </LanguageContext.Provider>
   );
 }
+

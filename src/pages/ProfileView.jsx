@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Settings, Sun, Moon, Edit2, Shield, Bell, Activity, Save, Key, User as UserIcon, List, CheckCircle, Clock } from 'lucide-react';
+import { Settings, Sun, Moon, Edit2, Shield, Bell, Activity, Save, Key, User as UserIcon, List, CheckCircle, Clock, Eye, EyeOff } from 'lucide-react';
 import { LanguageContext } from '../context/LanguageContext';
 import { AppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
@@ -24,6 +24,7 @@ export function ProfileView({ onContact, currentUser }) {
   // Tabs state
   const [activeTab, setActiveTab] = useState('profile'); // profile, reports, security
   const [activeReportTab, setActiveReportTab] = useState('all'); // all, active, resolved
+  const [showPassword, setShowPassword] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -390,11 +391,21 @@ export function ProfileView({ onContact, currentUser }) {
             <form onSubmit={handleChangePassword} style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('newPasswordLabel') || 'Kata Laluan Baru'}</label>
-                <input type="password" name="password" className="input-field" required minLength={6} placeholder="********" />
+                <div style={{ position: 'relative' }}>
+                  <input type={showPassword ? "text" : "password"} name="password" className="input-field" required minLength={6} placeholder="********" style={{ paddingRight: '2.5rem', width: '100%', boxSizing: 'border-box' }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, display: 'flex' }} title={showPassword ? (t('hidePassword') || "Sembunyikan Kata Laluan") : (t('showPassword') || "Papar Kata Laluan")}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('confirmNewPasswordLabel') || 'Sahkan Kata Laluan Baru'}</label>
-                <input type="password" name="confirm" className="input-field" required minLength={6} placeholder="********" />
+                <div style={{ position: 'relative' }}>
+                  <input type={showPassword ? "text" : "password"} name="confirm" className="input-field" required minLength={6} placeholder="********" style={{ paddingRight: '2.5rem', width: '100%', boxSizing: 'border-box' }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, display: 'flex' }} title={showPassword ? (t('hidePassword') || "Sembunyikan Kata Laluan") : (t('showPassword') || "Papar Kata Laluan")}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
                 {t('updatePassword') || 'Kemas Kini Kata Laluan'}

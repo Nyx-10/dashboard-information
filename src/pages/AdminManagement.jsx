@@ -40,6 +40,7 @@ const badgeStyle = (status) => {
 };
 
 export const AdminUsersView = ({ currentUser }) => {
+  const isSuperAdmin = currentUser?.role === 'superadmin' || currentUser?.role === 'Super Admin';
   const { t } = useContext(LanguageContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -330,7 +331,9 @@ export const AdminUsersView = ({ currentUser }) => {
           />
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button 
+          {isSuperAdmin && (
+              <>
+<button 
             onClick={() => {
               const doc = new jsPDF();
               doc.text("User List Report", 14, 15);
@@ -344,7 +347,7 @@ export const AdminUsersView = ({ currentUser }) => {
             className="btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
           >
-            <FileDown size={16} /> Export (PDF)
+            <FileDown size={16} />{t('exportPDF') || 'Export (PDF)'}
           </button>
           <button 
             onClick={() => {
@@ -363,8 +366,10 @@ export const AdminUsersView = ({ currentUser }) => {
             className="btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
           >
-            <Download size={16} /> Export (CSV)
+            <Download size={16} />{t('exportCSV') || 'Export (CSV)'}
           </button>
+              </>
+            )}
         </div>
       </div>
       
@@ -825,3 +830,5 @@ export const AdminReportsView = ({ currentUser }) => {
     </div>
   );
 };
+
+
