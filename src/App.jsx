@@ -363,7 +363,7 @@ export default function App() {
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
         <GlobalAtmosphere />
         <div style={{ position: 'relative', zIndex: 10 }}>
-          <img src="https://esijil.jtm.gov.my/images/toplogo1.png" alt="Logo" style={{ height: '80px', marginBottom: '2rem' }} />
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10" alt="Logo Adtec Melaka" style={{ height: '90px', marginBottom: '2rem', borderRadius: '12px' }} />
           <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>{t('systemUnderMaintenance') || 'Sistem Sedang Diselenggara'}</h1>
           <p style={{ color: 'var(--text-muted)', maxWidth: '400px', lineHeight: '1.6' }}>
             {t('maintenanceReturnMsg') || 'Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali.'}
