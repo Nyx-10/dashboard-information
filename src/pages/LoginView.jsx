@@ -113,7 +113,7 @@ export function LoginView({ onLogin, onSwitch, onForgotPassword, onBackToHome, o
           </select>
       </div>
       <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh-YvvgIb1EHj-jP-0_PsrlQOAEK_1iblfeU6NzqQZUVDYAqdULRNlG1-E&s=10" alt="Adtec Melaka Logo" style={{ height: '85px', margin: '0 auto 1rem', display: 'block' }} />
+        <img src="/ksm_logo.jpg" alt="Adtec Melaka Logo" style={{ height: '85px', margin: '0 auto 1rem', display: 'block' }} />
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t ? t('loginTitle') : 'Login'}</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t ? t('loginWelcome') : 'Welcome to Dashboard Adtec Melaka.'}</p>
         
