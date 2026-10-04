@@ -292,7 +292,7 @@ export function DoubleSliderAuthView({
         {/* Sign In Container */}
         <div className="ds-form-container ds-sign-in-container">
           <form className="ds-form" onSubmit={handleLogin}>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh-YvvgIb1EHj-jP-0_PsrlQOAEK_1iblfeU6NzqQZUVDYAqdULRNlG1-E&s=10" alt="Adtec Melaka Logo" style={{ height: '50px', marginBottom: '15px' }} />
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh-YvvgIb1EHj-jP-0_PsrlQOAEK_1iblfeU6NzqQZUVDYAqdULRNlG1-E&s=10" alt="Adtec Melaka Logo" style={{ height: '85px', marginBottom: '15px' }} />
             <h1>{t ? t('loginTitle') : 'Login'}</h1>
             <span>{t ? t('loginWelcome') : 'Welcome to Dashboard Adtec Melaka.'}</span>
             
