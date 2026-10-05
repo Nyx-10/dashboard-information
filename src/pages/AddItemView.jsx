@@ -111,6 +111,21 @@ export function AddItemView({ onSuccess }) {
         ]);
 
       if (error) throw error;
+
+      // Hantar notifikasi emel (tidak menyekat UI)
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      fetch(`${baseUrl}/api/notify-new-item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: finalTitle,
+          type,
+          location: finalLocation,
+          date,
+          description,
+          origin: window.location.origin
+        })
+      }).catch(err => console.error('Gagal menghantar notifikasi e-mel:', err));
       
       alert(t('alertSuccessAdd'));
       if (onSuccess) onSuccess();

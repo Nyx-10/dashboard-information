@@ -376,6 +376,78 @@ app.post('/api/send-message-notification', async (req, res) => {
   }
 });
 
+app.post('/api/notify-new-item', async (req, res) => {
+  const { title, type, location, date, description, reporterName } = req.body;
+
+  try {
+    // 1. Dapatkan semua profil yang setuju terima notifikasi emel (email_notifs = true)
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email_notifs', true)
+      .not('email', 'is', null);
+
+    if (error) throw error;
+
+    if (!profiles || profiles.length === 0) {
+      return res.status(200).json({ success: true, message: 'Tiada pengguna untuk dimaklumkan.' });
+    }
+
+    const bccList = profiles.map(p => p.email).filter(Boolean);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const typeLabel = type === 'lost' ? 'Barang Hilang (Lost)' : type === 'found' ? 'Barang Jumpa (Found)' : 'Maklumat Baru (Info)';
+    const subject = `📢 Laporan Baru: ${typeLabel} - ${title}`;
+    const frontendUrl = req.body.origin || req.headers.origin || process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+    
+    const htmlContent = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
+        <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px 24px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 700;">Dashboard ADTEC Melaka</h1>
+        </div>
+        <div style="padding: 32px 28px; color: #1e293b;">
+          <h2 style="color: #4F46E5; margin-top: 0;">${subject}</h2>
+          <p>Hai warga ADTEC Melaka,</p>
+          <p>Satu laporan <strong>${typeLabel}</strong> telah dimuat naik di Dashboard.</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 25px;">
+            <tr><td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc; width: 30%;">Tajuk</td><td style="padding: 10px; border: 1px solid #e2e8f0;">${title}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Kategori</td><td style="padding: 10px; border: 1px solid #e2e8f0;">${typeLabel}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Tarikh</td><td style="padding: 10px; border: 1px solid #e2e8f0;">${date || '-'}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Lokasi</td><td style="padding: 10px; border: 1px solid #e2e8f0;">${location || '-'}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; background: #f8fafc;">Keterangan</td><td style="padding: 10px; border: 1px solid #e2e8f0;">${description || '-'}</td></tr>
+          </table>
+          <div style="text-align: center;">
+            <a href="${frontendUrl}" target="_blank" style="display: inline-block; background: #4F46E5; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 8px; font-weight: bold;">Buka Dashboard</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Pastikan admin sentiasa dapat (To), dan semua warga lain dapat (BCC)
+    await transporter.sendMail({
+      from: `"Dashboard ADTEC Melaka" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      bcc: bccList,
+      subject: subject,
+      html: htmlContent,
+    });
+
+    console.log(`[EMAIL] Notifikasi laporan baru dihantar. (BCC count: ${bccList.length})`);
+
+    res.status(200).json({ success: true, message: 'Notifikasi laporan e-mel berjaya dihantar.' });
+  } catch (error) {
+    console.error('Ralat menghantar notifikasi laporan baru:', error);
+    res.status(500).json({ message: 'Gagal menghantar notifikasi: ' + error.message });
+  }
+});
+
 // Untuk Local Development (Bukan di Vercel)
 if (process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
