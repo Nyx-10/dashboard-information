@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { LanguageContext } from '../context/LanguageContext';
-import { ItemCardCompact } from '../components/ItemCardCompact';
-import { supabase } from '../supabaseClient';
+import React, { useContext, useEffect, useState } from "react";
+import { LanguageContext } from "../context/LanguageContext";
+import { ItemCardCompact } from "../components/ItemCardCompact";
+import { supabase } from "../supabaseClient";
 
 export function DashboardView({ onContact, currentUser }) {
   const { t } = useContext(LanguageContext);
@@ -11,10 +11,15 @@ export function DashboardView({ onContact, currentUser }) {
   useEffect(() => {
     fetchItems(true);
 
-    const channel = supabase.channel('dashboard_items_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
-        fetchItems(false);
-      })
+    const channel = supabase
+      .channel("dashboard_items_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "items" },
+        () => {
+          fetchItems(false);
+        },
+      )
       .subscribe();
 
     return () => {
@@ -25,34 +30,34 @@ export function DashboardView({ onContact, currentUser }) {
   async function fetchItems(showLoading = false) {
     try {
       if (showLoading) setLoading(true);
-      
+
       const [infoRes, reportRes] = await Promise.all([
         supabase
-          .from('items')
-          .select('*')
-          .neq('status', 'deleted')
-          .neq('status', 'resolved')
-          .eq('type', 'info')
-          .order('created_at', { ascending: false })
+          .from("items")
+          .select("*")
+          .neq("status", "deleted")
+          .neq("status", "resolved")
+          .eq("type", "info")
+          .order("created_at", { ascending: false })
           .limit(8),
         supabase
-          .from('items')
-          .select('*')
-          .neq('status', 'deleted')
-          .neq('status', 'resolved')
-          .neq('type', 'info')
-          .order('created_at', { ascending: false })
-          .limit(8)
+          .from("items")
+          .select("*")
+          .neq("status", "deleted")
+          .neq("status", "resolved")
+          .neq("type", "info")
+          .order("created_at", { ascending: false })
+          .limit(8),
       ]);
 
       if (infoRes.error) throw infoRes.error;
       if (reportRes.error) throw reportRes.error;
-      
+
       if (infoRes.data && reportRes.data) {
         setItems([...infoRes.data, ...reportRes.data]);
       }
     } catch (error) {
-      console.error('Error fetching items:', error.message);
+      console.error("Error fetching items:", error.message);
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -61,71 +66,167 @@ export function DashboardView({ onContact, currentUser }) {
   const handleDelete = async (itemId) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       try {
-        const { error } = await supabase.from('items').update({ status: 'deleted' }).eq('id', itemId);
+        const { error } = await supabase
+          .from("items")
+          .update({ status: "deleted" })
+          .eq("id", itemId);
         if (error) throw error;
-        alert(t('alertSuccessDelete') || 'Successfully deleted!');
+        alert(t("alertSuccessDelete") || "Successfully deleted!");
         fetchItems();
       } catch (err) {
-        alert((t('alertFailedDelete') || 'Failed to delete: ') + err.message);
+        alert((t("alertFailedDelete") || "Failed to delete: ") + err.message);
       }
     }
   };
 
-  const infoItems = items.filter(item => item.type === 'info').slice(0, 8);
-  const reportItems = items.filter(item => item.type !== 'info').slice(0, 8);
+  const infoItems = items.filter((item) => item.type === "info").slice(0, 8);
+  const reportItems = items.filter((item) => item.type !== "info").slice(0, 8);
 
   return (
     <div className="page-bg-common bg-dashboard">
-
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
           <div>
-            <div className="skeleton" style={{ width: '150px', height: '20px', marginBottom: '1rem' }} />
-            <div className="grid-cards" style={{ gap: '0.75rem' }}>
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="skeleton" style={{ height: '120px', width: '100%' }} />
+            <div
+              className="skeleton"
+              style={{ width: "150px", height: "20px", marginBottom: "1rem" }}
+            />
+            <div className="grid-cards" style={{ gap: "0.75rem" }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="skeleton"
+                  style={{ height: "120px", width: "100%" }}
+                />
               ))}
             </div>
           </div>
           <div>
-            <div className="skeleton" style={{ width: '150px', height: '20px', marginBottom: '1rem' }} />
-            <div className="grid-cards" style={{ gap: '0.75rem' }}>
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="skeleton" style={{ height: '120px', width: '100%' }} />
+            <div
+              className="skeleton"
+              style={{ width: "150px", height: "20px", marginBottom: "1rem" }}
+            />
+            <div className="grid-cards" style={{ gap: "0.75rem" }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="skeleton"
+                  style={{ height: "120px", width: "100%" }}
+                />
               ))}
             </div>
           </div>
         </div>
       ) : (
         <>
-          <div style={{ marginBottom: '0.75rem' }}>
-            <h2 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('infoOnly')}</h2>
+          <div style={{ marginBottom: "0.75rem" }}>
+            <h2
+              style={{
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                marginBottom: "0.5rem",
+                color: "var(--text-main)",
+              }}
+            >
+              {t("infoOnly")}
+            </h2>
             {infoItems.length > 0 ? (
-              <div className="grid-cards" style={{ gap: '0.75rem' }}>
-                {infoItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={((currentUser?.role === 'admin' || currentUser?.role === 'superadmin') && item.created_by !== currentUser?.id) ? handleDelete : undefined} />
+              <div className="grid-cards" style={{ gap: "0.75rem" }}>
+                {infoItems.map((item) => (
+                  <ItemCardCompact
+                    key={item.id}
+                    item={item}
+                    onContact={onContact}
+                    currentUser={currentUser}
+                    onDelete={
+                      (currentUser?.role === "admin" ||
+                        currentUser?.role === "superadmin") &&
+                      item.created_by !== currentUser?.id
+                        ? handleDelete
+                        : undefined
+                    }
+                  />
                 ))}
               </div>
             ) : (
-              <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--surface)', borderRadius: '1rem', border: '1px dashed var(--border)' }}>
-                <div className="floating-icon" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📭</div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('noInfoYet')}</p>
+              <div
+                style={{
+                  padding: "3rem",
+                  textAlign: "center",
+                  background: "var(--surface)",
+                  borderRadius: "1rem",
+                  border: "1px dashed var(--border)",
+                }}
+              >
+                <div
+                  className="floating-icon"
+                  style={{
+                    fontSize: "3rem",
+                    marginBottom: "1rem",
+                    opacity: 0.5,
+                  }}
+                >
+                  📭
+                </div>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  {t("noInfoYet")}
+                </p>
               </div>
             )}
           </div>
 
           <div>
-            <h2 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>{t('recentlyReported')}</h2>
+            <h2
+              style={{
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                marginBottom: "0.5rem",
+                color: "var(--text-main)",
+              }}
+            >
+              {t("recentlyReported")}
+            </h2>
             {reportItems.length > 0 ? (
-              <div className="grid-cards" style={{ gap: '0.75rem' }}>
-                {reportItems.map(item => (
-                  <ItemCardCompact key={item.id} item={item} onContact={onContact} currentUser={currentUser} onDelete={((currentUser?.role === 'admin' || currentUser?.role === 'superadmin') && item.created_by !== currentUser?.id) ? handleDelete : undefined} />
+              <div className="grid-cards" style={{ gap: "0.75rem" }}>
+                {reportItems.map((item) => (
+                  <ItemCardCompact
+                    key={item.id}
+                    item={item}
+                    onContact={onContact}
+                    currentUser={currentUser}
+                    onDelete={
+                      (currentUser?.role === "admin" ||
+                        currentUser?.role === "superadmin") &&
+                      item.created_by !== currentUser?.id
+                        ? handleDelete
+                        : undefined
+                    }
+                  />
                 ))}
               </div>
             ) : (
-              <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--surface)', borderRadius: '1rem', border: '1px dashed var(--border)' }}>
-                <div className="floating-icon" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🔍</div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('noReportsYet')}</p>
+              <div
+                style={{
+                  padding: "3rem",
+                  textAlign: "center",
+                  background: "var(--surface)",
+                  borderRadius: "1rem",
+                  border: "1px dashed var(--border)",
+                }}
+              >
+                <div
+                  className="floating-icon"
+                  style={{
+                    fontSize: "3rem",
+                    marginBottom: "1rem",
+                    opacity: 0.5,
+                  }}
+                >
+                  🔍
+                </div>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  {t("noReportsYet")}
+                </p>
               </div>
             )}
           </div>

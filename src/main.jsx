@@ -1,12 +1,12 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-import App from './App.jsx'
-import { ThemeProvider } from './context/ThemeContext.jsx'
-import { registerSW } from 'virtual:pwa-register'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css";
+import App from "./App.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { registerSW } from "virtual:pwa-register";
 
-import { ErrorBoundary } from './components/ErrorBoundary.jsx'
+import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
 
 const updateSW = registerSW({
   onNeedRefresh() {
@@ -14,9 +14,9 @@ const updateSW = registerSW({
     updateSW(true);
   },
   onOfflineReady() {},
-})
+});
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
@@ -26,4 +26,4 @@ createRoot(document.getElementById('root')).render(
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>,
-)
+);
