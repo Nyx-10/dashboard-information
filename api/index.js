@@ -393,7 +393,11 @@ app.post('/api/notify-new-item', async (req, res) => {
       return res.status(200).json({ success: true, message: 'Tiada pengguna untuk dimaklumkan.' });
     }
 
-    const bccList = profiles.map(p => p.email).filter(Boolean);
+    let bccList = profiles.map(p => p.email).filter(Boolean);
+    
+    if (req.body.reporterEmail) {
+      bccList = bccList.filter(email => email !== req.body.reporterEmail);
+    }
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
