@@ -53,7 +53,7 @@ export function ChatbotWidget() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       let historyText = "";
       if (currentMessages && currentMessages.length > 0) {
