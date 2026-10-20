@@ -1,4 +1,4 @@
-﻿# Dashboard ADTEC Melaka (PROTON Institute)
+# Dashboard ADTEC Melaka (PROTON Institute)
 
 Sistem Pengurusan Maklumat Digital, Lost & Found Pintar, serta Komuniti untuk Pusat Latihan Teknologi Tinggi (ADTEC) Melaka / Institut Teknologi Automotif Termaju PROTON.
 
@@ -6,16 +6,17 @@ Sistem Pengurusan Maklumat Digital, Lost & Found Pintar, serta Komuniti untuk Pu
 
 ```text
 Dashboard-information-web/
-├── api/                  # Express & Node.js backend (Pengesahan OTP, e-mel, dan integrasi Gemini AI)
+├── api/                  # Express & Node.js backend (Pengesahan OTP, e-mel SMTP, dan notifikasi pintar)
 ├── database/             # Skrip SQL, migrasi skema pangkalan data & polisi RLS Supabase
 ├── docs/                 # Dokumen rujukan dalaman (diabaikan oleh git)
-├── public/               # Aset statik (imej latar belakang, ikon, favicon, PWA manifest)
-├── scripts/              # Skrip utiliti pembangun (cth: semakan pengguna pangkalan data)
+├── poster/               # Fail Poster Pameran Projek bersaiz A1 (PDF Vektor, Studio HTML & skrip penjanaan)
+├── public/               # Aset statik web (logo rasmi, imej latar belakang, ikon, PWA manifest)
+├── scripts/              # Skrip utiliti pembangun & ujian dalaman
 ├── src/                  # Kod sumber aplikasi React (Vite + React 19)
-│   ├── assets/           # Ikon SVG dan logo
+│   ├── assets/           # Ikon SVG dan aset komponen
 │   ├── components/       # Komponen UI boleh guna semula (Topbar, Sidebar, Chatbot, Toast, Kad)
 │   ├── context/          # Context API (Bahasa, Tema, Global State)
-│   └── pages/            # Halaman paparan utama sistem (Landing, Dashboard, Auth, Profil, dsb.)
+│   └── pages/            # Halaman paparan utama sistem (Landing, Dashboard, Auth, Admin, Profil, dsb.)
 ├── index.html            # Entri HTML utama aplikasi
 ├── package.json          # Senarai kebergantungan (dependencies) & skrip npm
 ├── vercel.json           # Konfigurasi deployment ke pelayan Vercel
@@ -34,6 +35,7 @@ Pastikan pembolehubah persekitaran (environment variables) diisi dengan nilai ya
 ```env
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
 VITE_GEMINI_API_KEY=...
 EMAIL_USER=...
 EMAIL_PASS=...
