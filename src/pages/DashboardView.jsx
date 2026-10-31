@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Share2,
   Lock,
+  Tv,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
@@ -124,6 +125,56 @@ export function DashboardView({ onContact, currentUser }) {
 
     return (
       <div className="page-bg-common bg-dashboard">
+        {/* PINTASAN MOD PAPARAN TV / KIOSK */}
+        <div
+          className="glass-panel"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.75rem",
+            padding: "0.85rem 1.1rem",
+            marginBottom: "1rem",
+            borderLeft: "4px solid var(--primary)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Tv size={20} style={{ color: "var(--primary)", flexShrink: 0 }} />
+            <div>
+              <div
+                style={{
+                  fontSize: "0.92rem",
+                  fontWeight: 700,
+                  color: "var(--text-main)",
+                }}
+              >
+                {isMs
+                  ? "Mod Paparan TV / Monitor"
+                  : "TV / Monitor Display Mode"}
+              </div>
+              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                {isMs
+                  ? "Paparan skrin penuh dengan tulisan & gambar besar, auto-putar dan kemas kini masa nyata."
+                  : "Fullscreen view with large text & images, auto-rotating pages and real-time updates."}
+              </div>
+            </div>
+          </div>
+          <button
+            className="btn-primary"
+            onClick={() => window.open("/tv", "_blank", "noopener")}
+            style={{
+              padding: "0.55rem 1rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              borderRadius: "0.65rem",
+            }}
+          >
+            <Tv size={16} />
+            <span>{isMs ? "Buka Mod TV" : "Open TV Mode"}</span>
+          </button>
+        </div>
+
         {loading ? (
           <div
             style={{ display: "flex", flexDirection: "column", gap: "2rem" }}

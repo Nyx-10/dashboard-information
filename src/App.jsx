@@ -27,6 +27,7 @@ import { ProfileView } from "./pages/ProfileView";
 import { DoubleSliderAuthView } from "./pages/DoubleSliderAuthView";
 import { ForgotPasswordView } from "./pages/ForgotPasswordView";
 import { ResetPasswordView } from "./pages/ResetPasswordView";
+import { TvDisplayView } from "./pages/TvDisplayView";
 import { supabase } from "./supabaseClient";
 import { AppContext } from "./context/AppContext";
 import { ToastContainer } from "./components/Toast";
@@ -517,6 +518,8 @@ export default function App() {
   const isResetPasswordRoute =
     location.pathname === "/reset-password" || authMode === "reset-password";
   const isLoginRoute = !isAuthenticated && location.pathname === "/login";
+  // Mod Paparan TV / Kiosk: awam (baca sahaja), dipaparkan tanpa Sidebar/Topbar
+  const isTvRoute = location.pathname === "/tv";
   const authReason =
     location.state?.reason ||
     (location.state?.from === "/add"
@@ -611,6 +614,8 @@ export default function App() {
               </button>
             </div>
           </div>
+        ) : isTvRoute ? (
+          <TvDisplayView />
         ) : isResetPasswordRoute ? (
           <ResetPasswordView
             onBackToLogin={() => {
