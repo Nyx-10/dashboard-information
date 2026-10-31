@@ -24,6 +24,11 @@ export function ItemCardCompact({
 }) {
   const { t } = useContext(LanguageContext);
   const currentUserId = currentUser ? currentUser.id : null;
+  const normalizedRole = currentUser?.role
+    ? currentUser.role.toLowerCase().replace(/\s+/g, "")
+    : "";
+  const isAdminOrSuperAdmin =
+    normalizedRole === "admin" || normalizedRole === "superadmin";
 
   // ==========================================================================
   // PAPARAN BAHARU (KHAS UNTUK PENGGUNA BIASA DI DASHBOARD)
@@ -272,9 +277,7 @@ export function ItemCardCompact({
               (!currentUserId || item.created_by !== currentUserId)) ||
               (onDelete &&
                 currentUser &&
-                (item.created_by === currentUser.id ||
-                  currentUser.role === "admin" ||
-                  currentUser.role === "superadmin") &&
+                (item.created_by === currentUser.id || isAdminOrSuperAdmin) &&
                 item.status !== "resolved")) && (
               <div
                 style={{ display: "flex", gap: "0.4rem" }}
@@ -312,9 +315,7 @@ export function ItemCardCompact({
 
                 {onDelete &&
                   currentUser &&
-                  (item.created_by === currentUser.id ||
-                    currentUser.role === "admin" ||
-                    currentUser.role === "superadmin") &&
+                  (item.created_by === currentUser.id || isAdminOrSuperAdmin) &&
                   item.status !== "resolved" && (
                     <button
                       className="btn-primary"
@@ -540,9 +541,7 @@ export function ItemCardCompact({
 
         {onDelete &&
           currentUser &&
-          (item.created_by === currentUser.id ||
-            currentUser.role === "admin" ||
-            currentUser.role === "superadmin") &&
+          (item.created_by === currentUser.id || isAdminOrSuperAdmin) &&
           item.status !== "resolved" && (
             <button
               className="btn-primary"

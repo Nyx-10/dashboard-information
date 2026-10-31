@@ -13,6 +13,7 @@ import {
   Share2,
   Lock,
   Tv,
+  Trash2,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
@@ -104,6 +105,7 @@ export function DashboardView({ onContact, currentUser }) {
           .update({ status: "deleted" })
           .eq("id", itemId);
         if (error) throw error;
+        if (selectedItem?.id === itemId) setSelectedItem(null);
         alert(t("alertSuccessDelete") || "Successfully deleted!");
         fetchItems();
       } catch (err) {
@@ -112,20 +114,26 @@ export function DashboardView({ onContact, currentUser }) {
     }
   };
 
-  // ==========================================================================
-  // PAPARAN ASAL (KHAS UNTUK ADMIN & SUPER ADMIN)
-  // ==========================================================================
-  if (isAdminOrSuperAdmin) {
-    const infoItemsClassic = items
-      .filter((item) => item.type === "info")
-      .slice(0, 8);
-    const reportItemsClassic = items
-      .filter((item) => item.type !== "info")
-      .slice(0, 8);
+  const infoItems = items.filter((item) => item.type === "info").slice(0, 6);
+  const allReportItems = items.filter((item) => item.type !== "info");
+  const filteredReportItems = allReportItems
+    .filter((item) =>
+      reportFilter === "all" ? true : item.type === reportFilter,
+    )
+    .slice(0, 9);
 
-    return (
-      <div className="page-bg-common bg-dashboard">
-        {/* PINTASAN MOD PAPARAN TV / KIOSK */}
+  const userName =
+    currentUser?.name ||
+    currentUser?.username ||
+    (isMs ? "Warga ADTEC" : "Campus Member");
+
+  return (
+    <div
+      className="page-bg-common bg-dashboard"
+      style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+    >
+      {/* 1. BANNER ATAS (PINTASAN MOD TV UNTUK ADMIN / SAPAAN UNTUK PENGGUNA BIASA) */}
+      {isAdminOrSuperAdmin ? (
         <div
           className="glass-panel"
           style={{
@@ -135,7 +143,6 @@ export function DashboardView({ onContact, currentUser }) {
             justifyContent: "space-between",
             gap: "0.75rem",
             padding: "0.85rem 1.1rem",
-            marginBottom: "1rem",
             borderLeft: "4px solid var(--primary)",
           }}
         >
@@ -174,276 +181,103 @@ export function DashboardView({ onContact, currentUser }) {
             <span>{isMs ? "Buka Mod TV" : "Open TV Mode"}</span>
           </button>
         </div>
-
-        {loading ? (
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
-          >
-            <div>
-              <div
-                className="skeleton"
-                style={{ width: "150px", height: "20px", marginBottom: "1rem" }}
-              />
-              <div className="grid-cards" style={{ gap: "0.75rem" }}>
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="skeleton"
-                    style={{ height: "120px", width: "100%" }}
-                  />
-                ))}
-              </div>
-            </div>
-            <div>
-              <div
-                className="skeleton"
-                style={{ width: "150px", height: "20px", marginBottom: "1rem" }}
-              />
-              <div className="grid-cards" style={{ gap: "0.75rem" }}>
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="skeleton"
-                    style={{ height: "120px", width: "100%" }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ marginBottom: "0.75rem" }}>
-              <h2
+      ) : (
+        <div
+          className="glass-panel"
+          style={{
+            padding: "1.35rem 1.5rem",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+            borderLeft: "4px solid var(--primary)",
+          }}
+        >
+          <div style={{ flex: "1 1 320px" }}>
+            {isGuest && (
+              <span
                 style={{
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  marginBottom: "0.5rem",
-                  color: "var(--text-main)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  padding: "0.2rem 0.65rem",
+                  borderRadius: "999px",
+                  background: "rgba(99, 102, 241, 0.14)",
+                  color: "var(--primary)",
+                  border: "1px solid rgba(99, 102, 241, 0.3)",
+                  marginBottom: "0.45rem",
                 }}
               >
-                {t("infoOnly")}
-              </h2>
-              {infoItemsClassic.length > 0 ? (
-                <div className="grid-cards" style={{ gap: "0.75rem" }}>
-                  {infoItemsClassic.map((item) => (
-                    <ItemCardCompact
-                      key={item.id}
-                      item={item}
-                      onContact={onContact}
-                      currentUser={currentUser}
-                      variant="classic"
-                      onDelete={
-                        item.created_by !== currentUser?.id
-                          ? handleDelete
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div
-                  style={{
-                    padding: "3rem",
-                    textAlign: "center",
-                    background: "var(--surface)",
-                    borderRadius: "1rem",
-                    border: "1px dashed var(--border)",
-                  }}
-                >
-                  <div
-                    className="floating-icon"
-                    style={{
-                      fontSize: "3rem",
-                      marginBottom: "1rem",
-                      opacity: 0.5,
-                    }}
-                  >
-                    📭
-                  </div>
-                  <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                    {t("noInfoYet")}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h2
-                style={{
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  marginBottom: "0.5rem",
-                  color: "var(--text-main)",
-                }}
-              >
-                {t("recentlyReported")}
-              </h2>
-              {reportItemsClassic.length > 0 ? (
-                <div className="grid-cards" style={{ gap: "0.75rem" }}>
-                  {reportItemsClassic.map((item) => (
-                    <ItemCardCompact
-                      key={item.id}
-                      item={item}
-                      onContact={onContact}
-                      currentUser={currentUser}
-                      variant="classic"
-                      onDelete={
-                        item.created_by !== currentUser?.id
-                          ? handleDelete
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div
-                  style={{
-                    padding: "3rem",
-                    textAlign: "center",
-                    background: "var(--surface)",
-                    borderRadius: "1rem",
-                    border: "1px dashed var(--border)",
-                  }}
-                >
-                  <div
-                    className="floating-icon"
-                    style={{
-                      fontSize: "3rem",
-                      marginBottom: "1rem",
-                      opacity: 0.5,
-                    }}
-                  >
-                    🔍
-                  </div>
-                  <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                    {t("noReportsYet")}
-                  </p>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
-
-  // ==========================================================================
-  // PAPARAN BAHARU (KHAS UNTUK PENGGUNA BIASA / USER SAHAJA)
-  // ==========================================================================
-  const infoItems = items.filter((item) => item.type === "info").slice(0, 6);
-  const allReportItems = items.filter((item) => item.type !== "info");
-  const filteredReportItems = allReportItems
-    .filter((item) =>
-      reportFilter === "all" ? true : item.type === reportFilter,
-    )
-    .slice(0, 9);
-
-  const userName =
-    currentUser?.name ||
-    currentUser?.username ||
-    (isMs ? "Warga ADTEC" : "Campus Member");
-
-  return (
-    <div
-      className="page-bg-common bg-dashboard"
-      style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-    >
-      {/* 1. BANNER SAPAAN & TINDAKAN PANTAS */}
-      <div
-        className="glass-panel"
-        style={{
-          padding: "1.35rem 1.5rem",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-          borderLeft: "4px solid var(--primary)",
-        }}
-      >
-        <div style={{ flex: "1 1 320px" }}>
-          {isGuest && (
-            <span
+                {t("guestModeBadge")}
+              </span>
+            )}
+            <h1
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                fontSize: "0.72rem",
+                fontSize: "1.35rem",
                 fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                padding: "0.2rem 0.65rem",
-                borderRadius: "999px",
-                background: "rgba(99, 102, 241, 0.14)",
-                color: "var(--primary)",
-                border: "1px solid rgba(99, 102, 241, 0.3)",
-                marginBottom: "0.45rem",
+                color: "var(--text-main)",
+                marginBottom: "0.2rem",
               }}
             >
-              {t("guestModeBadge")}
-            </span>
-          )}
-          <h1
-            style={{
-              fontSize: "1.35rem",
-              fontWeight: 700,
-              color: "var(--text-main)",
-              marginBottom: "0.2rem",
-            }}
-          >
-            {isGuest
-              ? t("guestWelcomeTitle")
-              : isMs
-                ? `Selamat Kembali, ${userName} 👋`
-                : `Welcome Back, ${userName} 👋`}
-          </h1>
-          <p style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>
-            {isGuest ? t("guestWelcomeDesc") : t("welcomeBack")}
-          </p>
-        </div>
+              {isGuest
+                ? t("guestWelcomeTitle")
+                : isMs
+                  ? `Selamat Kembali, ${userName} 👋`
+                  : `Welcome Back, ${userName} 👋`}
+            </h1>
+            <p style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>
+              {isGuest ? t("guestWelcomeDesc") : t("welcomeBack")}
+            </p>
+          </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem" }}>
-          <button
-            className="btn-primary"
-            onClick={() => {
-              if (isGuest && requireAuth) {
-                requireAuth("/add", t("loginRequiredToReport"), {
-                  reason: "report",
-                });
-              } else {
-                navigate("/add");
-              }
-            }}
-            style={{
-              padding: "0.6rem 1.1rem",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              borderRadius: "0.65rem",
-            }}
-          >
-            <PlusCircle size={17} />
-            <span>{isMs ? "Lapor Barang / Info" : "Report Item / Info"}</span>
-            {isGuest && <Lock size={14} style={{ opacity: 0.85 }} />}
-          </button>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem" }}>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                if (isGuest && requireAuth) {
+                  requireAuth("/add", t("loginRequiredToReport"), {
+                    reason: "report",
+                  });
+                } else {
+                  navigate("/add");
+                }
+              }}
+              style={{
+                padding: "0.6rem 1.1rem",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                borderRadius: "0.65rem",
+              }}
+            >
+              <PlusCircle size={17} />
+              <span>{isMs ? "Lapor Barang / Info" : "Report Item / Info"}</span>
+              {isGuest && <Lock size={14} style={{ opacity: 0.85 }} />}
+            </button>
 
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/search")}
-            style={{
-              padding: "0.6rem 1.1rem",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              borderRadius: "0.65rem",
-              background: "var(--surface)",
-              color: "var(--text-main)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <Search size={17} />
-            <span>{t("searchItems")}</span>
-          </button>
+            <button
+              className="btn-primary"
+              onClick={() => navigate("/search")}
+              style={{
+                padding: "0.6rem 1.1rem",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                borderRadius: "0.65rem",
+                background: "var(--surface)",
+                color: "var(--text-main)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <Search size={17} />
+              <span>{t("searchItems")}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 2. KANDUNGAN UTAMA */}
       {loading ? (
@@ -566,6 +400,11 @@ export function DashboardView({ onContact, currentUser }) {
                     currentUser={currentUser}
                     variant="modern"
                     onSelect={setSelectedItem}
+                    onDelete={
+                      isAdminOrSuperAdmin && item.created_by !== currentUser?.id
+                        ? handleDelete
+                        : undefined
+                    }
                   />
                 ))}
               </div>
@@ -730,6 +569,11 @@ export function DashboardView({ onContact, currentUser }) {
                     currentUser={currentUser}
                     variant="modern"
                     onSelect={setSelectedItem}
+                    onDelete={
+                      isAdminOrSuperAdmin && item.created_by !== currentUser?.id
+                        ? handleDelete
+                        : undefined
+                    }
                   />
                 ))}
               </div>
@@ -963,6 +807,23 @@ export function DashboardView({ onContact, currentUser }) {
                     >
                       <MessageSquare size={16} />
                       <span>{t("contactReporter")}</span>
+                    </button>
+                  )}
+
+                {isAdminOrSuperAdmin &&
+                  selectedItem.created_by !== currentUser?.id &&
+                  selectedItem.status !== "resolved" && (
+                    <button
+                      className="btn-primary"
+                      onClick={() => handleDelete(selectedItem.id)}
+                      style={{
+                        background: "rgba(239, 68, 68, 0.15)",
+                        color: "#EF4444",
+                        border: "1px solid rgba(239, 68, 68, 0.35)",
+                      }}
+                    >
+                      <Trash2 size={16} />
+                      <span>{t("deleteBtn")}</span>
                     </button>
                   )}
               </div>
