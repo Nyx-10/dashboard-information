@@ -6,13 +6,21 @@ import {
   PlusCircle,
   MessageSquare,
   User,
+  LogIn,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
 
 export function MobileBottomNav() {
   const { t } = useContext(LanguageContext);
-  const { totalUnreadMessages, setActiveChatUser } = useContext(AppContext);
+  const {
+    user,
+    isAuthenticated,
+    requireAuth,
+    goToLogin,
+    totalUnreadMessages,
+    setActiveChatUser,
+  } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,6 +34,16 @@ export function MobileBottomNav() {
   };
 
   const handleNav = (path, isMessage = false) => {
+    if (path === "/add" && !isAuthenticated && requireAuth) {
+      requireAuth("/add", t("loginRequiredToReport"), { reason: "report" });
+      return;
+    }
+    if (path === "/messages" && !isAuthenticated && requireAuth) {
+      requireAuth("/messages", t("loginRequiredForMessages"), {
+        reason: "messages",
+      });
+      return;
+    }
     if (isMessage && setActiveChatUser) {
       setActiveChatUser(null);
     }
@@ -79,14 +97,25 @@ export function MobileBottomNav() {
         <span>{t("messages")}</span>
       </button>
 
-      <button
-        type="button"
-        className={`mobile-nav-item ${isActive("/profile") ? "active" : ""}`}
-        onClick={() => handleNav("/profile")}
-      >
-        <User size={20} />
-        <span>{t("profile")}</span>
-      </button>
+      {isAuthenticated && user ? (
+        <button
+          type="button"
+          className={`mobile-nav-item ${isActive("/profile") ? "active" : ""}`}
+          onClick={() => handleNav("/profile")}
+        >
+          <User size={20} />
+          <span>{t("profile")}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={`mobile-nav-item ${isActive("/login") ? "active" : ""}`}
+          onClick={() => goToLogin && goToLogin()}
+        >
+          <LogIn size={20} />
+          <span>{t("loginBtn")}</span>
+        </button>
+      )}
     </nav>
   );
 }

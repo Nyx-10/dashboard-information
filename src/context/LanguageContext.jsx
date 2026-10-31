@@ -281,6 +281,29 @@ export const dict = {
     saveProfile: "Save Profile",
     updatePassword: "Update Password",
     noReportsForCategory: "No reports found for this category.",
+    guestModeBadge: "Guest Mode",
+    guestWelcomeTitle: "Welcome to ADTEC Melaka Dashboard 👋",
+    guestWelcomeDesc:
+      "You can view all campus announcements and Lost & Found records without logging in. Sign in only when you want to submit a Lost & Found report or message a reporter.",
+    guestTopbarSub: "Public information access — Sign in to submit reports",
+    loginRequiredToReport:
+      "Please sign in first to report a Lost & Found item.",
+    loginRequiredToContact:
+      "Please sign in first to contact the item reporter.",
+    loginRequiredForMessages:
+      "Please sign in first to access messages.",
+    loginPromptReportBanner:
+      "Sign in to your account to submit a Lost & Found report",
+    loginPromptContactBanner:
+      "Sign in to your account to contact the item reporter",
+    loginPromptMessagesBanner:
+      "Sign in to your account to access 1-to-1 messages",
+    backToDashboard: "Back to Dashboard",
+    exploreDashboardNoLogin: "View Dashboard (No Login)",
+    viewDashboard: "View Dashboard",
+    guestSidebarDesc:
+      "Browse all information freely. Sign in to report Lost & Found items.",
+    backToIntro: "Intro Landing Page",
   },
   ms: {
     dashboard: "Papan Pemuka",
@@ -580,5 +603,28 @@ export const dict = {
     saveProfile: "Simpan Profil",
     updatePassword: "Kemas Kini Kata Laluan",
     noReportsForCategory: "Tiada laporan dijumpai untuk kategori ini.",
+    guestModeBadge: "Mod Tetamu",
+    guestWelcomeTitle: "Selamat Datang ke Dashboard ADTEC Melaka 👋",
+    guestWelcomeDesc:
+      "Anda boleh melihat segala maklumat kolej serta senarai Lost & Found tanpa log masuk. Log masuk hanya diperlukan sekiranya anda ingin membuat laporan Lost & Found atau menghubungi pelapor.",
+    guestTopbarSub: "Akses maklumat awam — Log masuk untuk membuat laporan",
+    loginRequiredToReport:
+      "Sila log masuk terlebih dahulu untuk melaporkan Lost & Found.",
+    loginRequiredToContact:
+      "Sila log masuk terlebih dahulu untuk menghubungi pelapor.",
+    loginRequiredForMessages:
+      "Sila log masuk terlebih dahulu untuk mengakses ruangan mesej.",
+    loginPromptReportBanner:
+      "Log masuk ke akaun anda untuk menghantar laporan Lost & Found",
+    loginPromptContactBanner:
+      "Log masuk ke akaun anda untuk menghubungi pelapor barang",
+    loginPromptMessagesBanner:
+      "Log masuk ke akaun anda untuk mengakses mesej 1-ke-1",
+    backToDashboard: "Kembali ke Dashboard",
+    exploreDashboardNoLogin: "Lihat Dashboard (Tanpa Login)",
+    viewDashboard: "Lihat Dashboard",
+    guestSidebarDesc:
+      "Semua maklumat boleh dilihat secara bebas. Log masuk untuk lapor Lost & Found.",
+    backToIntro: "Halaman Pengenalan",
   },
 };

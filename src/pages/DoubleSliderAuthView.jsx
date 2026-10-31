@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { LanguageContext } from "../context/LanguageContext";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Lock } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import "./double-slider.css";
 
@@ -54,6 +54,8 @@ export function DoubleSliderAuthView({
   onSignup,
   onForgotPassword,
   onBackToHome,
+  backLabel,
+  authReason,
   onMaintenanceMode,
 }) {
   const { lang, setLang, t } = useContext(LanguageContext);
@@ -259,15 +261,27 @@ export function DoubleSliderAuthView({
     }
   };
 
+  const authReasonBannerText =
+    authReason === "report"
+      ? t("loginPromptReportBanner")
+      : authReason === "contact"
+        ? t("loginPromptContactBanner")
+        : authReason === "messages"
+          ? t("loginPromptMessagesBanner")
+          : null;
+
   return (
     <div
       className="bg-auth"
       style={{
         display: "flex",
+        flexDirection: "column",
         minHeight: "100vh",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
+        padding: "4.5rem 1rem 2rem",
+        gap: "1rem",
       }}
     >
       {/* Top Controls */}
@@ -294,7 +308,8 @@ export function DoubleSliderAuthView({
             fontWeight: 500,
           }}
         >
-          <ArrowLeft size={16} /> {t ? t("backToHome") : "Back to Home"}
+          <ArrowLeft size={16} />{" "}
+          {backLabel || (t ? t("backToHome") : "Back to Home")}
         </button>
       </div>
       <div
@@ -323,6 +338,29 @@ export function DoubleSliderAuthView({
           <option value="en">English</option>
         </select>
       </div>
+
+      {authReasonBannerText && (
+        <div
+          className="glass-panel animate-fade-in"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.6rem",
+            padding: "0.65rem 1.15rem",
+            borderRadius: "999px",
+            background: "rgba(99, 102, 241, 0.14)",
+            border: "1px solid rgba(99, 102, 241, 0.35)",
+            color: "var(--text-main)",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            maxWidth: "100%",
+            textAlign: "center",
+          }}
+        >
+          <Lock size={15} style={{ color: "var(--primary)", flexShrink: 0 }} />
+          <span>{authReasonBannerText}</span>
+        </div>
+      )}
 
       <div
         className={`ds-container glass-panel ${isRightPanelActive ? "right-panel-active" : ""}`}

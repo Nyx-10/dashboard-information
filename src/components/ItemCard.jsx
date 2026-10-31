@@ -107,8 +107,8 @@ export function ItemCard({ item, onContact, currentUser, onDelete }) {
             <Share2 size={16} /> WhatsApp
           </button>
           {item.type !== "info" &&
-            currentUserId &&
-            item.created_by !== currentUserId && (
+            item.created_by &&
+            (!currentUserId || item.created_by !== currentUserId) && (
               <button
                 className="btn-primary"
                 style={{

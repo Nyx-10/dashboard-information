@@ -11,6 +11,8 @@ import {
   Info,
   Sun,
   Moon,
+  LogIn,
+  Globe,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
@@ -25,9 +27,11 @@ export function Topbar({
   setShowNotifications,
   setShowLogoutModal,
 }) {
-  const { t } = useContext(LanguageContext);
+  const { lang, setLang, t } = useContext(LanguageContext);
   const {
     user,
+    isAuthenticated,
+    goToLogin,
     hasUnreadNotifications,
     setLastSeenNotifTime,
     notifications,
@@ -89,7 +93,7 @@ export function Topbar({
                 margin: "0.25rem 0 0 0",
               }}
             >
-              {t("welcomeBack")}
+              {isAuthenticated && user ? t("welcomeBack") : t("guestTopbarSub")}
             </p>
           </div>
         )}
@@ -148,22 +152,24 @@ export function Topbar({
           )}
         </button>
 
-        <div style={{ position: "relative" }}>
-          <button
-            style={{ position: "relative", color: "var(--text-muted)" }}
-            onClick={() => {
-              setShowNotifications(!showNotifications);
-              if (!showNotifications && user?.id) {
-                const now = Date.now();
-                setLastSeenNotifTime(now);
-                localStorage.setItem(
-                  "lastSeenNotifTime_" + user.id,
-                  now.toString(),
-                );
-              }
-            }}
-          >
-            <Bell size={24} />
+        {isAuthenticated && user ? (
+          <>
+            <div style={{ position: "relative" }}>
+              <button
+                style={{ position: "relative", color: "var(--text-muted)" }}
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  if (!showNotifications && user?.id) {
+                    const now = Date.now();
+                    setLastSeenNotifTime(now);
+                    localStorage.setItem(
+                      "lastSeenNotifTime_" + user.id,
+                      now.toString(),
+                    );
+                  }
+                }}
+              >
+                <Bell size={24} />
             {hasUnreadNotifications && (
               <span
                 className="notif-pulse"
@@ -397,6 +403,46 @@ export function Topbar({
             </span>
           </div>
         </div>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setLang(lang === "ms" ? "en" : "ms")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.3rem",
+                padding: "0.35rem 0.65rem",
+                borderRadius: "0.5rem",
+                background: "var(--surface)",
+                color: "var(--text-main)",
+                border: "1px solid var(--border)",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+              title={t("languageSettings")}
+            >
+              <Globe size={14} style={{ color: "var(--primary)" }} />
+              <span>{lang === "ms" ? "MS" : "EN"}</span>
+            </button>
+
+            <button
+              className="btn-primary"
+              onClick={() => goToLogin && goToLogin()}
+              style={{
+                padding: "0.45rem 0.95rem",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+                borderRadius: "0.55rem",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <LogIn size={16} />
+              <span>{t("loginBtn")}</span>
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

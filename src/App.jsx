@@ -1,5 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useTheme } from "./context/ThemeContext";
 import "./index.css";
@@ -30,6 +36,7 @@ import { MobileBottomNav } from "./components/MobileBottomNav";
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { colorTheme, setColorTheme, setTheme } = useTheme();
 
   // Global ripple effect listener
@@ -274,9 +281,44 @@ export default function App() {
     } catch (e) {}
   };
 
-  const handleContact = async (userId, title) => {
-    if (user && user.id === userId) {
+  const goToLogin = (options = {}) => {
+    setShowLanding(false);
+    setAuthMode(options.mode || "login");
+    navigate("/login", {
+      state: {
+        from:
+          options.from ||
+          (location.pathname !== "/login" && location.pathname !== "/"
+            ? location.pathname
+            : "/home"),
+        source: options.source || "dashboard",
+        pendingContact: options.pendingContact || null,
+        reason: options.reason || null,
+      },
+    });
+  };
+
+  const requireAuth = (
+    targetPath = "/home",
+    toastMessage = null,
+    extraOptions = {},
+  ) => {
+    if (isAuthenticated && user) {
+      navigate(targetPath);
+      return true;
+    }
+    if (toastMessage) {
+      alert(toastMessage);
+    }
+    goToLogin({ from: targetPath, ...extraOptions });
+    return false;
+  };
+
+  const openContactChat = async (userId, title, currentUserObj = user) => {
+    if (!userId) return;
+    if (currentUserObj && currentUserObj.id === userId) {
       alert(t("cannotContactSelf") || "You cannot contact yourself.");
+      navigate("/home");
       return;
     }
     let name = `User ${userId.substring(0, 5)}`;
@@ -300,6 +342,19 @@ export default function App() {
     navigate("/messages");
   };
 
+  const handleContact = async (userId, title) => {
+    if (!isAuthenticated || !user) {
+      alert(t("loginRequiredToContact"));
+      goToLogin({
+        from: "/messages",
+        pendingContact: { userId, title },
+        reason: "contact",
+      });
+      return;
+    }
+    await openContactChat(userId, title, user);
+  };
+
   useEffect(() => {
     // Apabila pengguna klik link dari email, URL mungkin /reset-password atau /messages
     if (window.location.pathname === "/reset-password") {
@@ -308,6 +363,9 @@ export default function App() {
       setAuthMode("reset-password");
       setIsCheckingAuth(false);
     } else {
+      if (authMode === "reset-password") {
+        setAuthMode("login");
+      }
       if (window.location.pathname !== "/" && window.location.pathname !== "") {
         setShowLanding(false);
       }
@@ -410,9 +468,41 @@ export default function App() {
     }
   };
 
+  const handleAuthSuccess = async (userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+    const pendingContact = location.state?.pendingContact;
+    if (pendingContact?.userId) {
+      await openContactChat(
+        pendingContact.userId,
+        pendingContact.title,
+        userData,
+      );
+      return;
+    }
+    const targetFrom = location.state?.from;
+    if (
+      targetFrom &&
+      targetFrom !== "/" &&
+      targetFrom !== "/login" &&
+      targetFrom !== "/reset-password"
+    ) {
+      navigate(targetFrom, { replace: true });
+    } else {
+      navigate("/home", { replace: true });
+    }
+  };
+
   const contextValue = {
     user,
     setUser,
+    isAuthenticated,
+    requireAuth,
+    goToLogin,
+    goToLanding: () => {
+      setShowLanding(true);
+      navigate("/");
+    },
     notifications,
     hasUnreadNotifications,
     totalUnreadMessages,
@@ -424,335 +514,401 @@ export default function App() {
     setLastSeenNotifTime,
   };
 
-  if (isCheckingAuth) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          height: "100vh",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <GlobalAtmosphere />
-        <div
-          className="spinner"
-          style={{
-            width: "40px",
-            height: "40px",
-            borderColor: "rgba(79, 70, 229, 0.3)",
-            borderLeftColor: "var(--primary)",
-            position: "relative",
-            zIndex: 10,
-          }}
-        ></div>
-      </div>
-    );
-  }
-
-  if (showMaintenanceScreen) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          padding: "2rem",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <GlobalAtmosphere />
-        <div style={{ position: "relative", zIndex: 10 }}>
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10"
-            alt="Logo Adtec Melaka"
-            style={{
-              height: "90px",
-              marginBottom: "2rem",
-              borderRadius: "12px",
-            }}
-          />
-          <h1
-            style={{
-              fontSize: "2rem",
-              fontWeight: 700,
-              color: "var(--text-main)",
-              marginBottom: "1rem",
-            }}
-          >
-            {t("systemUnderMaintenance") || "Sistem Sedang Diselenggara"}
-          </h1>
-          <p
-            style={{
-              color: "var(--text-muted)",
-              maxWidth: "400px",
-              lineHeight: "1.6",
-            }}
-          >
-            {t("maintenanceReturnMsg") ||
-              "Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali."}
-          </p>
-          <button
-            onClick={() => setShowMaintenanceScreen(false)}
-            className="btn-primary"
-            style={{ marginTop: "2rem", padding: "0.75rem 1.5rem" }}
-          >
-            {t("returnToLogin") || "Kembali ke Log Masuk"}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (showLanding) {
-    return (
-      <LanguageContext.Provider value={{ lang, setLang, t }}>
-        <GlobalAtmosphere />
-        <LandingPage onGetStarted={() => setShowLanding(false)} />
-        <ToastContainer />
-      </LanguageContext.Provider>
-    );
-  }
-
-  if (!isAuthenticated) {
-    let authContent;
-    if (authMode === "login" || authMode === "signup") {
-      authContent = (
-        <DoubleSliderAuthView
-          initialMode={authMode}
-          onLogin={(userData) => {
-            setIsAuthenticated(true);
-            setUser(userData);
-            if (
-              window.location.pathname &&
-              window.location.pathname !== "/" &&
-              window.location.pathname !== "/login"
-            ) {
-              navigate(window.location.pathname + window.location.search);
-            } else {
-              navigate("/home");
-            }
-          }}
-          onSignup={(userData) => {
-            setIsAuthenticated(true);
-            setUser(userData);
-            if (
-              window.location.pathname &&
-              window.location.pathname !== "/" &&
-              window.location.pathname !== "/login"
-            ) {
-              navigate(window.location.pathname + window.location.search);
-            } else {
-              navigate("/home");
-            }
-          }}
-          onForgotPassword={() => setAuthMode("forgot-password")}
-          onBackToHome={() => setShowLanding(true)}
-          onMaintenanceMode={() => setShowMaintenanceScreen(true)}
-        />
-      );
-    } else if (authMode === "forgot-password") {
-      authContent = (
-        <ForgotPasswordView onSwitchBack={() => setAuthMode("login")} />
-      );
-    } else if (authMode === "reset-password") {
-      authContent = (
-        <ResetPasswordView
-          onBackToLogin={() => {
-            navigate("/");
-            setAuthMode("login");
-          }}
-        />
-      );
-    }
-    return (
-      <LanguageContext.Provider value={{ lang, setLang, t }}>
-        <GlobalAtmosphere />
-        {authContent}
-        <ToastContainer />
-      </LanguageContext.Provider>
-    );
-  }
+  const isResetPasswordRoute =
+    location.pathname === "/reset-password" || authMode === "reset-password";
+  const isLoginRoute = !isAuthenticated && location.pathname === "/login";
+  const authReason =
+    location.state?.reason ||
+    (location.state?.from === "/add"
+      ? "report"
+      : location.state?.from === "/messages"
+        ? "messages"
+        : null);
+  const cameFromLanding = location.state?.source === "landing";
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
       <AppContext.Provider value={contextValue}>
         <GlobalAtmosphere />
-        <div className="app-container" data-color={colorTheme}>
-          {/* Sidebar */}
-          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-          {/* Main Content */}
-          <main className="main-content">
-            <Topbar
-              sidebarOpen={sidebarOpen}
-              setSidebarOpen={setSidebarOpen}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              showNotifications={showNotifications}
-              setShowNotifications={setShowNotifications}
-              setShowLogoutModal={setShowLogoutModal}
-            />
-
+        {isCheckingAuth ? (
+          <div
+            style={{
+              display: "flex",
+              height: "100vh",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <div
-              className="page-content animate-fade-in"
-              onClick={() => showNotifications && setShowNotifications(false)}
-            >
-              <Routes>
-                <Route
-                  path="/home"
-                  element={
-                    <DashboardView
-                      onContact={handleContact}
-                      currentUser={user}
-                    />
-                  }
-                />
-                <Route
-                  path="/search"
-                  element={
-                    <SearchView
-                      query={searchQuery}
-                      setQuery={setSearchQuery}
-                      onContact={handleContact}
-                      currentUser={user}
-                    />
-                  }
-                />
-                <Route
-                  path="/admin-analytics"
-                  element={<AdminAnalyticsView currentUser={user} />}
-                />
-                <Route
-                  path="/admin-users"
-                  element={<AdminUsersView currentUser={user} />}
-                />
-                <Route
-                  path="/admin-reports"
-                  element={<AdminReportsView currentUser={user} />}
-                />
-                <Route
-                  path="/admin-logs"
-                  element={<AdminAuditLogsView currentUser={user} />}
-                />
-                <Route
-                  path="/add"
-                  element={<AddItemView onSuccess={() => navigate("/home")} />}
-                />
-                <Route
-                  path="/messages"
-                  element={
-                    <MessagesView
-                      onMessagesRead={fetchTotalUnreadMessages}
-                      initialChatUser={activeChatUser}
-                      onlineUsers={onlineUsers}
-                    />
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProfileView onContact={handleContact} currentUser={user} />
-                  }
-                />
-                <Route path="*" element={<Navigate to="/home" replace />} />
-              </Routes>
-            </div>
-          </main>
-
-          {/* Logout Confirmation Modal */}
-          {showLogoutModal && (
-            <div
-              className="modal-backdrop"
+              className="spinner"
               style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 9999,
+                width: "40px",
+                height: "40px",
+                borderColor: "rgba(79, 70, 229, 0.3)",
+                borderLeftColor: "var(--primary)",
+                position: "relative",
+                zIndex: 10,
               }}
-            >
-              <div
-                className="glass-panel modal-bounce"
+            ></div>
+          </div>
+        ) : showMaintenanceScreen ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100vh",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              padding: "2rem",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ position: "relative", zIndex: 10 }}>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10"
+                alt="Logo Adtec Melaka"
                 style={{
-                  padding: "2rem",
-                  width: "100%",
-                  maxWidth: "400px",
-                  textAlign: "center",
+                  height: "90px",
+                  marginBottom: "2rem",
+                  borderRadius: "12px",
+                }}
+              />
+              <h1
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: 700,
+                  color: "var(--text-main)",
+                  marginBottom: "1rem",
                 }}
               >
-                <LogOut
-                  size={48}
-                  style={{ color: "#EF4444", margin: "0 auto 1rem" }}
-                />
-                <h2
-                  style={{
-                    fontSize: "1.5rem",
-                    fontWeight: 700,
-                    marginBottom: "0.5rem",
-                    color: "var(--text-main)",
-                  }}
-                >
-                  {t("logoutConfirm")}
-                </h2>
-                <p style={{ color: "var(--text-muted)", marginBottom: "2rem" }}>
-                  {t("logoutMsg")}
-                </p>
+                {t("systemUnderMaintenance") || "Sistem Sedang Diselenggara"}
+              </h1>
+              <p
+                style={{
+                  color: "var(--text-muted)",
+                  maxWidth: "400px",
+                  lineHeight: "1.6",
+                }}
+              >
+                {t("maintenanceReturnMsg") ||
+                  "Kami sedang melakukan kerja-kerja penyelenggaraan untuk meningkatkan kualiti sistem. Sila kembali sebentar lagi. Segala kesulitan amat dikesali."}
+              </p>
+              <button
+                onClick={() => {
+                  setShowMaintenanceScreen(false);
+                  setShowLanding(false);
+                  setAuthMode("login");
+                  navigate("/login");
+                }}
+                className="btn-primary"
+                style={{ marginTop: "2rem", padding: "0.75rem 1.5rem" }}
+              >
+                {t("returnToLogin") || "Kembali ke Log Masuk"}
+              </button>
+            </div>
+          </div>
+        ) : isResetPasswordRoute ? (
+          <ResetPasswordView
+            onBackToLogin={() => {
+              setAuthMode("login");
+              navigate("/login");
+            }}
+          />
+        ) : showLanding && !isAuthenticated ? (
+          <LandingPage
+            onExploreDashboard={() => {
+              setShowLanding(false);
+              navigate("/home");
+            }}
+            onGetStarted={() => {
+              setShowLanding(false);
+              setAuthMode("login");
+              navigate("/login", {
+                state: { from: "/home", source: "landing" },
+              });
+            }}
+          />
+        ) : isLoginRoute ? (
+          authMode === "forgot-password" ? (
+            <ForgotPasswordView onSwitchBack={() => setAuthMode("login")} />
+          ) : (
+            <DoubleSliderAuthView
+              initialMode={authMode === "signup" ? "signup" : "login"}
+              onLogin={handleAuthSuccess}
+              onSignup={handleAuthSuccess}
+              onForgotPassword={() => setAuthMode("forgot-password")}
+              authReason={authReason}
+              backLabel={
+                cameFromLanding ? t("backToHome") : t("backToDashboard")
+              }
+              onBackToHome={() => {
+                if (cameFromLanding) {
+                  setShowLanding(true);
+                  navigate("/");
+                } else {
+                  navigate("/home");
+                }
+              }}
+              onMaintenanceMode={() => setShowMaintenanceScreen(true)}
+            />
+          )
+        ) : (
+          <div className="app-container" data-color={colorTheme}>
+            {/* Sidebar */}
+            <Sidebar
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+            />
+
+            {/* Main Content */}
+            <main className="main-content">
+              <Topbar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                showNotifications={showNotifications}
+                setShowNotifications={setShowNotifications}
+                setShowLogoutModal={setShowLogoutModal}
+              />
+
+              <div
+                className="page-content animate-fade-in"
+                onClick={() =>
+                  showNotifications && setShowNotifications(false)
+                }
+              >
+                <Routes>
+                  <Route
+                    path="/home"
+                    element={
+                      <DashboardView
+                        onContact={handleContact}
+                        currentUser={user}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/search"
+                    element={
+                      <SearchView
+                        query={searchQuery}
+                        setQuery={setSearchQuery}
+                        onContact={handleContact}
+                        currentUser={user}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/admin-analytics"
+                    element={
+                      isAuthenticated ? (
+                        <AdminAnalyticsView currentUser={user} />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/admin-analytics" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/admin-users"
+                    element={
+                      isAuthenticated ? (
+                        <AdminUsersView currentUser={user} />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/admin-users" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/admin-reports"
+                    element={
+                      isAuthenticated ? (
+                        <AdminReportsView currentUser={user} />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/admin-reports" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/admin-logs"
+                    element={
+                      isAuthenticated ? (
+                        <AdminAuditLogsView currentUser={user} />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/admin-logs" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/add"
+                    element={
+                      isAuthenticated ? (
+                        <AddItemView onSuccess={() => navigate("/home")} />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/add", reason: "report" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/messages"
+                    element={
+                      isAuthenticated ? (
+                        <MessagesView
+                          onMessagesRead={fetchTotalUnreadMessages}
+                          initialChatUser={activeChatUser}
+                          onlineUsers={onlineUsers}
+                        />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/messages", reason: "messages" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      isAuthenticated ? (
+                        <ProfileView
+                          onContact={handleContact}
+                          currentUser={user}
+                        />
+                      ) : (
+                        <Navigate
+                          to="/login"
+                          state={{ from: "/profile" }}
+                          replace
+                        />
+                      )
+                    }
+                  />
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Routes>
+              </div>
+            </main>
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+              <div
+                className="modal-backdrop"
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(0,0,0,0.5)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 9999,
+                }}
+              >
                 <div
+                  className="glass-panel modal-bounce"
                   style={{
-                    display: "flex",
-                    gap: "1rem",
-                    justifyContent: "center",
+                    padding: "2rem",
+                    width: "100%",
+                    maxWidth: "400px",
+                    textAlign: "center",
                   }}
                 >
-                  <button
-                    className="btn-primary"
+                  <LogOut
+                    size={48}
+                    style={{ color: "#EF4444", margin: "0 auto 1rem" }}
+                  />
+                  <h2
                     style={{
-                      background: "var(--surface)",
+                      fontSize: "1.5rem",
+                      fontWeight: 700,
+                      marginBottom: "0.5rem",
                       color: "var(--text-main)",
-                      border: "1px solid var(--border)",
-                      padding: "0.75rem 2rem",
-                    }}
-                    onClick={() => setShowLogoutModal(false)}
-                  >
-                    {t("cancel")}
-                  </button>
-                  <button
-                    className="btn-primary"
-                    style={{ background: "#EF4444", padding: "0.75rem 2rem" }}
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      setShowLogoutModal(false);
-                      setIsAuthenticated(false);
-                      setUser(null);
-                      setColorTheme("default");
-                      navigate("/");
-                      sessionStorage.removeItem("tempSession");
-                      localStorage.removeItem("rememberMe");
-                      setShowLanding(true);
                     }}
                   >
-                    {t("logout")}
-                  </button>
+                    {t("logoutConfirm")}
+                  </h2>
+                  <p
+                    style={{
+                      color: "var(--text-muted)",
+                      marginBottom: "2rem",
+                    }}
+                  >
+                    {t("logoutMsg")}
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <button
+                      className="btn-primary"
+                      style={{
+                        background: "var(--surface)",
+                        color: "var(--text-main)",
+                        border: "1px solid var(--border)",
+                        padding: "0.75rem 2rem",
+                      }}
+                      onClick={() => setShowLogoutModal(false)}
+                    >
+                      {t("cancel")}
+                    </button>
+                    <button
+                      className="btn-primary"
+                      style={{
+                        background: "#EF4444",
+                        padding: "0.75rem 2rem",
+                      }}
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        setShowLogoutModal(false);
+                        setIsAuthenticated(false);
+                        setUser(null);
+                        setColorTheme("default");
+                        navigate("/");
+                        sessionStorage.removeItem("tempSession");
+                        localStorage.removeItem("rememberMe");
+                        setShowLanding(true);
+                      }}
+                    >
+                      {t("logout")}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <ChatbotWidget />
-          <MobileBottomNav />
-          <ToastContainer />
-        </div>
+            )}
+            <ChatbotWidget />
+            <MobileBottomNav />
+          </div>
+        )}
+        <ToastContainer />
       </AppContext.Provider>
     </LanguageContext.Provider>
   );

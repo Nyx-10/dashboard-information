@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Megaphone,
   PackageSearch,
-  AlertCircle,
-  PackageCheck,
-  CheckCircle2,
   PlusCircle,
   Search,
   ArrowRight,
@@ -14,15 +11,19 @@ import {
   X,
   MessageSquare,
   Share2,
+  Lock,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
+import { AppContext } from "../context/AppContext";
 import { ItemCardCompact } from "../components/ItemCardCompact";
 import { supabase } from "../supabaseClient";
 
 export function DashboardView({ onContact, currentUser }) {
   const { lang, t } = useContext(LanguageContext);
+  const { requireAuth } = useContext(AppContext) || {};
   const navigate = useNavigate();
   const isMs = lang === "ms";
+  const isGuest = !currentUser;
 
   const normalizedRole = currentUser?.role
     ? currentUser.role.toLowerCase().replace(/\s+/g, "")
@@ -34,12 +35,6 @@ export function DashboardView({ onContact, currentUser }) {
   const [loading, setLoading] = useState(true);
   const [reportFilter, setReportFilter] = useState("all"); // 'all' | 'lost' | 'found'
   const [selectedItem, setSelectedItem] = useState(null);
-  const [stats, setStats] = useState({
-    lostCount: 0,
-    foundCount: 0,
-    infoCount: 0,
-    resolvedCount: 0,
-  });
 
   useEffect(() => {
     fetchItems(true);
@@ -64,14 +59,7 @@ export function DashboardView({ onContact, currentUser }) {
     try {
       if (showLoading) setLoading(true);
 
-      const [
-        infoRes,
-        reportRes,
-        lostCountRes,
-        foundCountRes,
-        infoCountRes,
-        resolvedCountRes,
-      ] = await Promise.all([
+      const [infoRes, reportRes] = await Promise.all([
         supabase
           .from("items")
           .select("*")
@@ -88,28 +76,6 @@ export function DashboardView({ onContact, currentUser }) {
           .neq("type", "info")
           .order("created_at", { ascending: false })
           .limit(12),
-        supabase
-          .from("items")
-          .select("*", { count: "exact", head: true })
-          .neq("status", "deleted")
-          .neq("status", "resolved")
-          .eq("type", "lost"),
-        supabase
-          .from("items")
-          .select("*", { count: "exact", head: true })
-          .neq("status", "deleted")
-          .neq("status", "resolved")
-          .eq("type", "found"),
-        supabase
-          .from("items")
-          .select("*", { count: "exact", head: true })
-          .neq("status", "deleted")
-          .neq("status", "resolved")
-          .eq("type", "info"),
-        supabase
-          .from("items")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "resolved"),
       ]);
 
       if (infoRes.error) throw infoRes.error;
@@ -118,13 +84,6 @@ export function DashboardView({ onContact, currentUser }) {
       if (infoRes.data && reportRes.data) {
         setItems([...infoRes.data, ...reportRes.data]);
       }
-
-      setStats({
-        lostCount: lostCountRes.count || 0,
-        foundCount: foundCountRes.count || 0,
-        infoCount: infoCountRes.count || 0,
-        resolvedCount: resolvedCountRes.count || 0,
-      });
     } catch (error) {
       console.error("Error fetching items:", error.message);
     } finally {
@@ -351,7 +310,28 @@ export function DashboardView({ onContact, currentUser }) {
           borderLeft: "4px solid var(--primary)",
         }}
       >
-        <div>
+        <div style={{ flex: "1 1 320px" }}>
+          {isGuest && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                padding: "0.2rem 0.65rem",
+                borderRadius: "999px",
+                background: "rgba(99, 102, 241, 0.14)",
+                color: "var(--primary)",
+                border: "1px solid rgba(99, 102, 241, 0.3)",
+                marginBottom: "0.45rem",
+              }}
+            >
+              {t("guestModeBadge")}
+            </span>
+          )}
           <h1
             style={{
               fontSize: "1.35rem",
@@ -360,19 +340,29 @@ export function DashboardView({ onContact, currentUser }) {
               marginBottom: "0.2rem",
             }}
           >
-            {isMs
-              ? `Selamat Kembali, ${userName} 👋`
-              : `Welcome Back, ${userName} 👋`}
+            {isGuest
+              ? t("guestWelcomeTitle")
+              : isMs
+                ? `Selamat Kembali, ${userName} 👋`
+                : `Welcome Back, ${userName} 👋`}
           </h1>
           <p style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>
-            {t("welcomeBack")}
+            {isGuest ? t("guestWelcomeDesc") : t("welcomeBack")}
           </p>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem" }}>
           <button
             className="btn-primary"
-            onClick={() => navigate("/add")}
+            onClick={() => {
+              if (isGuest && requireAuth) {
+                requireAuth("/add", t("loginRequiredToReport"), {
+                  reason: "report",
+                });
+              } else {
+                navigate("/add");
+              }
+            }}
             style={{
               padding: "0.6rem 1.1rem",
               fontSize: "0.85rem",
@@ -382,6 +372,7 @@ export function DashboardView({ onContact, currentUser }) {
           >
             <PlusCircle size={17} />
             <span>{isMs ? "Lapor Barang / Info" : "Report Item / Info"}</span>
+            {isGuest && <Lock size={14} style={{ opacity: 0.85 }} />}
           </button>
 
           <button
@@ -403,236 +394,7 @@ export function DashboardView({ onContact, currentUser }) {
         </div>
       </div>
 
-      {/* 2. BAR RINGKASAN STATISTIK SEMASA (4 KAD KPI INTERAKTIF) */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "1rem",
-        }}
-      >
-        <div
-          className="glass-panel"
-          onClick={() => {
-            setReportFilter("lost");
-            document
-              .getElementById("section-reports")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-          style={{
-            padding: "1.1rem 1.25rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-            borderBottom: "3px solid #EF4444",
-          }}
-        >
-          <div>
-            <span
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {t("lostItems")}
-            </span>
-            <div
-              style={{
-                fontSize: "1.85rem",
-                fontWeight: 800,
-                color: "#EF4444",
-                lineHeight: 1.2,
-                marginTop: "0.15rem",
-              }}
-            >
-              {stats.lostCount}
-            </div>
-          </div>
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "0.75rem",
-              background: "rgba(239, 68, 68, 0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#EF4444",
-            }}
-          >
-            <AlertCircle size={22} />
-          </div>
-        </div>
-
-        <div
-          className="glass-panel"
-          onClick={() => {
-            setReportFilter("found");
-            document
-              .getElementById("section-reports")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-          style={{
-            padding: "1.1rem 1.25rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-            borderBottom: "3px solid #10B981",
-          }}
-        >
-          <div>
-            <span
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {t("foundItems")}
-            </span>
-            <div
-              style={{
-                fontSize: "1.85rem",
-                fontWeight: 800,
-                color: "#10B981",
-                lineHeight: 1.2,
-                marginTop: "0.15rem",
-              }}
-            >
-              {stats.foundCount}
-            </div>
-          </div>
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "0.75rem",
-              background: "rgba(16, 185, 129, 0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#10B981",
-            }}
-          >
-            <PackageCheck size={22} />
-          </div>
-        </div>
-
-        <div
-          className="glass-panel"
-          onClick={() => {
-            document
-              .getElementById("section-info")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-          style={{
-            padding: "1.1rem 1.25rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-            borderBottom: "3px solid #3B82F6",
-          }}
-        >
-          <div>
-            <span
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {t("infoOnly")}
-            </span>
-            <div
-              style={{
-                fontSize: "1.85rem",
-                fontWeight: 800,
-                color: "#3B82F6",
-                lineHeight: 1.2,
-                marginTop: "0.15rem",
-              }}
-            >
-              {stats.infoCount}
-            </div>
-          </div>
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "0.75rem",
-              background: "rgba(59, 130, 246, 0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#3B82F6",
-            }}
-          >
-            <Megaphone size={22} />
-          </div>
-        </div>
-
-        <div
-          className="glass-panel"
-          style={{
-            padding: "1.1rem 1.25rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottom: "3px solid #6366F1",
-          }}
-        >
-          <div>
-            <span
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {isMs ? "Selesai Dipulangkan" : "Resolved Items"}
-            </span>
-            <div
-              style={{
-                fontSize: "1.85rem",
-                fontWeight: 800,
-                color: "#6366F1",
-                lineHeight: 1.2,
-                marginTop: "0.15rem",
-              }}
-            >
-              {stats.resolvedCount}
-            </div>
-          </div>
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "0.75rem",
-              background: "rgba(99, 102, 241, 0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#6366F1",
-            }}
-          >
-            <CheckCircle2 size={22} />
-          </div>
-        </div>
-      </div>
-
-      {/* 3. KANDUNGAN UTAMA */}
+      {/* 2. KANDUNGAN UTAMA */}
       {loading ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
           <div>
@@ -1136,8 +898,9 @@ export function DashboardView({ onContact, currentUser }) {
                 </button>
 
                 {selectedItem.type !== "info" &&
-                  currentUser?.id &&
-                  selectedItem.created_by !== currentUser.id && (
+                  selectedItem.created_by &&
+                  (!currentUser?.id ||
+                    selectedItem.created_by !== currentUser.id) && (
                     <button
                       className="btn-primary"
                       onClick={() => {

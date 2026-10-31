@@ -11,6 +11,9 @@ import {
   Bot,
   Sparkles,
   X,
+  Lock,
+  LogIn,
+  Home,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
@@ -19,6 +22,10 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { t } = useContext(LanguageContext);
   const {
     user,
+    isAuthenticated,
+    requireAuth,
+    goToLogin,
+    goToLanding,
     setActiveChatUser,
     totalUnreadMessages,
     isChatbotOpen,
@@ -33,14 +40,28 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
     return location.pathname.startsWith(path);
   };
 
+  const closeMobileSidebar = () => {
+    if (window.innerWidth <= 768 && setSidebarOpen) {
+      setSidebarOpen(false);
+    }
+  };
+
   const handleNav = (path, isMessage = false) => {
+    closeMobileSidebar();
+    if (path === "/add" && !isAuthenticated && requireAuth) {
+      requireAuth("/add", t("loginRequiredToReport"), { reason: "report" });
+      return;
+    }
+    if (path === "/messages" && !isAuthenticated && requireAuth) {
+      requireAuth("/messages", t("loginRequiredForMessages"), {
+        reason: "messages",
+      });
+      return;
+    }
     if (isMessage) {
       setActiveChatUser(null);
     }
     navigate(path);
-    if (window.innerWidth <= 768 && setSidebarOpen) {
-      setSidebarOpen(false);
-    }
   };
 
   return (
@@ -99,7 +120,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
             className={`nav-link w-full text-left ${isActive("/add") ? "active" : ""}`}
             onClick={() => handleNav("/add")}
           >
-            <PlusCircle size={20} /> {t("missingItem")}
+            <PlusCircle size={20} />
+            <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
+              {t("missingItem")}
+            </span>
+            {!isAuthenticated && (
+              <Lock size={14} style={{ opacity: 0.65, flexShrink: 0 }} />
+            )}
           </button>
           <button
             className={`nav-link w-full text-left ${isActive("/messages") ? "active" : ""}`}
@@ -107,25 +134,29 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
           >
             <MessageSquare size={20} />
             <span style={{ flex: 1 }}>{t("messages")}</span>
-            {totalUnreadMessages > 0 && (
-              <span
-                className="unread-badge-pulse"
-                style={{
-                  background: "#EF4444",
-                  color: "white",
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  minWidth: "18px",
-                  height: "18px",
-                  borderRadius: "9px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 5px",
-                }}
-              >
-                {totalUnreadMessages}
-              </span>
+            {!isAuthenticated ? (
+              <Lock size={14} style={{ opacity: 0.65, flexShrink: 0 }} />
+            ) : (
+              totalUnreadMessages > 0 && (
+                <span
+                  className="unread-badge-pulse"
+                  style={{
+                    background: "#EF4444",
+                    color: "white",
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    minWidth: "18px",
+                    height: "18px",
+                    borderRadius: "9px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 5px",
+                  }}
+                >
+                  {totalUnreadMessages}
+                </span>
+              )
             )}
           </button>
 
@@ -195,6 +226,86 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </>
           )}
         </nav>
+
+        {!isAuthenticated && (
+          <div
+            style={{
+              marginTop: "1rem",
+              padding: "1rem",
+              borderRadius: "0.85rem",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.65rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.45rem",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "var(--primary)",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              <Lock size={13} />
+              <span>{t("guestModeBadge")}</span>
+            </div>
+            <p
+              style={{
+                fontSize: "0.78rem",
+                color: "var(--text-muted)",
+                lineHeight: 1.45,
+                whiteSpace: "normal",
+              }}
+            >
+              {t("guestSidebarDesc")}
+            </p>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                closeMobileSidebar();
+                if (goToLogin) goToLogin();
+              }}
+              style={{
+                width: "100%",
+                padding: "0.55rem 0.75rem",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+                borderRadius: "0.55rem",
+              }}
+            >
+              <LogIn size={15} />
+              <span>
+                {t("loginBtn")} / {t("signUpBtn")}
+              </span>
+            </button>
+            <button
+              onClick={() => {
+                closeMobileSidebar();
+                if (goToLanding) goToLanding();
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.35rem",
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                color: "var(--text-muted)",
+                padding: "0.2rem",
+                cursor: "pointer",
+              }}
+            >
+              <Home size={13} />
+              <span>{t("backToIntro")}</span>
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );

@@ -267,7 +267,9 @@ export function ItemCardCompact({
               </button>
             </div>
 
-            {((!isInfo && currentUserId && item.created_by !== currentUserId) ||
+            {((!isInfo &&
+              item.created_by &&
+              (!currentUserId || item.created_by !== currentUserId)) ||
               (onDelete &&
                 currentUser &&
                 (item.created_by === currentUser.id ||
@@ -279,8 +281,8 @@ export function ItemCardCompact({
                 onClick={(e) => e.stopPropagation()}
               >
                 {!isInfo &&
-                  currentUserId &&
-                  item.created_by !== currentUserId && (
+                  item.created_by &&
+                  (!currentUserId || item.created_by !== currentUserId) && (
                     <button
                       className="btn-primary"
                       style={{
@@ -497,8 +499,8 @@ export function ItemCardCompact({
         </div>
 
         {item.type !== "info" &&
-          currentUserId &&
-          item.created_by !== currentUserId && (
+          item.created_by &&
+          (!currentUserId || item.created_by !== currentUserId) && (
             <button
               className="btn-primary"
               style={{
