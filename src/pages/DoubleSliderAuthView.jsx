@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { LanguageContext } from "../context/LanguageContext";
 import { Eye, EyeOff, ArrowLeft, Lock } from "lucide-react";
 import { supabase } from "../supabaseClient";
@@ -62,6 +62,10 @@ export function DoubleSliderAuthView({
   const [isRightPanelActive, setIsRightPanelActive] = useState(
     initialMode === "signup",
   );
+
+  useEffect(() => {
+    setIsRightPanelActive(initialMode === "signup");
+  }, [initialMode]);
 
   // Login State
   const [loginEmail, setLoginEmail] = useState("");

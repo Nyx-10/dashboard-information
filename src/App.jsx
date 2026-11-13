@@ -623,25 +623,12 @@ export default function App() {
               navigate("/login");
             }}
           />
-        ) : showLanding && !isAuthenticated ? (
-          <LandingPage
-            onExploreDashboard={() => {
-              setShowLanding(false);
-              navigate("/home");
-            }}
-            onGetStarted={() => {
-              setShowLanding(false);
-              setAuthMode("login");
-              navigate("/login", {
-                state: { from: "/home", source: "landing" },
-              });
-            }}
-          />
         ) : isLoginRoute ? (
           authMode === "forgot-password" ? (
             <ForgotPasswordView onSwitchBack={() => setAuthMode("login")} />
           ) : (
             <DoubleSliderAuthView
+              key={authMode}
               initialMode={authMode === "signup" ? "signup" : "login"}
               onLogin={handleAuthSuccess}
               onSignup={handleAuthSuccess}
@@ -661,6 +648,20 @@ export default function App() {
               onMaintenanceMode={() => setShowMaintenanceScreen(true)}
             />
           )
+        ) : showLanding && !isAuthenticated ? (
+          <LandingPage
+            onExploreDashboard={() => {
+              setShowLanding(false);
+              navigate("/home");
+            }}
+            onGetStarted={() => {
+              setShowLanding(false);
+              setAuthMode("login");
+              navigate("/login", {
+                state: { from: "/home", source: "landing" },
+              });
+            }}
+          />
         ) : (
           <div className="app-container" data-color={colorTheme}>
             {/* Sidebar */}

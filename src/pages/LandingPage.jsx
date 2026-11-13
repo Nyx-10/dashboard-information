@@ -27,6 +27,7 @@ import {
   Tag,
   LayoutDashboard,
   LogIn,
+  QrCode,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { supabase } from "../supabaseClient";
@@ -400,13 +401,13 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
               </span>
               <ArrowRight size={18} />
             </button>
-            <button className="landing-btn-secondary" onClick={onGetStarted}>
+            <button
+              type="button"
+              className="landing-btn-secondary"
+              onClick={onGetStarted}
+            >
               <LogIn size={18} />
-              <span>
-                {isMs
-                  ? "Log Masuk / Lapor Barang"
-                  : "Sign In / Report Item"}
-              </span>
+              <span>{isMs ? "Log Masuk" : "Sign In"}</span>
             </button>
           </div>
 
@@ -1205,6 +1206,36 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
                   : "Live Database Connected"}
               </span>
             </div>
+            <a
+              href="/qr-preview.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                color: "#94a3b8",
+                fontSize: "13px",
+                textDecoration: "none",
+                marginTop: "6px",
+                padding: "4px 10px",
+                borderRadius: "8px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#38bdf8";
+                e.currentTarget.style.borderColor = "rgba(56, 189, 248, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#94a3b8";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+              }}
+            >
+              <QrCode size={14} />
+              <span>{isMs ? "Kod QR Laman Web" : "Website QR Code"}</span>
+            </a>
             <p className="landing-footer-copy">
               © {new Date().getFullYear()} ADTEC Melaka.{" "}
               {isMs ? "Hak Cipta Terpelihara." : "All Rights Reserved."}

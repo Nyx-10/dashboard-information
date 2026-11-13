@@ -255,3 +255,46 @@
   box-shadow: none !important;
   transition: none !important;
 }
+
+@media (max-width: 768px) {
+  .ds-container {
+    min-height: 520px;
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .ds-overlay-container {
+    display: none;
+  }
+
+  .ds-form-container {
+    width: 100%;
+  }
+
+  .ds-sign-in-container {
+    width: 100%;
+  }
+
+  .ds-sign-up-container {
+    width: 100%;
+  }
+
+  .ds-container.right-panel-active .ds-sign-in-container {
+    display: none;
+  }
+
+  .ds-container:not(.right-panel-active) .ds-sign-up-container {
+    display: none;
+  }
+
+  .ds-container.right-panel-active .ds-sign-up-container {
+    transform: none;
+    opacity: 1;
+    z-index: 5;
+    animation: none;
+  }
+
+  .mobile-auth-switch {
+    display: block !important;
+  }
+}

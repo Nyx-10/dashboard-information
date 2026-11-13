@@ -544,11 +544,26 @@ export function TvDisplayView() {
 
       {/* 4. FOOTER: PAUTAN LAPORAN & STATUS LANGSUNG */}
       <footer className="tv-footer">
-        <div className="tv-ellipsis">
-          {isMs
-            ? "Jumpa atau hilang barang? Laporkan di "
-            : "Lost or found something? Report it at "}
-          <strong>{reportUrl}</strong>
+        <div className="tv-ellipsis" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <img
+            src="/qr-code.svg"
+            alt="Kod QR Portal"
+            style={{
+              width: "38px",
+              height: "38px",
+              background: "#ffffff",
+              borderRadius: "6px",
+              padding: "2px",
+              flexShrink: 0,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+            }}
+          />
+          <span>
+            {isMs
+              ? "Jumpa atau hilang barang? Imbas QR atau layari "
+              : "Lost or found something? Scan QR or visit "}
+            <strong>{reportUrl}</strong>
+          </span>
         </div>
         <div className="tv-live">
           <span className="tv-live-dot" />

@@ -8,7 +8,8 @@
     "dev": "concurrently \"vite --host\" \"node api/index.js\"",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "qr": "node scripts/generate-qr.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -20,6 +21,7 @@
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.28.0",
     "nodemailer": "^10.0.14",
+    "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
