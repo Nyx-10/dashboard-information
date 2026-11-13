@@ -284,6 +284,7 @@ export default function App() {
 
   const goToLogin = (options = {}) => {
     setShowLanding(false);
+    sessionStorage.setItem("showLanding", "false");
     setAuthMode(options.mode || "login");
     navigate("/login", {
       state: {
@@ -656,6 +657,7 @@ export default function App() {
             }}
             onGetStarted={() => {
               setShowLanding(false);
+              sessionStorage.setItem("showLanding", "false");
               setAuthMode("login");
               navigate("/login", {
                 state: { from: "/home", source: "landing" },

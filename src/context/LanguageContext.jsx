@@ -299,7 +299,7 @@ export const dict = {
     loginPromptMessagesBanner:
       "Sign in to your account to access 1-to-1 messages",
     backToDashboard: "Back to Dashboard",
-    exploreDashboardNoLogin: "View Dashboard (No Login)",
+    exploreDashboardNoLogin: "View Dashboard (Guest Mode)",
     viewDashboard: "View Dashboard",
     guestSidebarDesc:
       "Browse all information freely. Sign in to report Lost & Found items.",
@@ -621,7 +621,7 @@ export const dict = {
     loginPromptMessagesBanner:
       "Log masuk ke akaun anda untuk mengakses mesej 1-ke-1",
     backToDashboard: "Kembali ke Dashboard",
-    exploreDashboardNoLogin: "Lihat Dashboard (Tanpa Login)",
+    exploreDashboardNoLogin: "Lihat Dashboard (Mod Tetamu)",
     viewDashboard: "Lihat Dashboard",
     guestSidebarDesc:
       "Semua maklumat boleh dilihat secara bebas. Log masuk untuk lapor Lost & Found.",

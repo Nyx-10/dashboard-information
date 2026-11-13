@@ -391,23 +391,27 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
             className="landing-hero-actions animate-fade-in"
             style={{ animationDelay: "0.3s" }}
           >
-            <button className="landing-btn-primary" onClick={handleExplore}>
+            <button
+              type="button"
+              className="landing-btn-primary"
+              onClick={onGetStarted}
+            >
               <span className="btn-shine"></span>
-              <LayoutDashboard size={19} />
-              <span>
-                {isMs
-                  ? "Lihat Dashboard (Tanpa Login)"
-                  : "View Dashboard (No Login)"}
-              </span>
+              <LogIn size={19} />
+              <span>{isMs ? "Log Masuk" : "Sign In"}</span>
               <ArrowRight size={18} />
             </button>
             <button
               type="button"
               className="landing-btn-secondary"
-              onClick={onGetStarted}
+              onClick={handleExplore}
             >
-              <LogIn size={18} />
-              <span>{isMs ? "Log Masuk" : "Sign In"}</span>
+              <LayoutDashboard size={18} />
+              <span>
+                {isMs
+                  ? "Lihat Dashboard"
+                  : "View Dashboard"}
+              </span>
             </button>
           </div>
 
@@ -1149,27 +1153,29 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
               </p>
               <div className="cta-buttons">
                 <button
+                  type="button"
                   className="landing-btn-primary btn-large"
-                  onClick={handleExplore}
-                >
-                  <span className="btn-shine"></span>
-                  <LayoutDashboard size={20} />
-                  <span>
-                    {isMs
-                      ? "Lihat Dashboard (Tanpa Login)"
-                      : "View Dashboard (No Login)"}
-                  </span>
-                  <ArrowRight size={20} />
-                </button>
-                <button
-                  className="landing-btn-secondary btn-large"
                   onClick={onGetStarted}
                 >
+                  <span className="btn-shine"></span>
                   <LogIn size={20} />
                   <span>
                     {isMs
                       ? "Log Masuk / Daftar Akaun"
                       : "Sign In / Register Account"}
+                  </span>
+                  <ArrowRight size={20} />
+                </button>
+                <button
+                  type="button"
+                  className="landing-btn-secondary btn-large"
+                  onClick={handleExplore}
+                >
+                  <LayoutDashboard size={20} />
+                  <span>
+                    {isMs
+                      ? "Lihat Dashboard"
+                      : "View Dashboard"}
                   </span>
                 </button>
               </div>
