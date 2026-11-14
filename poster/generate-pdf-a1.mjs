@@ -112,55 +112,57 @@ doc.addImage(bannerLogoBase64, 'JPEG', bx, by, bannerW, bannerH);
 // Institusi Pill Badge
 setFill(C.bgCardInner);
 setStroke(C.indigoLight, 0.4);
-doc.roundedRect(W / 2 - 105, hy + 40, 210, 9, 4, 4, 'FD');
-setText(C.cyan, 11, 'bold');
-doc.text('PUSAT LATIHAN TEKNOLOGI TINGGI (ADTEC) MELAKA', W / 2, hy + 46.2, { align: 'center' });
+doc.roundedRect(W / 2 - 118, hy + 39, 236, 10, 4, 4, 'FD');
+setText(C.cyan, 12.5, 'bold');
+doc.text('PUSAT LATIHAN TEKNOLOGI TINGGI (ADTEC) MELAKA', W / 2, hy + 45.8, { align: 'center' });
 
 // Tajuk Utama Poster
-setText(C.white, 36, 'bold');
-doc.text('DASHBOARD ADTEC MELAKA', W / 2, hy + 60.5, { align: 'center' });
+setText(C.white, 42, 'bold');
+doc.text('DASHBOARD ADTEC MELAKA', W / 2, hy + 61, { align: 'center' });
 
 // Subtajuk
-setText(C.textSec, 15, 'bold');
-doc.text('Hab Maklumat Digital & Sistem Lost & Found Pintar Berasaskan AI', W / 2, hy + 69.5, { align: 'center' });
+setText(C.textSec, 17, 'bold');
+doc.text('Hab Maklumat Digital & Sistem Lost & Found Pintar Berasaskan AI', W / 2, hy + 71, { align: 'center' });
 
 // Garis Pemisah
 setStroke(C.borderCard, 0.4);
-doc.line(hx + 16, hy + 75.5, hx + hw - 16, hy + 75.5);
+doc.line(hx + 16, hy + 77, hx + hw - 16, hy + 77);
 
 // AHLI KUMPULAN BERGAMBAR & PENYELIA (ATAS SEKALI)
-const ty = hy + 80, th = 55;
+const ty = hy + 81, th = 54;
 
 // Kad 1: Ahli Kumpulan Berserta Gambar (Lebar: 372mm)
 const t1x = hx + 8, t1w = 372;
 setFill(C.bgCardInner);
 setStroke(C.indigoLight, 0.45);
 doc.roundedRect(t1x, ty, t1w, th, 4, 4, 'FD');
-setText(C.cyan, 10.5, 'bold');
+setText(C.cyan, 12, 'bold');
 doc.text('AHLI KUMPULAN PROJEK', t1x + 8, ty + 7.5);
 
 const slotW = (t1w - 20) / 3; // 117.3mm
 const memberData = [
-  { img: member1Base64, name: 'MUHAMMAD ADAM DARWISH BIN NOR HAIDIL' },
-  { img: member2Base64, name: 'HAZIM AFIQ BIN RAZALI' },
-  { img: member3Base64, name: 'MUHAMMAD SYAHMI BIN YAZMIN' },
+  { img: member1Base64, name: 'MUHAMMAD ADAM DARWISH BIN NOR HAIDIL', ndp: '16126091' },
+  { img: member2Base64, name: 'HAZIM AFIQ BIN RAZALI', ndp: '16126053' },
+  { img: member3Base64, name: 'MUHAMMAD SYAHMI BIN YAZMIN', ndp: '16126004' },
 ];
 
 memberData.forEach((m, idx) => {
   const sx = t1x + 6 + idx * (slotW + 4);
   setFill([15, 23, 42]);
   setStroke(C.borderSubtle, 0.4);
-  doc.roundedRect(sx, ty + 10.5, slotW, 40, 3, 3, 'FD');
+  doc.roundedRect(sx, ty + 10.5, slotW, 39, 3, 3, 'FD');
 
   // Gambar Ahli
-  doc.addImage(m.img, 'JPEG', sx + 3.5, ty + 13, 24, 32);
+  doc.addImage(m.img, 'JPEG', sx + 3.5, ty + 12.5, 24, 32);
   setStroke(C.cyan, 0.5);
-  doc.roundedRect(sx + 3.5, ty + 13, 24, 32, 1.5, 1.5, 'S');
+  doc.roundedRect(sx + 3.5, ty + 12.5, 24, 32, 1.5, 1.5, 'S');
 
   // Nama Ahli
-  drawWrappedText(m.name, sx + 31, ty + 19, slotW - 34, 9.6, C.white, 'bold', 1.25);
-  setText(C.cyan, 8.8, 'bold');
-  doc.text('Pelajar TVET', sx + 31, ty + 46);
+  drawWrappedText(m.name, sx + 30, ty + 16.5, slotW - 32, 10.5, C.white, 'bold', 1.2);
+  setText(C.amber, 10, 'bold');
+  doc.text('NDP: ' + m.ndp, sx + 30, ty + 37.5);
+  setText(C.cyan, 9.5, 'bold');
+  doc.text('Pelajar TVET', sx + 30, ty + 43.5);
 });
 
 // Kad 2: Penyelia Projek & Institusi (Lebar: 164mm)
@@ -170,24 +172,24 @@ setStroke(C.indigoLight, 0.45);
 doc.roundedRect(t2x, ty, t2w, th, 4, 4, 'FD');
 
 // Blok Penyelia
-setText(C.cyan, 10.5, 'bold');
+setText(C.cyan, 12, 'bold');
 doc.text('PENYELIA PROJEK', t2x + 8, ty + 7.5);
-setText(C.white, 12.5, 'bold');
-doc.text('Encik Nik Mohd Fairus Bin Ismail', t2x + 8, ty + 17);
-setText(C.textMuted, 10, 'normal');
+setText(C.white, 15, 'bold');
+doc.text('Encik Nik Mohd Fairus Bin Ismail', t2x + 8, ty + 17.5);
+setText(C.textMuted, 11.5, 'normal');
 doc.text('Pensyarah Pembimbing ADTEC Melaka', t2x + 8, ty + 24.5);
 
 // Divider
 setStroke(C.borderSubtle, 0.4);
-doc.line(t2x + 8, ty + 29, t2x + t2w - 8, ty + 29);
+doc.line(t2x + 8, ty + 28.5, t2x + t2w - 8, ty + 28.5);
 
 // Blok Institusi
-setText(C.cyan, 10.5, 'bold');
-doc.text('INSTITUSI & SESI', t2x + 8, ty + 37);
-setText(C.white, 12.5, 'bold');
-doc.text('ADTEC Melaka', t2x + 8, ty + 47);
-setText(C.textMuted, 10, 'normal');
-doc.text('Inovasi Digital TVET • Sesi 2026', t2x + 44, ty + 47);
+setText(C.cyan, 12, 'bold');
+doc.text('INSTITUSI & SESI', t2x + 8, ty + 36.5);
+setText(C.white, 15, 'bold');
+doc.text('ADTEC Melaka', t2x + 8, ty + 46.5);
+setText(C.textMuted, 11.5, 'normal');
+doc.text('Inovasi Digital TVET • Sesi 2026', t2x + 48, ty + 46.5);
 
 // ============================================================================
 // 2. BARIS 1: MASALAH VS PENYELESAIAN (y = 170mm, h = 132mm)
@@ -208,12 +210,12 @@ doc.roundedRect(c1x, r1y, cardW, 2.5, 2, 2, 'F');
 // Tajuk Seksyen Cabaran
 setFill(C.bgCardInner);
 setStroke(C.rose, 0.4);
-doc.roundedRect(c1x + 10, r1y + 9, 12, 12, 3, 3, 'FD');
-setText(C.rose, 14, 'bold');
-doc.text('!', c1x + 16, r1y + 18, { align: 'center' });
+doc.roundedRect(c1x + 10, r1y + 9, 13, 13, 3, 3, 'FD');
+setText(C.rose, 16, 'bold');
+doc.text('!', c1x + 16.5, r1y + 19, { align: 'center' });
 
-setText(C.rose, 17.5, 'bold');
-doc.text('CABARAN & ISU SEMASA', c1x + 28, r1y + 18);
+setText(C.rose, 21, 'bold');
+doc.text('CABARAN & ISU SEMASA', c1x + 29, r1y + 19);
 
 const problems = [
   { t: 'Hebahan Terlepas Pandang:', d: 'Maklumat rasmi kolej di WhatsApp cepat tenggelam dan poster kertas mudah koyak atau tercicir.' },
@@ -221,16 +223,16 @@ const problems = [
   { t: 'Ketirisan Privasi Pelajar:', d: 'Perkongsian nombor telefon peribadi secara terbuka di grup awam mendedahkan pelajar kepada risiko scam.' },
 ];
 
-let py = r1y + 33;
+let py = r1y + 34;
 problems.forEach((p) => {
-  setText(C.rose, 14, 'bold');
+  setText(C.rose, 16, 'bold');
   doc.text('x', c1x + 12, py);
 
-  setText(C.white, 13, 'bold');
+  setText(C.white, 15, 'bold');
   doc.text(p.t, c1x + 20, py);
 
-  py = drawWrappedText(p.d, c1x + 20, py + 6, cardW - 32, 11.5, C.textSec, 'normal', 1.35);
-  py += 7.5;
+  py = drawWrappedText(p.d, c1x + 20, py + 6.5, cardW - 32, 13, C.textSec, 'normal', 1.35);
+  py += 8;
 });
 
 // Kad Kanan: Penyelesaian Digital Pintar
@@ -246,12 +248,12 @@ doc.roundedRect(c2x, r1y, cardW, 2.5, 2, 2, 'F');
 // Tajuk Seksyen Penyelesaian
 setFill(C.bgCardInner);
 setStroke(C.emerald, 0.4);
-doc.roundedRect(c2x + 10, r1y + 9, 12, 12, 3, 3, 'FD');
-setText(C.emerald, 13, 'bold');
-doc.text('OK', c2x + 16, r1y + 18, { align: 'center' });
+doc.roundedRect(c2x + 10, r1y + 9, 13, 13, 3, 3, 'FD');
+setText(C.emerald, 15, 'bold');
+doc.text('OK', c2x + 16.5, r1y + 19, { align: 'center' });
 
-setText(C.emerald, 17.5, 'bold');
-doc.text('PENYELESAIAN DIGITAL PINTAR', c2x + 28, r1y + 18);
+setText(C.emerald, 21, 'bold');
+doc.text('PENYELESAIAN DIGITAL PINTAR', c2x + 29, r1y + 19);
 
 const solutions = [
   { t: 'Hab Digital Berpusat:', d: 'Pengumuman rasmi diurus secara sistematik dan dipaparkan di telefon pintar serta skrin TV Kiosk kolej.' },
@@ -259,16 +261,16 @@ const solutions = [
   { t: 'Sembang Selamat & Tertutup:', d: 'Komunikasi tertutup secara terus dalam portal tanpa perlu berkongsi nombor telefon peribadi.' },
 ];
 
-let sy = r1y + 33;
+let sy = r1y + 34;
 solutions.forEach((s) => {
-  setText(C.emerald, 14, 'bold');
+  setText(C.emerald, 16, 'bold');
   doc.text('V', c2x + 12, sy);
 
-  setText(C.white, 13, 'bold');
+  setText(C.white, 15, 'bold');
   doc.text(s.t, c2x + 20, sy);
 
-  sy = drawWrappedText(s.d, c2x + 20, sy + 6, cardW - 32, 11.5, C.textSec, 'normal', 1.35);
-  sy += 7.5;
+  sy = drawWrappedText(s.d, c2x + 20, sy + 6.5, cardW - 32, 13, C.textSec, 'normal', 1.35);
+  sy += 8;
 });
 
 // ============================================================================
@@ -313,20 +315,20 @@ pillars.forEach((p, idx) => {
   // Ikon Kotak
   setFill(C.bgCardInner);
   setStroke(p.color, 0.4);
-  doc.roundedRect(hx + 8, fy + 8, 16, 16, 3, 3, 'FD');
-  setText(p.color, 15, 'bold');
-  doc.text(p.num, hx + 16, fy + 19.5, { align: 'center' });
+  doc.roundedRect(hx + 8, fy + 8, 17, 17, 3, 3, 'FD');
+  setText(p.color, 16, 'bold');
+  doc.text(p.num, hx + 16.5, fy + 20.5, { align: 'center' });
 
   // Tajuk Ciri
-  setText(C.white, 15.5, 'bold');
-  doc.text(p.title, hx + 30, fy + 16);
+  setText(C.white, 17.5, 'bold');
+  doc.text(p.title, hx + 31, fy + 16.5);
 
   // Badge Kanan
-  setText(p.color, 10.5, 'bold');
-  doc.text(p.badge, hx + featW - 10, fy + 16, { align: 'right' });
+  setText(p.color, 12, 'bold');
+  doc.text(p.badge, hx + featW - 10, fy + 16.5, { align: 'right' });
 
   // Penerangan
-  drawWrappedText(p.desc, hx + 10, fy + 30, featW - 20, 11.2, C.textSec, 'normal', 1.35);
+  drawWrappedText(p.desc, hx + 10, fy + 30, featW - 20, 12.8, C.textSec, 'normal', 1.35);
 });
 
 // GAMBAR WEBSITE PROJEK / BROWSER MOCKUP (KANAN)
@@ -352,7 +354,7 @@ doc.circle(mockX + 26, r2y + 11.5, 2.4, 'F');
 setFill(C.bgCardInner);
 setStroke(C.cyan, 0.4);
 doc.roundedRect(mockX + 34, r2y + 6.5, mockW - 46, 10, 2.5, 2.5, 'FD');
-setText(C.cyan, 9.6, 'bold');
+setText(C.cyan, 11, 'bold');
 doc.text('https://dashboard-information-nu.vercel.app', mockX + 34 + (mockW - 46) / 2, r2y + 13.5, { align: 'center' });
 
 // Masukkan Tangkapan Skrin Sebenar Web Projek
@@ -361,9 +363,9 @@ const imgH = 158;
 doc.addImage(webPreviewBase64, 'PNG', mockX + 6, r2y + 22, imgW, imgH);
 
 // Kapsyen Bawah Mockup
-setText(C.white, 11.5, 'bold');
+setText(C.white, 13.5, 'bold');
 doc.text('Paparan Antaramuka Laman Web Sebenar Sistem', mockX + 8, r2y + r2h - 7);
-setText(C.cyan, 10.5, 'bold');
+setText(C.cyan, 12.5, 'bold');
 doc.text('Akses Responsif Web & PWA', mockX + mockW - 8, r2y + r2h - 7, { align: 'right' });
 
 // ============================================================================
@@ -383,8 +385,8 @@ setFill(C.indigo);
 doc.roundedRect(hx, r3y, metW, 2.5, 2, 2, 'F');
 
 // Tajuk Metrik
-setText(C.white, 17.5, 'bold');
-doc.text('KELEBIHAN UTAMA & NILAI TAMBAH', hx + 16, r3y + 19);
+setText(C.white, 21, 'bold');
+doc.text('KELEBIHAN UTAMA & NILAI TAMBAH', hx + 16, r3y + 20);
 
 const stats = [
   { h: '100% Realtime', sub: 'Pangkalan Data Awan', d: 'Dikuasakan Supabase PostgreSQL & WebSockets untuk kemas kini data secara langsung.', c: C.cyan },
@@ -406,13 +408,13 @@ stats.forEach((st, sidx) => {
   setStroke(st.c, 0.4);
   doc.roundedRect(tx, ty, tileW, tileH, 4, 4, 'FD');
 
-  setText(st.c, 15.5, 'bold');
-  doc.text(st.h, tx + 10, ty + 16);
+  setText(st.c, 18, 'bold');
+  doc.text(st.h, tx + 10, ty + 17);
 
-  setText(C.white, 12.5, 'bold');
-  doc.text(st.sub, tx + 10, ty + 26);
+  setText(C.white, 14.5, 'bold');
+  doc.text(st.sub, tx + 10, ty + 28);
 
-  drawWrappedText(st.d, tx + 10, ty + 37, tileW - 18, 10.5, C.textSec, 'normal', 1.35);
+  drawWrappedText(st.d, tx + 10, ty + 39, tileW - 18, 12.2, C.textSec, 'normal', 1.35);
 });
 
 // Kad Kanan: HERO SCAN KOD QR (BESAR & SANGAT JELAS)
@@ -423,9 +425,9 @@ doc.roundedRect(qCardX, r3y, qrCardW, r3h, 6, 6, 'FD');
 
 // Top Accent Pill
 setFill(C.indigo);
-doc.roundedRect(qCardX + qrCardW / 2 - 50, r3y - 6, 100, 13, 6.5, 6.5, 'F');
-setText(C.white, 11, 'bold');
-doc.text('IMBAS UNTUK CUBA', qCardX + qrCardW / 2, r3y + 3, { align: 'center' });
+doc.roundedRect(qCardX + qrCardW / 2 - 55, r3y - 6, 110, 13, 6.5, 6.5, 'F');
+setText(C.white, 12.5, 'bold');
+doc.text('IMBAS UNTUK CUBA', qCardX + qrCardW / 2, r3y + 3.2, { align: 'center' });
 
 // Kotak Putih Kod QR (Sangat Kontras)
 const qrBoxSize = 110;
@@ -456,18 +458,18 @@ for (let r = 0; r < qrN; r++) {
 // URL Badge
 setFill(C.bgCard);
 setStroke(C.cyan, 0.5);
-doc.roundedRect(qCardX + 14, r3y + 142, qrCardW - 28, 16, 4, 4, 'FD');
-setText(C.cyan, 12.5, 'bold');
-doc.text('dashboard-information-nu.vercel.app', qCardX + qrCardW / 2, r3y + 152.5, { align: 'center' });
+doc.roundedRect(qCardX + 14, r3y + 140, qrCardW - 28, 17, 4, 4, 'FD');
+setText(C.cyan, 14.5, 'bold');
+doc.text('dashboard-information-nu.vercel.app', qCardX + qrCardW / 2, r3y + 151.5, { align: 'center' });
 
 // Arahan Scan
-setText(C.white, 15.5, 'bold');
-doc.text('Halakan Kamera Telefon Anda', qCardX + qrCardW / 2, r3y + 176, { align: 'center' });
-doc.text('Untuk Uji Sistem Sekarang', qCardX + qrCardW / 2, r3y + 185, { align: 'center' });
+setText(C.white, 18.5, 'bold');
+doc.text('Halakan Kamera Telefon Anda', qCardX + qrCardW / 2, r3y + 175, { align: 'center' });
+doc.text('Untuk Uji Sistem Sekarang', qCardX + qrCardW / 2, r3y + 185.5, { align: 'center' });
 
-setText(C.textMuted, 11.5, 'normal');
-doc.text('Akses serta-merta tanpa perlu memasang sebarang aplikasi.', qCardX + qrCardW / 2, r3y + 201, { align: 'center' });
-doc.text('Boleh dicuba sebagai Pelawat (Guest Mode).', qCardX + qrCardW / 2, r3y + 209, { align: 'center' });
+setText(C.textMuted, 13, 'normal');
+doc.text('Akses serta-merta tanpa perlu memasang sebarang aplikasi.', qCardX + qrCardW / 2, r3y + 202, { align: 'center' });
+doc.text('Boleh dicuba sebagai Pelawat (Guest Mode).', qCardX + qrCardW / 2, r3y + 211, { align: 'center' });
 
 // ============================================================================
 // 5. FOOTER POSTER (y = 796mm, h = 22mm)
@@ -477,7 +479,7 @@ setFill(C.bgCard);
 setStroke(C.indigo, 0.5);
 doc.roundedRect(hx, fy, hw, fh, 4, 4, 'FD');
 
-setText(C.textSec, 12, 'normal');
+setText(C.textSec, 13.5, 'normal');
 doc.text(
   'PUSAT LATIHAN TEKNOLOGI TINGGI (ADTEC) MELAKA (PROTON INSTITUTE)  •  Bandar Vendor, Taboh Naning, 78000 Alor Gajah, Melaka  •  Tel: 06-552 7227',
   W / 2,

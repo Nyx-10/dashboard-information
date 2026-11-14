@@ -87,6 +87,8 @@ const htmlContent = `<!DOCTYPE html>
       --text-sub: #334155;
       --text-muted: #64748b;
 
+      --amber: #d97706;
+
       --primary-glow: rgba(99, 102, 241, 0.1);
     }
 
@@ -288,27 +290,27 @@ const htmlContent = `<!DOCTYPE html>
 
     .inst-badge {
       display: inline-block;
-      padding: 7px 22px;
+      padding: 9px 28px;
       border-radius: 9999px;
       background: var(--bg-card-inner);
-      border: 1px solid var(--border-card);
+      border: 1.5px solid var(--border-card);
       color: var(--cyan);
-      font-size: 21px;
+      font-size: 25px;
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .poster-main-title {
-      font-size: 72px;
+      font-size: 86px;
       font-weight: 900;
       letter-spacing: -1.5px;
       line-height: 1.15;
       background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     [data-poster-theme="light"] .poster-main-title {
@@ -318,8 +320,8 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .poster-subtitle {
-      font-size: 27px;
-      font-weight: 600;
+      font-size: 33px;
+      font-weight: 700;
       color: var(--text-sub);
     }
 
@@ -327,9 +329,9 @@ const htmlContent = `<!DOCTYPE html>
     .header-team-grid {
       display: grid;
       grid-template-columns: 2.15fr 1fr;
-      gap: 18px;
-      margin-top: 20px;
-      padding-top: 18px;
+      gap: 20px;
+      margin-top: 22px;
+      padding-top: 20px;
       border-top: 1px solid var(--border-subtle);
       align-items: stretch;
     }
@@ -338,15 +340,15 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--bg-card-inner);
       border: 1px solid var(--border-card);
       border-radius: 20px;
-      padding: 16px 20px;
+      padding: 18px 22px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     }
 
     .team-label {
-      font-size: 16.5px;
+      font-size: 20px;
       font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -359,23 +361,23 @@ const htmlContent = `<!DOCTYPE html>
     .members-cards-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
+      gap: 14px;
     }
 
     .member-profile-card {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 10px 12px;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px 14px;
     }
 
     .member-avatar {
-      width: 66px;
-      height: 82px;
-      border-radius: 10px;
+      width: 72px;
+      height: 90px;
+      border-radius: 12px;
       overflow: hidden;
       border: 2px solid var(--cyan);
       box-shadow: 0 4px 12px rgba(0,0,0,0.35);
@@ -399,15 +401,22 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .member-name {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--text-main);
       line-height: 1.25;
       text-transform: uppercase;
     }
 
+    .member-ndp {
+      font-size: 16px;
+      color: var(--amber);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
     .member-role {
-      font-size: 14px;
+      font-size: 15.5px;
       color: var(--cyan);
       font-weight: 600;
     }
@@ -422,17 +431,17 @@ const htmlContent = `<!DOCTYPE html>
     .sup-block {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
     }
 
     .sup-name {
-      font-size: 21px;
+      font-size: 25px;
       font-weight: 800;
       color: var(--text-main);
     }
 
     .sup-role {
-      font-size: 15.5px;
+      font-size: 18px;
       color: var(--text-muted);
     }
 
@@ -465,7 +474,7 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--bg-card);
       border: 1px solid var(--border-card);
       border-radius: 26px;
-      padding: 28px 34px;
+      padding: 32px 38px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
@@ -475,19 +484,19 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
       border-bottom: 1px solid var(--border-subtle);
     }
 
     .badge-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 28px;
       flex-shrink: 0;
     }
 
@@ -504,7 +513,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .card-title-text {
-      font-size: 29px;
+      font-size: 35px;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
@@ -513,8 +522,8 @@ const htmlContent = `<!DOCTYPE html>
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      font-size: 21.5px;
+      gap: 18px;
+      font-size: 25.5px;
       line-height: 1.5;
       color: var(--text-sub);
     }
@@ -522,12 +531,12 @@ const htmlContent = `<!DOCTYPE html>
     .point-list-simple li {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
+      gap: 14px;
     }
 
     .bullet-tag {
       font-weight: 800;
-      font-size: 21px;
+      font-size: 26px;
       padding-top: 1px;
       flex-shrink: 0;
     }
@@ -553,20 +562,20 @@ const htmlContent = `<!DOCTYPE html>
     .feature-item-card {
       background: var(--bg-card);
       border: 1px solid var(--border-card);
-      border-radius: 20px;
-      padding: 22px 26px;
+      border-radius: 22px;
+      padding: 24px 28px;
       display: flex;
       align-items: flex-start;
-      gap: 18px;
+      gap: 20px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
 
     .feature-icon-box {
-      font-size: 34px;
+      font-size: 38px;
       background: var(--bg-card-inner);
-      width: 58px;
-      height: 58px;
-      border-radius: 15px;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -577,33 +586,33 @@ const htmlContent = `<!DOCTYPE html>
     .feature-info {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .feature-title-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .feature-title-text {
-      font-size: 25px;
+      font-size: 30px;
       font-weight: 800;
       color: var(--text-main);
     }
 
     .feature-tag {
-      font-size: 14px;
+      font-size: 17px;
       font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 6px;
+      padding: 5px 14px;
+      border-radius: 8px;
       background: var(--bg-card-inner);
       border: 1px solid var(--border-subtle);
       color: var(--cyan);
     }
 
     .feature-desc-text {
-      font-size: 20px;
+      font-size: 24px;
       line-height: 1.5;
       color: var(--text-sub);
     }
@@ -649,8 +658,8 @@ const htmlContent = `<!DOCTYPE html>
       background: rgba(30, 41, 59, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 10px;
-      padding: 6px 16px;
-      font-size: 16.5px;
+      padding: 8px 18px;
+      font-size: 19px;
       font-family: 'JetBrains Mono', monospace;
       color: var(--cyan);
       flex: 1;
@@ -676,13 +685,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .mockup-caption-bar {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 18px;
+      font-size: 22px;
       color: var(--text-muted);
-      padding: 0 4px;
+      padding: 0 6px;
     }
 
     .mockup-caption-bar strong {
@@ -707,10 +716,10 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .metrics-title {
-      font-size: 27px;
+      font-size: 34px;
       font-weight: 800;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
@@ -727,14 +736,14 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--bg-card-inner);
       border: 1px solid var(--border-subtle);
       border-radius: 18px;
-      padding: 18px 20px;
+      padding: 20px 22px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
 
     .stat-highlight {
-      font-size: 26px;
+      font-size: 31px;
       font-weight: 900;
       color: var(--cyan);
       display: flex;
@@ -743,13 +752,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .stat-heading {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--text-main);
     }
 
     .stat-text {
-      font-size: 17.5px;
+      font-size: 21px;
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -772,12 +781,12 @@ const htmlContent = `<!DOCTYPE html>
     .qr-hero-card::before {
       content: 'IMBAS UNTUK UJI PORTAL';
       position: absolute;
-      top: -15px;
+      top: -16px;
       background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
       color: #ffffff;
-      padding: 7px 22px;
+      padding: 8px 26px;
       border-radius: 9999px;
-      font-size: 16px;
+      font-size: 19px;
       font-weight: 800;
       letter-spacing: 1.2px;
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5);
@@ -796,25 +805,25 @@ const htmlContent = `<!DOCTYPE html>
 
     .qr-url-badge {
       background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--cyan);
+      border: 1.5px solid var(--cyan);
       border-radius: 12px;
-      padding: 8px 18px;
+      padding: 10px 22px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--cyan);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .qr-instruction {
-      font-size: 21.5px;
+      font-size: 26px;
       font-weight: 700;
       color: #f1f5f9;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     .qr-subtext {
-      font-size: 17px;
+      font-size: 20px;
       color: var(--text-muted);
     }
 
@@ -825,11 +834,11 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--bg-card);
       border: 1px solid var(--border-card);
       border-radius: 18px;
-      padding: 18px 40px;
+      padding: 20px 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 19px;
+      font-size: 23px;
       color: var(--text-muted);
       text-align: center;
     }
@@ -915,6 +924,7 @@ const htmlContent = `<!DOCTYPE html>
                   </div>
                   <div class="member-meta">
                     <span class="member-name" contenteditable="false">MUHAMMAD ADAM DARWISH BIN NOR HAIDIL</span>
+                    <span class="member-ndp" contenteditable="false">NDP: 16126091</span>
                     <span class="member-role">Pelajar TVET</span>
                   </div>
                 </div>
@@ -926,6 +936,7 @@ const htmlContent = `<!DOCTYPE html>
                   </div>
                   <div class="member-meta">
                     <span class="member-name" contenteditable="false">HAZIM AFIQ BIN RAZALI</span>
+                    <span class="member-ndp" contenteditable="false">NDP: 16126053</span>
                     <span class="member-role">Pelajar TVET</span>
                   </div>
                 </div>
@@ -937,6 +948,7 @@ const htmlContent = `<!DOCTYPE html>
                   </div>
                   <div class="member-meta">
                     <span class="member-name" contenteditable="false">MUHAMMAD SYAHMI BIN YAZMIN</span>
+                    <span class="member-ndp" contenteditable="false">NDP: 16126004</span>
                     <span class="member-role">Pelajar TVET</span>
                   </div>
                 </div>
@@ -1175,7 +1187,7 @@ const htmlContent = `<!DOCTYPE html>
 
       const editableSelectors = [
         '.inst-badge', '.poster-main-title', '.poster-subtitle',
-        '.member-name', '.sup-name', '.card-title-text', '.point-list-simple',
+        '.member-name', '.member-ndp', '.sup-name', '.card-title-text', '.point-list-simple',
         '.feature-title-text', '.feature-desc-text', '.stat-highlight', '.stat-heading', '.stat-text', '.footer-bar'
       ];
       editableSelectors.forEach(sel => {

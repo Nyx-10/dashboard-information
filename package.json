@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "qr": "node scripts/generate-qr.mjs"
+    "qr": "node scripts/generate-qr.mjs",
+    "video": "node scripts/generate-video-studio.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
