@@ -837,7 +837,7 @@ const html = `<!DOCTYPE html>
       <div class="strip-logo-box">
         <img src="${bannerLogoBase64}" alt="Logo Rasmi">
       </div>
-      <div class="strip-tag" id="timerTag">0:00 / 4:05</div>
+      <div class="strip-tag" id="timerTag">0:00 / 3:18</div>
     </div>
 
     <!-- ==========================================
@@ -1070,7 +1070,7 @@ const html = `<!DOCTYPE html>
       </div>
       <div>
         <div style="font-size:12.5px; font-weight:800; color:#fff;" id="audioTrackTitle">Suara AI: Bahasa Melayu (Aoede)</div>
-        <div style="font-size:10px; color:var(--cyan);" id="audioTrackSub">Master Pitch Audio • Durasi 4m 05s (Format CIFPEC)</div>
+        <div style="font-size:10px; color:var(--cyan);" id="audioTrackSub">Master Pitch Audio • Durasi 3m 18s (Format CIFPEC)</div>
       </div>
     </div>
 
@@ -1096,41 +1096,43 @@ const html = `<!DOCTYPE html>
 
     let currentLang = 'bm';
 
-    // TIMESTAMPS FOR BAHASA MELAYU (Durasi ~245.7s = 4m 05s)
+    // TIMESTAMPS FOR BAHASA MELAYU (Durasi ~197.5s = 3m 18s)
     const scenesBM = [
-      { id: 'scene-1', start: 0, end: 48.0 },
-      { id: 'scene-2', start: 48.0, end: 95.0 },
-      { id: 'scene-3', start: 95.0, end: 161.0 },
-      { id: 'scene-4', start: 161.0, end: 200.0 },
-      { id: 'scene-5', start: 200.0, end: 246.0 }
+      { id: 'scene-1', start: 0, end: 43.0 },
+      { id: 'scene-2', start: 43.0, end: 81.0 },
+      { id: 'scene-3', start: 81.0, end: 132.6 },
+      { id: 'scene-4', start: 132.6, end: 162.8 },
+      { id: 'scene-5', start: 162.8, end: 197.5 }
     ];
 
     const captionsBM = [
-      { start: 0, text: "Pernahkah anda terlepas hebahan penting kolej kerana <span class='caption-highlight'>tertimbus dalam ratusan mesej WhatsApp</span>?" },
-      { start: 10, text: "Atau anda pernah kehilangan <span class='caption-highlight'>kunci kenderaan, kad matrik, atau laptop</span> di bengkel kolej?" },
-      { start: 22, text: "Kaedah konvensional menggunakan <span class='caption-highlight'>papan kenyataan kertas yang mudah rosak</span>..." },
-      { start: 30, text: "Manakala berkongsi nombor telefon di grup awam <span class='caption-highlight'>mendedahkan privasi kepada risiko scam</span>." },
-      { start: 39, text: "Atas faktor inilah, kami di ADTEC Melaka membangunkan <span class='caption-highlight'>Dashboard ADTEC Melaka</span>!" },
+      { start: 0, text: "Assalamualaikum dan salam sejahtera kepada <span class='caption-highlight'>barisan panel penilai CIFPEC 2026</span>." },
+      { start: 5, text: "Kami dari ADTEC Melaka mempersembahkan inovasi <span class='caption-highlight'>Dashboard ADTEC Melaka</span>." },
+      { start: 12, text: "Pernahkah anda terlepas hebahan penting kolej kerana <span class='caption-highlight'>tertimbus dalam ratusan mesej WhatsApp</span>?" },
+      { start: 20, text: "Atau anda pernah kehilangan <span class='caption-highlight'>kunci kenderaan, kad matrik, atau laptop</span> di bengkel kolej?" },
+      { start: 29, text: "Kaedah konvensional menggunakan <span class='caption-highlight'>papan kenyataan kertas yang mudah rosak</span>..." },
+      { start: 35, text: "Manakala berkongsi nombor di grup awam <span class='caption-highlight'>mendedahkan privasi kepada penipuan</span>." },
+      { start: 39, text: "Atas faktor inilah, kami membangunkan <span class='caption-highlight'>penyelesaian pintar bersepadu ini</span>!" },
 
-      { start: 48, text: "Dashboard ADTEC Melaka ialah <span class='caption-highlight'>hab kampus digital mesra alam</span>." },
-      { start: 58, text: "Menyatukan hebahan rasmi, <span class='caption-highlight'>Kiosk TV digital</span>, dan penjejakan Lost &amp; Found berkuasa AI." },
-      { start: 70, text: "Dibangunkan dengan <span class='caption-highlight'>React 19, Supabase Realtime, dan Google Gemini AI</span>." },
-      { start: 83, text: "Sokongan <span class='caption-highlight'>Progressive Web App (PWA)</span> membolehkan pemasangan terus di Android dan iOS!" },
+      { start: 43, text: "Dashboard ADTEC Melaka ialah <span class='caption-highlight'>hab kampus digital mesra alam</span>." },
+      { start: 51, text: "Menyatukan hebahan rasmi kolej, <span class='caption-highlight'>Kiosk TV digital</span>, dan penjejakan Lost &amp; Found berkuasa AI." },
+      { start: 61, text: "Dibangunkan dengan <span class='caption-highlight'>React 19, Supabase Realtime, dan Google Gemini AI</span>." },
+      { start: 72, text: "Sokongan <span class='caption-highlight'>Progressive Web App (PWA)</span> membolehkan pemasangan terus di telefon pintar!" },
 
-      { start: 95, text: "Bagaimanakah sistem ini berfungsi? Pertama, layari dashboard untuk <span class='caption-highlight'>memo rasmi dan aktiviti kolej</span>." },
-      { start: 108, text: "Kedua, <span class='caption-highlight'>Mod Kiosk TV</span> memaparkan berita terkini dengan jam masa nyata di lobi dan kafeteria." },
-      { start: 122, text: "Ketiga, lapor barang tercicir dengan pantas berserta <span class='caption-highlight'>foto bukti dan lokasi spesifik</span>." },
-      { start: 136, text: "Akhir sekali, tuntut barangan melalui <span class='caption-highlight'>sembang sulit tanpa mendedahkan nombor WhatsApp</span>!" },
-      { start: 148, text: "Pembantu maya <span class='caption-highlight'>AdtecBot AI (Gemini)</span> sedia menjawab pertanyaan kampus 24 jam sehari." },
+      { start: 81, text: "Bagaimanakah sistem ini berfungsi? Pertama, layari dashboard untuk <span class='caption-highlight'>memo rasmi dan aktiviti kolej</span>." },
+      { start: 91, text: "Kedua, <span class='caption-highlight'>Mod Kiosk TV</span> beroperasi di lobi dan kafeteria berserta jam masa nyata dan berita bergulir." },
+      { start: 103, text: "Ketiga, muat naik foto dan lokasi barang tercicir secara <span class='caption-highlight'>langsung kepada seluruh warga kolej</span>." },
+      { start: 114, text: "Akhir sekali, tuntut barangan melalui <span class='caption-highlight'>ruang sembang tertutup tanpa dedah nombor telefon</span>!" },
+      { start: 123, text: "Pembantu maya <span class='caption-highlight'>AdtecBot AI (Gemini)</span> sedia menjawab seputar pertanyaan kampus 24 jam sehari." },
 
-      { start: 161, text: "Inovasi ini menyokong <span class='caption-highlight'>inisiatif Kampus Hijau</span> dengan menjimatkan 90% cetakan kertas!" },
-      { start: 175, text: "Menyokong Matlamat Pembangunan Mampan PBB: <span class='caption-highlight'>SDG 12 &amp; SDG 9</span>." },
-      { start: 187, text: "Keselamatan data terjamin dengan <span class='caption-highlight'>OTP e-mel rasmi dan Row Level Security</span>." },
+      { start: 132.6, text: "Inovasi ini menyokong <span class='caption-highlight'>inisiatif Kampus Hijau</span> dengan mengurangkan 90% cetakan kertas notis!" },
+      { start: 142, text: "Keselamatan data dipelihara dengan <span class='caption-highlight'>OTP e-mel rasmi dan Row Level Security Supabase</span>." },
+      { start: 152, text: "Tempoh pemulangan barangan tercicir disingkatkan daripada <span class='caption-highlight'>berminggu-minggu kepada beberapa jam</span>!" },
 
-      { start: 200, text: "Seni bina modularnya sedia direplikasi ke <span class='caption-highlight'>kesemua 33 institusi ILJTM seluruh Malaysia</span>!" },
-      { start: 215, text: "Mentransformasikan tadbir urus kolej ke arah <span class='caption-highlight'>ekosistem TVET pintar dan selamat</span>." },
-      { start: 228, text: "<span class='caption-highlight'>Imbas kod QR di skrin anda</span> sekarang untuk menguji sistem live!" },
-      { start: 238, text: "Sekian, <span class='caption-highlight'>terima kasih kepada barisan panel juri CIFPEC 2026</span>!" }
+      { start: 162.8, text: "Seni bina modular sedia direplikasi ke <span class='caption-highlight'>kesemua 33 buah institusi latihan JTM &amp; politeknik</span>!" },
+      { start: 173, text: "Mentransformasikan tadbir urus kampus ke arah <span class='caption-highlight'>ekosistem TVET yang pintar, selamat dan mampan</span>." },
+      { start: 182, text: "<span class='caption-highlight'>Imbas kod QR di skrin anda</span> sekarang untuk mencuba sistem live!" },
+      { start: 190, text: "Sekian, <span class='caption-highlight'>terima kasih kepada barisan panel penilai CIFPEC 2026</span>!" }
     ];
 
     // TIMESTAMPS FOR ENGLISH (Durasi ~173s = 2m 53s)
@@ -1178,8 +1180,8 @@ const html = `<!DOCTYPE html>
         document.getElementById('btnEn').classList.remove('active');
         audio.src = 'audio/full_voiceover_bahasa_melayu.wav';
         audioTrackTitle.innerText = 'Suara AI: Bahasa Melayu (Aoede)';
-        audioTrackSub.innerText = 'Master Pitch Audio • Durasi 4m 05s (Format CIFPEC Rasmi)';
-        timerTag.innerText = '0:00 / 4:05';
+        audioTrackSub.innerText = 'Master Pitch Audio • Durasi 3m 18s (Format CIFPEC Rasmi)';
+        timerTag.innerText = '0:00 / 3:18';
         captionText.innerHTML = 'Tekan <span class="caption-highlight">▶️ Play Suara AI</span> untuk memulakan persembahan.';
         playBtn.innerText = '▶️ Play Suara AI';
       } else {
@@ -1263,7 +1265,7 @@ const html = `<!DOCTYPE html>
       const cur = audio.currentTime;
       const scenesList = (currentLang === 'bm') ? scenesBM : scenesEN;
       const captionsList = (currentLang === 'bm') ? captionsBM : captionsEN;
-      const totalDur = (currentLang === 'bm') ? 245.7 : 173.0;
+      const totalDur = (currentLang === 'bm') ? 197.5 : 173.0;
       const dur = audio.duration || totalDur;
 
       // Update progress bar
@@ -1311,7 +1313,7 @@ const html = `<!DOCTYPE html>
     });
 
     function seekAudio(delta) {
-      const totalDur = (currentLang === 'bm') ? 245.7 : 173.0;
+      const totalDur = (currentLang === 'bm') ? 197.5 : 173.0;
       audio.currentTime = Math.max(0, Math.min(audio.duration || totalDur, audio.currentTime + delta));
       playSfx('whoosh');
     }

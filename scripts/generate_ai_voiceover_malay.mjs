@@ -45,7 +45,7 @@ async function generateTTSMalay(text, voiceName = 'Aoede', timeoutMs = 45000) {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Sila sebut dan baca teks berikut dalam Bahasa Melayu standard secara fasih, jelas, formal dan profesional: ${text}`
+            text: text
           }]
         }],
         generationConfig: {
@@ -75,7 +75,7 @@ const scriptsBM = [
   {
     filename: 'part1_hook_problem_bm.wav',
     title: 'Babak 1: Isu Semasa & Soalan Pembuka (BM)',
-    text: "Pernahkah anda terlepas hebahan penting kolej kerana tertimbus dalam ratusan mesej WhatsApp? Atau anda pernah kehilangan kunci kenderaan, kad matrik, mahupun komputer riba di bengkel kolej tanpa sebarang platform berpusat untuk menjejaknya? Kaedah konvensional menggunakan papan kenyataan kertas yang mudah rosak dan usang, manakala perkongsian nombor telefon peribadi secara terbuka di grup awam mendedahkan pelajar kepada risiko pencerobohan privasi dan penipuan. Atas faktor inilah, pasukan kami dari ADTEC Melaka membangunkan sebuah penyelesaian pintar iaitu Dashboard ADTEC Melaka."
+    text: "Assalamualaikum dan salam sejahtera kepada barisan panel penilai CIFPEC 2026. Kami dari ADTEC Melaka dengan bangganya mempersembahkan inovasi Dashboard ADTEC Melaka. Pernahkah anda terlepas hebahan penting kolej kerana tertimbus dalam ratusan mesej harian WhatsApp? Atau anda pernah kehilangan kunci kenderaan, kad matrik, mahupun komputer riba di bengkel kolej tanpa sebarang platform berpusat untuk menjejaknya? Kaedah konvensional menggunakan papan kenyataan kertas yang mudah rosak dan usang, manakala perkongsian nombor telefon peribadi secara terbuka di grup awam mendedahkan pelajar kepada risiko pencerobohan privasi dan penipuan. Atas faktor inilah, kami membangunkan penyelesaian pintar ini."
   },
   {
     filename: 'part2_solution_architecture_bm.wav',
