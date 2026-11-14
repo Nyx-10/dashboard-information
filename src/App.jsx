@@ -70,18 +70,6 @@ export default function App() {
     return () => document.removeEventListener("click", handleGlobalClick);
   }, []);
 
-  const [showLanding, setShowLanding] = useState(() => {
-    // Jika pengguna membuka pautan terus (seperti /messages, /reset-password), jangan sekat dengan Landing Page
-    if (window.location.pathname !== "/" && window.location.pathname !== "") {
-      return false;
-    }
-    return sessionStorage.getItem("showLanding") !== "false";
-  });
-
-  useEffect(() => {
-    sessionStorage.setItem("showLanding", showLanding);
-  }, [showLanding]);
-
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [lang, setLang] = useState("en");
   const t = (key) => dict[lang][key] || key;
@@ -181,7 +169,7 @@ export default function App() {
               supabase.auth.signOut();
               setIsAuthenticated(false);
               setUser(null);
-              setShowLanding(true);
+              navigate("/");
             }
           },
         )
@@ -283,8 +271,6 @@ export default function App() {
   };
 
   const goToLogin = (options = {}) => {
-    setShowLanding(false);
-    sessionStorage.setItem("showLanding", "false");
     sessionStorage.setItem("authSource", options.source || "dashboard");
     setAuthMode(options.mode || "login");
     navigate("/login", {
@@ -361,16 +347,12 @@ export default function App() {
   useEffect(() => {
     // Apabila pengguna klik link dari email, URL mungkin /reset-password atau /messages
     if (window.location.pathname === "/reset-password") {
-      setShowLanding(false);
       setIsAuthenticated(false);
       setAuthMode("reset-password");
       setIsCheckingAuth(false);
     } else {
       if (authMode === "reset-password") {
         setAuthMode("login");
-      }
-      if (window.location.pathname !== "/" && window.location.pathname !== "") {
-        setShowLanding(false);
       }
       checkUser();
     }
@@ -462,7 +444,6 @@ export default function App() {
           avatar_url: profile?.avatar_url,
         });
         setIsAuthenticated(true);
-        setShowLanding(false);
       }
     } catch (e) {
       console.error(e);
@@ -504,7 +485,6 @@ export default function App() {
     requireAuth,
     goToLogin,
     goToLanding: () => {
-      setShowLanding(true);
       navigate("/");
     },
     notifications,
@@ -521,6 +501,9 @@ export default function App() {
   const isResetPasswordRoute =
     location.pathname === "/reset-password" || authMode === "reset-password";
   const isLoginRoute = !isAuthenticated && location.pathname === "/login";
+  const isLandingRoute =
+    !isAuthenticated &&
+    (location.pathname === "/" || location.pathname === "");
   // Mod Paparan TV / Kiosk: awam (baca sahaja), dipaparkan tanpa Sidebar/Topbar
   const isTvRoute = location.pathname === "/tv";
   const authReason =
@@ -608,7 +591,6 @@ export default function App() {
               <button
                 onClick={() => {
                   setShowMaintenanceScreen(false);
-                  setShowLanding(false);
                   setAuthMode("login");
                   navigate("/login");
                 }}
@@ -644,7 +626,6 @@ export default function App() {
               }
               onBackToHome={() => {
                 if (cameFromLanding) {
-                  setShowLanding(true);
                   sessionStorage.removeItem("authSource");
                   navigate("/");
                 } else {
@@ -654,15 +635,12 @@ export default function App() {
               onMaintenanceMode={() => setShowMaintenanceScreen(true)}
             />
           )
-        ) : showLanding && !isAuthenticated ? (
+        ) : isLandingRoute ? (
           <LandingPage
             onExploreDashboard={() => {
-              setShowLanding(false);
               navigate("/home");
             }}
             onGetStarted={() => {
-              setShowLanding(false);
-              sessionStorage.setItem("showLanding", "false");
               sessionStorage.setItem("authSource", "landing");
               setAuthMode("login");
               navigate("/login", {
@@ -909,7 +887,7 @@ export default function App() {
                         navigate("/");
                         sessionStorage.removeItem("tempSession");
                         localStorage.removeItem("rememberMe");
-                        setShowLanding(true);
+                        sessionStorage.removeItem("authSource");
                       }}
                     >
                       {t("logout")}
