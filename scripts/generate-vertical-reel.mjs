@@ -30,6 +30,17 @@ const html = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vertical AI Video Reel (Bahasa Melayu &amp; English) — Dashboard ADTEC Melaka</title>
+  
+  <!-- WhatsApp & Social Media Rich Preview Meta Tags -->
+  <meta property="og:title" content="🎬 Video Inovasi: Dashboard ADTEC Melaka (CIFPEC 2026)">
+  <meta property="og:description" content="Persembahan video inovasi digital TVET berasaskan AI (PTA 2). Hab maklumat kampus &amp; Lost &amp; Found pintar masa nyata.">
+  <meta property="og:image" content="https://dashboard-information-nu.vercel.app/dashboard_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://dashboard-information-nu.vercel.app/video">
+  <meta property="og:type" content="video.other">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
