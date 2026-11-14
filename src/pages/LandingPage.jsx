@@ -394,24 +394,20 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
             <button
               type="button"
               className="landing-btn-primary"
-              onClick={onGetStarted}
+              onClick={handleExplore}
             >
               <span className="btn-shine"></span>
-              <LogIn size={19} />
-              <span>{isMs ? "Log Masuk" : "Sign In"}</span>
+              <LayoutDashboard size={19} />
+              <span>{isMs ? "Lihat Dashboard" : "View Dashboard"}</span>
               <ArrowRight size={18} />
             </button>
             <button
               type="button"
               className="landing-btn-secondary"
-              onClick={handleExplore}
+              onClick={onGetStarted}
             >
-              <LayoutDashboard size={18} />
-              <span>
-                {isMs
-                  ? "Lihat Dashboard"
-                  : "View Dashboard"}
-              </span>
+              <LogIn size={18} />
+              <span>{isMs ? "Log Masuk" : "Sign In"}</span>
             </button>
           </div>
 
@@ -1155,27 +1151,27 @@ export default function LandingPage({ onGetStarted, onExploreDashboard }) {
                 <button
                   type="button"
                   className="landing-btn-primary btn-large"
-                  onClick={onGetStarted}
+                  onClick={handleExplore}
                 >
                   <span className="btn-shine"></span>
-                  <LogIn size={20} />
+                  <LayoutDashboard size={20} />
                   <span>
                     {isMs
-                      ? "Log Masuk / Daftar Akaun"
-                      : "Sign In / Register Account"}
+                      ? "Lihat Dashboard"
+                      : "View Dashboard"}
                   </span>
                   <ArrowRight size={20} />
                 </button>
                 <button
                   type="button"
                   className="landing-btn-secondary btn-large"
-                  onClick={handleExplore}
+                  onClick={onGetStarted}
                 >
-                  <LayoutDashboard size={20} />
+                  <LogIn size={20} />
                   <span>
                     {isMs
-                      ? "Lihat Dashboard"
-                      : "View Dashboard"}
+                      ? "Log Masuk / Daftar Akaun"
+                      : "Sign In / Register Account"}
                   </span>
                 </button>
               </div>

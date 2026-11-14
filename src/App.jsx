@@ -285,6 +285,7 @@ export default function App() {
   const goToLogin = (options = {}) => {
     setShowLanding(false);
     sessionStorage.setItem("showLanding", "false");
+    sessionStorage.setItem("authSource", options.source || "dashboard");
     setAuthMode(options.mode || "login");
     navigate("/login", {
       state: {
@@ -471,6 +472,7 @@ export default function App() {
   };
 
   const handleAuthSuccess = async (userData) => {
+    sessionStorage.removeItem("authSource");
     setIsAuthenticated(true);
     setUser(userData);
     const pendingContact = location.state?.pendingContact;
@@ -528,7 +530,9 @@ export default function App() {
       : location.state?.from === "/messages"
         ? "messages"
         : null);
-  const cameFromLanding = location.state?.source === "landing";
+  const cameFromLanding =
+    location.state?.source === "landing" ||
+    sessionStorage.getItem("authSource") === "landing";
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
@@ -641,6 +645,7 @@ export default function App() {
               onBackToHome={() => {
                 if (cameFromLanding) {
                   setShowLanding(true);
+                  sessionStorage.removeItem("authSource");
                   navigate("/");
                 } else {
                   navigate("/home");
@@ -658,6 +663,7 @@ export default function App() {
             onGetStarted={() => {
               setShowLanding(false);
               sessionStorage.setItem("showLanding", "false");
+              sessionStorage.setItem("authSource", "landing");
               setAuthMode("login");
               navigate("/login", {
                 state: { from: "/home", source: "landing" },
