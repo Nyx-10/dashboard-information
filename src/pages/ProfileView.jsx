@@ -15,12 +15,139 @@ import {
   Clock,
   Eye,
   EyeOff,
+  GraduationCap,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 import { ItemCardCompact } from "../components/ItemCardCompact";
 import { supabase } from "../supabaseClient";
+
+// Senarai rasmi kursus & jabatan di Institut Teknologi Automotif Termaju PROTON (ADTEC Melaka)
+const PROTON_INSTITUTE_COURSE_GROUPS = [
+  {
+    groupMs: "Jabatan Teknologi Automotif & EV",
+    groupEn: "Automotive & EV Technology Department",
+    options: [
+      {
+        code: "DTA",
+        value: "Teknologi Automotif (Servis Automotif) - DTA",
+        labelMs: "Teknologi Automotif (Servis Automotif) — DTA",
+        labelEn: "Automotive Technology (Automotive Service) — DTA",
+      },
+      {
+        code: "EV",
+        value: "Teknologi Automotif (Kenderaan Elektrik / EV)",
+        labelMs: "Teknologi Automotif (Kenderaan Elektrik / EV)",
+        labelEn: "Automotive Technology (Electric Vehicle / EV)",
+      },
+      {
+        code: "SKM-AUTO",
+        value: "Teknologi Automotif (Servis Diagnostik - Kenderaan Ringan)",
+        labelMs: "Teknologi Automotif (Servis Diagnostik Kenderaan Ringan)",
+        labelEn: "Automotive Technology (Light Vehicle Diagnostic Service)",
+      },
+      {
+        code: "AFTERSALES",
+        value: "Teknologi Automotif (Operasi Servis Selepas Jualan)",
+        labelMs: "Teknologi Automotif (Operasi Servis Selepas Jualan)",
+        labelEn: "Automotive Technology (After-Sales Service Operations)",
+      },
+    ],
+  },
+  {
+    groupMs: "Jabatan Teknologi Mekatronik & Automasi",
+    groupEn: "Mechatronics & Industrial Automation Department",
+    options: [
+      {
+        code: "DTM",
+        value: "Teknologi Mekatronik (Kejuruteraan Automasi Industri) - DTM",
+        labelMs: "Teknologi Mekatronik (Kejuruteraan Automasi Industri) — DTM",
+        labelEn: "Mechatronics Technology (Industrial Automation Eng.) — DTM",
+      },
+    ],
+  },
+  {
+    groupMs: "Jabatan Teknologi Komputer & ICT",
+    groupEn: "Computer System & ICT Department",
+    options: [
+      {
+        code: "DTK",
+        value: "Teknologi Komputer Sistem (Pentadbiran Sistem Komputer) - DTK",
+        labelMs: "Teknologi Komputer Sistem (Pentadbiran Sistem Komputer) — DTK",
+        labelEn: "Computer System Technology (System Administration) — DTK",
+      },
+    ],
+  },
+  {
+    groupMs: "Jabatan Teknologi Telekomunikasi",
+    groupEn: "Telecommunication Technology Department",
+    options: [
+      {
+        code: "DTT",
+        value: "Teknologi Telekomunikasi (Infrastruktur Penghantaran) - DTT",
+        labelMs: "Teknologi Telekomunikasi (Infrastruktur Penghantaran) — DTT",
+        labelEn: "Telecommunication Tech. (Transmission Infrastructure) — DTT",
+      },
+    ],
+  },
+  {
+    groupMs: "Jabatan Teknologi Pembuatan (Perkakasan)",
+    groupEn: "Manufacturing Technology (Tooling) Department",
+    options: [
+      {
+        code: "DTP-DIE",
+        value: "Teknologi Pembuatan Perkakasan (Penekanan Dai Logam / Die) - DTP",
+        labelMs: "Teknologi Pembuatan Perkakasan (Penekanan Dai Logam / Die) — DTP",
+        labelEn: "Manufacturing Tech. (Metal Stamping Die) — DTP",
+      },
+      {
+        code: "DTP-MOULD",
+        value: "Teknologi Pembuatan Perkakasan (Acuan Suntikan Plastik / Mould)",
+        labelMs: "Teknologi Pembuatan Perkakasan (Acuan Suntikan Plastik / Mould)",
+        labelEn: "Manufacturing Tech. (Plastic Injection Mould)",
+      },
+    ],
+  },
+  {
+    groupMs: "Kakitangan & Pentadbiran Kampus",
+    groupEn: "Campus Staff & Administration",
+    options: [
+      {
+        code: "PENGAJAR",
+        value: "Staf Akademik / Pengajar",
+        labelMs: "Staf Akademik / Pengajar",
+        labelEn: "Academic Staff / Instructor",
+      },
+      {
+        code: "PENTADBIRAN",
+        value: "Staf Pentadbiran & Pengurusan",
+        labelMs: "Staf Pentadbiran & Pengurusan",
+        labelEn: "Administration & Management Staff",
+      },
+    ],
+  },
+];
+
+const ALL_PROTON_COURSES = PROTON_INSTITUTE_COURSE_GROUPS.flatMap(
+  (g) => g.options,
+);
+
+const LEGACY_DEPARTMENT_MAP = {
+  DTK: "Teknologi Komputer Sistem (Pentadbiran Sistem Komputer) - DTK",
+  DTA: "Teknologi Automotif (Servis Automotif) - DTA",
+  DTM: "Teknologi Mekatronik (Kejuruteraan Automasi Industri) - DTM",
+  DTT: "Teknologi Telekomunikasi (Infrastruktur Penghantaran) - DTT",
+  DTP: "Teknologi Pembuatan Perkakasan (Penekanan Dai Logam / Die) - DTP",
+};
+
+function normalizeDepartment(raw) {
+  if (!raw) return "";
+  const trimmed = raw.trim();
+  const upper = trimmed.toUpperCase();
+  if (LEGACY_DEPARTMENT_MAP[upper]) return LEGACY_DEPARTMENT_MAP[upper];
+  return trimmed;
+}
 
 export function ProfileView({ onContact, currentUser }) {
   const { lang, setLang, t } = useContext(LanguageContext);
@@ -80,7 +207,7 @@ export function ProfileView({ onContact, currentUser }) {
 
         if (pData) {
           setProfileData({
-            department: pData.department || "",
+            department: normalizeDepartment(pData.department),
             email_notifs: pData.email_notifs === true,
             match_notifs: pData.match_notifs !== false,
           });
@@ -366,12 +493,32 @@ export function ProfileView({ onContact, currentUser }) {
             <p
               style={{
                 color: "var(--text-muted)",
-                marginBottom: "1.5rem",
+                marginBottom: profileData.department ? "0.65rem" : "1.5rem",
                 fontSize: "1.1rem",
               }}
             >
               {user?.email || "Email"}
             </p>
+            {profileData.department && (
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.45rem",
+                  padding: "0.35rem 0.85rem",
+                  borderRadius: "999px",
+                  background: "rgba(99, 102, 241, 0.14)",
+                  border: "1px solid rgba(99, 102, 241, 0.35)",
+                  color: "var(--primary)",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  marginBottom: "1.25rem",
+                }}
+              >
+                <GraduationCap size={16} />
+                <span>{profileData.department}</span>
+              </div>
+            )}
 
             <div
               style={{
@@ -802,20 +949,25 @@ export function ProfileView({ onContact, currentUser }) {
               <UserIcon size={20} className="text-primary" />{" "}
               {t("updateInfo") || "Kemas Kini Maklumat"}
             </h3>
-            <div style={{ maxWidth: "450px", marginBottom: "2rem" }}>
+            <div style={{ maxWidth: "680px", marginBottom: "2rem" }}>
               <div>
                 <label
                   style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.45rem",
+                    marginBottom: "0.55rem",
                     color: "var(--text-muted)",
                     fontSize: "0.9rem",
+                    fontWeight: 600,
                   }}
                 >
-                  {t("departmentCourse") || "Jabatan / Kursus"}
+                  <GraduationCap size={16} className="text-primary" />
+                  {t("departmentCourse") ||
+                    "Jabatan / Kursus (PROTON Institute Melaka)"}
                 </label>
-                <input
-                  type="text"
+
+                <select
                   className="input-field"
                   value={profileData.department}
                   onChange={(e) =>
@@ -824,10 +976,119 @@ export function ProfileView({ onContact, currentUser }) {
                       department: e.target.value,
                     })
                   }
-                  placeholder={
-                    t("deptPlaceholder") || "Contoh: Kejuruteraan Komputer"
-                  }
-                />
+                  style={{
+                    cursor: "pointer",
+                    fontWeight: 500,
+                  }}
+                >
+                  <option value="">
+                    {t("deptPlaceholder") || "-- Pilih Kursus / Jabatan --"}
+                  </option>
+                  {/* Kekalkan nilai lama jika pengguna pernah menaip nilai tersendiri sebelum ini */}
+                  {profileData.department &&
+                    !ALL_PROTON_COURSES.some(
+                      (c) => c.value === profileData.department,
+                    ) && (
+                      <option value={profileData.department}>
+                        {profileData.department}
+                      </option>
+                    )}
+                  {PROTON_INSTITUTE_COURSE_GROUPS.map((group) => (
+                    <optgroup
+                      key={group.groupMs}
+                      label={lang === "ms" ? group.groupMs : group.groupEn}
+                    >
+                      {group.options.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {lang === "ms" ? opt.labelMs : opt.labelEn}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+
+                {/* Pilihan Pantas (Klik Terus Tanpa Perlu Taip) */}
+                <div style={{ marginTop: "1rem" }}>
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "var(--text-muted)",
+                      marginBottom: "0.6rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {t("deptQuickSelectHint") ||
+                      "Atau klik pilihan kursus di bawah:"}
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(260px, 1fr))",
+                      gap: "0.55rem",
+                    }}
+                  >
+                    {ALL_PROTON_COURSES.map((opt) => {
+                      const isSelected = profileData.department === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() =>
+                            setProfileData({
+                              ...profileData,
+                              department: opt.value,
+                            })
+                          }
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.6rem",
+                            padding: "0.6rem 0.8rem",
+                            borderRadius: "0.65rem",
+                            border: isSelected
+                              ? "1.5px solid var(--primary)"
+                              : "1px solid var(--border)",
+                            background: isSelected
+                              ? "rgba(99, 102, 241, 0.14)"
+                              : "var(--surface)",
+                            color: "var(--text-main)",
+                            textAlign: "left",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              padding: "0.2rem 0.5rem",
+                              borderRadius: "0.4rem",
+                              background: isSelected
+                                ? "var(--primary)"
+                                : "rgba(99, 102, 241, 0.12)",
+                              color: isSelected ? "#ffffff" : "var(--primary)",
+                              fontSize: "0.72rem",
+                              fontWeight: 700,
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            {opt.code}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "0.82rem",
+                              fontWeight: isSelected ? 600 : 500,
+                              lineHeight: 1.3,
+                              flex: 1,
+                            }}
+                          >
+                            {lang === "ms" ? opt.labelMs : opt.labelEn}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 
