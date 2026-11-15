@@ -19,6 +19,9 @@ import {
   Languages,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
+  Radio,
+  Inbox,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { supabase } from "../supabaseClient";
@@ -33,11 +36,15 @@ const REFETCH_INTERVAL_MS = 2 * 60 * 1000; // Sandaran: muat semula data setiap 
 const HARD_RELOAD_INTERVAL_MS = 6 * 60 * 60 * 1000; // Muat semula penuh setiap 6 jam
 const CONTROLS_IDLE_MS = 3000; // Sembunyi kawalan & kursor selepas 3 saat
 const MAX_ITEMS_PER_SECTION = 36;
+const NEW_ITEM_WINDOW_MS = 3 * 24 * 60 * 60 * 1000; // Lencana "BARU" untuk 3 hari
+const TICKER_MAX_ITEMS = 12;
+const FONT_URL =
+  "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap";
 const LOGO_URL =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU1ioLqnxA_hYgapTKlsagISjhIZOyPzasjVVkJt5H8vxhKHKhsfmZlpAZ&s=10";
 
 const TYPE_META = {
-  lost: { color: "#EF4444", icon: AlertCircle, ms: "Hilang", en: "Lost" },
+  lost: { color: "#F43F5E", icon: AlertCircle, ms: "Hilang", en: "Lost" },
   found: {
     color: "#10B981",
     icon: PackageCheck,
@@ -57,7 +64,7 @@ const SECTION_META = {
   reports: {
     color: "#F59E0B",
     icon: PackageSearch,
-    ms: "Laporan Barang Hilang & Dijumpai",
+    ms: "Barang Hilang & Dijumpai",
     en: "Lost & Found Reports",
   },
 };
@@ -88,6 +95,31 @@ function formatDate(value, locale) {
   });
 }
 
+function isNewItem(item) {
+  const created = new Date(item.created_at).getTime();
+  return !Number.isNaN(created) && Date.now() - created < NEW_ITEM_WINDOW_MS;
+}
+
+// Tajuk lalai seperti "Information (2026-08-31)" tidak bermakna di TV,
+// jadi gunakan penerangan sebagai tajuk utama jika ada.
+function getCardText(item, isMs) {
+  const title =
+    item.title && item.title.trim()
+      ? item.title.trim()
+      : isMs
+        ? "Maklumat Kolej"
+        : "College Information";
+  const description = item.description?.trim() || "";
+  const isGenericTitle = /^(information|maklumat)\s*\(.*\)$/i.test(title);
+  return {
+    title,
+    headline: isGenericTitle && description ? description : title,
+    subText: isGenericTitle ? "" : description,
+  };
+}
+
+const pad = (n) => String(n).padStart(2, "0");
+
 // Jam diasingkan supaya grid kad tidak dirender semula setiap saat
 function TvClock({ locale }) {
   const [now, setNow] = useState(() => new Date());
@@ -100,12 +132,10 @@ function TvClock({ locale }) {
   return (
     <div className="tv-clock">
       <div className="tv-clock-time">
-        {now.toLocaleTimeString(locale, {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        })}
+        <span>{pad(now.getHours())}</span>
+        <span className="tv-clock-colon">:</span>
+        <span>{pad(now.getMinutes())}</span>
+        <span className="tv-clock-sec">{pad(now.getSeconds())}</span>
       </div>
       <div className="tv-clock-date">
         {now.toLocaleDateString(locale, {
@@ -119,33 +149,22 @@ function TvClock({ locale }) {
   );
 }
 
-function TvCard({ item, isMs, locale }) {
+function TvCard({ item, isMs, locale, index }) {
   const meta = TYPE_META[item.type] || TYPE_META.info;
   const Icon = meta.icon;
-  const title =
-    item.title && item.title.trim()
-      ? item.title
-      : isMs
-        ? "Maklumat Kolej"
-        : "College Information";
+  const { title, headline, subText } = getCardText(item, isMs);
   const location =
     item.location && item.location.trim()
       ? item.location
       : isMs
         ? "Kampus ADTEC Melaka"
         : "ADTEC Melaka Campus";
-  const description = item.description?.trim() || "";
-
-  // Tajuk lalai seperti "Information (2026-08-31)" tidak bermakna di TV,
-  // jadi gunakan penerangan sebagai tajuk utama jika ada.
-  const isGenericTitle = /^(information|maklumat)\s*\(.*\)$/i.test(
-    title.trim(),
-  );
-  const headline = isGenericTitle && description ? description : title;
-  const subText = isGenericTitle ? "" : description;
 
   return (
-    <article className="tv-card" style={{ "--accent": meta.color }}>
+    <article
+      className="tv-card"
+      style={{ "--accent": meta.color, "--i": index }}
+    >
       <div className="tv-card-media">
         {item.image ? (
           <>
@@ -159,13 +178,25 @@ function TvCard({ item, isMs, locale }) {
           </>
         ) : (
           <div className="tv-card-placeholder">
-            <Icon />
+            <span className="tv-card-placeholder-icon">
+              <Icon />
+            </span>
           </div>
         )}
+
         <span className="tv-badge">
-          <Icon />
+          <span className="tv-badge-icon">
+            <Icon />
+          </span>
           {isMs ? meta.ms : meta.en}
         </span>
+
+        {isNewItem(item) && (
+          <span className="tv-new">
+            <Sparkles />
+            {isMs ? "Baru" : "New"}
+          </span>
+        )}
       </div>
 
       <div className="tv-card-body">
@@ -174,11 +205,11 @@ function TvCard({ item, isMs, locale }) {
         </h3>
         {subText && <p className="tv-card-desc">{subText}</p>}
         <div className="tv-card-meta">
-          <span>
+          <span className="tv-chip tv-chip--grow">
             <MapPin />
             <span className="tv-ellipsis">{location}</span>
           </span>
-          <span>
+          <span className="tv-chip">
             <Calendar />
             {formatDate(item.date || item.created_at, locale)}
           </span>
@@ -203,6 +234,16 @@ export function TvDisplayView() {
   const [isFullscreen, setIsFullscreen] = useState(
     () => !!document.fullscreenElement,
   );
+
+  // Fon khas paparan TV (dimuatkan sekali sahaja)
+  useEffect(() => {
+    if (document.getElementById("tv-display-font")) return;
+    const link = document.createElement("link");
+    link.id = "tv-display-font";
+    link.rel = "stylesheet";
+    link.href = FONT_URL;
+    document.head.appendChild(link);
+  }, []);
 
   // Sokong pautan seperti /tv?lang=ms untuk tetapan bahasa TV secara terus
   useEffect(() => {
@@ -293,9 +334,31 @@ export function TvDisplayView() {
     return result;
   }, [infoItems, reportItems]);
 
+  const stats = useMemo(
+    () => ({
+      info: infoItems.length,
+      lost: reportItems.filter((item) => item.type === "lost").length,
+      found: reportItems.filter((item) => item.type === "found").length,
+    }),
+    [infoItems, reportItems],
+  );
+
+  // Berita terkini untuk ticker di footer (gabungan semua item, terbaru dahulu)
+  const tickerItems = useMemo(
+    () =>
+      [...infoItems, ...reportItems]
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
+        .slice(0, TICKER_MAX_ITEMS),
+    [infoItems, reportItems],
+  );
+
   const totalPages = pages.length;
   const safeIndex = totalPages ? pageIndex % totalPages : 0;
   const currentPage = pages[safeIndex];
+  const activeSection = currentPage?.section || "info";
 
   const goToPage = useCallback(
     (step) => {
@@ -303,6 +366,14 @@ export function TvDisplayView() {
       setPageIndex((prev) => (prev + step + totalPages) % totalPages);
     },
     [totalPages],
+  );
+
+  const goToSection = useCallback(
+    (key) => {
+      const index = pages.findIndex((page) => page.section === key);
+      if (index >= 0) setPageIndex(index);
+    },
+    [pages],
   );
 
   // Auto-putar halaman (dimulakan semula setiap kali halaman bertukar)
@@ -383,14 +454,35 @@ export function TvDisplayView() {
     };
   }, []);
 
-  const section = SECTION_META[currentPage?.section || "info"];
-  const SectionIcon = section.icon;
-  const sectionCount =
-    currentPage?.section === "reports" ? reportItems.length : infoItems.length;
+  const sectionColor = SECTION_META[activeSection].color;
   const reportUrl = `${window.location.host}/home`;
+  const tickerDuration = Math.max(
+    30,
+    tickerItems.reduce(
+      (sum, item) => sum + getCardText(item, isMs).headline.length,
+      0,
+    ) * 0.16,
+  );
+
+  const statTiles = [
+    { key: "info", value: stats.info, ...TYPE_META.info },
+    { key: "lost", value: stats.lost, ...TYPE_META.lost },
+    { key: "found", value: stats.found, ...TYPE_META.found },
+  ];
 
   return (
-    <div className={`tv-root ${showControls ? "" : "tv-hide-cursor"}`}>
+    <div
+      className={`tv-root ${showControls ? "" : "tv-hide-cursor"}`}
+      style={{ "--tv-section": sectionColor }}
+    >
+      {/* LATAR BELAKANG BERANIMASI */}
+      <div className="tv-bg" aria-hidden="true">
+        <div className="tv-bg-blob tv-bg-blob--a" />
+        <div className="tv-bg-blob tv-bg-blob--b" />
+        <div className="tv-bg-blob tv-bg-blob--c" />
+        <div className="tv-bg-grid" />
+      </div>
+
       {/* KAWALAN TERAPUNG (auto-sembunyi) */}
       <div className={`tv-controls ${showControls ? "" : "is-hidden"}`}>
         <button
@@ -401,24 +493,26 @@ export function TvDisplayView() {
           <ArrowLeft size={16} />
           Dashboard
         </button>
+        <span className="tv-control-sep" />
         <button
           type="button"
-          className="tv-control-btn"
+          className="tv-control-btn tv-control-btn--icon"
           onClick={() => goToPage(-1)}
           disabled={totalPages <= 1}
           aria-label={isMs ? "Halaman sebelum" : "Previous page"}
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={18} />
         </button>
         <button
           type="button"
-          className="tv-control-btn"
+          className="tv-control-btn tv-control-btn--icon"
           onClick={() => goToPage(1)}
           disabled={totalPages <= 1}
           aria-label={isMs ? "Halaman seterusnya" : "Next page"}
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={18} />
         </button>
+        <span className="tv-control-sep" />
         <button
           type="button"
           className="tv-control-btn"
@@ -443,7 +537,7 @@ export function TvDisplayView() {
         </button>
       </div>
 
-      {/* 1. HEADER: LOGO, TAJUK & JAM */}
+      {/* 1. HEADER: LOGO, STATISTIK & JAM */}
       <header className="tv-header">
         <div className="tv-brand">
           <img
@@ -458,52 +552,81 @@ export function TvDisplayView() {
                 : "ADTEC Melaka Information Board"}
             </div>
             <div className="tv-brand-subtitle">
-              {isMs
-                ? "Pengumuman Kolej • Barang Hilang & Dijumpai"
-                : "College Announcements • Lost & Found"}
+              <span>{isMs ? "Pengumuman Kolej" : "College Announcements"}</span>
+              <span className="tv-brand-dot" />
+              <span>{isMs ? "Barang Hilang & Dijumpai" : "Lost & Found"}</span>
             </div>
           </div>
         </div>
+
+        <div className="tv-stats">
+          {statTiles.map(({ key, value, color, icon: StatIcon, ms, en }) => (
+            <div key={key} className="tv-stat" style={{ "--accent": color }}>
+              <span className="tv-stat-icon">
+                <StatIcon />
+              </span>
+              <div>
+                <div className="tv-stat-value">{loading ? "–" : value}</div>
+                <div className="tv-stat-label">{isMs ? ms : en}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <TvClock locale={locale} />
       </header>
 
-      {/* 2. BAR SEKSYEN & PENUNJUK HALAMAN */}
-      <div className="tv-section-bar" style={{ "--accent": section.color }}>
-        <div className="tv-section-row">
-          <div className="tv-section-title">
-            <span className="tv-section-icon">
-              <SectionIcon />
-            </span>
-            <span>{isMs ? section.ms : section.en}</span>
-            {!loading && totalPages > 0 && (
-              <span className="tv-section-count">{sectionCount}</span>
-            )}
-          </div>
-
-          {totalPages > 1 && (
-            <div className="tv-pager">
-              <div className="tv-dots">
-                {pages.map((page, i) => (
-                  <span
-                    key={`${page.section}-${page.sectionPage}`}
-                    className={`tv-dot ${i === safeIndex ? "is-active" : ""}`}
-                  />
-                ))}
-              </div>
-              <span>
-                {isMs ? "Halaman" : "Page"} {safeIndex + 1} / {totalPages}
-              </span>
-            </div>
-          )}
+      {/* 2. TAB SEKSYEN & PENUNJUK HALAMAN */}
+      <div className="tv-section-bar">
+        <div className="tv-tabs">
+          {Object.entries(SECTION_META).map(([key, meta]) => {
+            const TabIcon = meta.icon;
+            const count = key === "info" ? infoItems.length : reportItems.length;
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`tv-tab ${activeSection === key ? "is-active" : ""}`}
+                style={{ "--accent": meta.color }}
+                onClick={() => goToSection(key)}
+                disabled={!loading && count === 0}
+              >
+                <span className="tv-tab-icon">
+                  <TabIcon />
+                </span>
+                {isMs ? meta.ms : meta.en}
+              </button>
+            );
+          })}
         </div>
 
         {totalPages > 1 && (
-          <div className="tv-progress">
-            <div
-              key={`${safeIndex}-${totalPages}`}
-              className="tv-progress-fill"
-              style={{ animationDuration: `${PAGE_DURATION_MS}ms` }}
-            />
+          <div className="tv-pager">
+            <div className="tv-segs">
+              {pages.map((page, i) => (
+                <span
+                  key={`${page.section}-${page.sectionPage}`}
+                  className={`tv-seg ${
+                    i < safeIndex ? "is-done" : i === safeIndex ? "is-active" : ""
+                  }`}
+                  style={{ "--accent": SECTION_META[page.section].color }}
+                >
+                  <span
+                    key={i === safeIndex ? `active-${safeIndex}` : "idle"}
+                    className="tv-seg-fill"
+                    style={
+                      i === safeIndex
+                        ? { animationDuration: `${PAGE_DURATION_MS}ms` }
+                        : undefined
+                    }
+                  />
+                </span>
+              ))}
+            </div>
+            <span className="tv-page-num">
+              <strong>{pad(safeIndex + 1)}</strong>
+              <span>/ {pad(totalPages)}</span>
+            </span>
           </div>
         )}
       </div>
@@ -520,14 +643,22 @@ export function TvDisplayView() {
           key={`page-${safeIndex}`}
           className={`tv-grid tv-grid--n${currentPage.items.length}`}
         >
-          {currentPage.items.map((item) => (
-            <TvCard key={item.id} item={item} isMs={isMs} locale={locale} />
+          {currentPage.items.map((item, i) => (
+            <TvCard
+              key={item.id}
+              item={item}
+              isMs={isMs}
+              locale={locale}
+              index={i}
+            />
           ))}
         </div>
       ) : (
         <div className="tv-empty">
           <div>
-            <div className="tv-empty-icon">📭</div>
+            <div className="tv-empty-icon">
+              <Inbox />
+            </div>
             <div className="tv-empty-title">
               {isMs
                 ? "Tiada maklumat atau laporan buat masa ini"
@@ -542,32 +673,63 @@ export function TvDisplayView() {
         </div>
       )}
 
-      {/* 4. FOOTER: PAUTAN LAPORAN & STATUS LANGSUNG */}
+      {/* 4. FOOTER: QR, BERITA TERKINI & STATUS LANGSUNG */}
       <footer className="tv-footer">
-        <div className="tv-ellipsis" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <img
-            src="/qr-code.svg"
-            alt="Kod QR Portal"
-            style={{
-              width: "38px",
-              height: "38px",
-              background: "#ffffff",
-              borderRadius: "6px",
-              padding: "2px",
-              flexShrink: 0,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
-            }}
-          />
-          <span>
-            {isMs
-              ? "Jumpa atau hilang barang? Imbas QR atau layari "
-              : "Lost or found something? Scan QR or visit "}
-            <strong>{reportUrl}</strong>
-          </span>
+        <div className="tv-qr">
+          <img src="/qr-code.svg" alt="Kod QR Portal" />
+          <div className="tv-qr-text">
+            <div className="tv-qr-title">
+              {isMs ? "Jumpa atau hilang barang?" : "Lost or found something?"}
+            </div>
+            <div className="tv-qr-sub">
+              {isMs ? "Imbas QR atau layari " : "Scan the QR or visit "}
+              <strong>{reportUrl}</strong>
+            </div>
+          </div>
         </div>
+
+        {tickerItems.length > 0 ? (
+          <div className="tv-ticker">
+            <span className="tv-ticker-label">
+              <Radio />
+              {isMs ? "Terkini" : "Latest"}
+            </span>
+            <div className="tv-ticker-viewport">
+              <div
+                key={`${lang}-${tickerItems.map((item) => item.id).join("-")}`}
+                className="tv-ticker-track"
+                style={{ animationDuration: `${tickerDuration}s` }}
+              >
+                {[0, 1].map((copy) =>
+                  tickerItems.map((item) => {
+                    const meta = TYPE_META[item.type] || TYPE_META.info;
+                    return (
+                      <span
+                        key={`${copy}-${item.id}`}
+                        className="tv-ticker-item"
+                        style={{ "--accent": meta.color }}
+                        aria-hidden={copy === 1 ? "true" : undefined}
+                      >
+                        <span className="tv-ticker-tag">
+                          {isMs ? meta.ms : meta.en}
+                        </span>
+                        {getCardText(item, isMs).headline}
+                      </span>
+                    );
+                  }),
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div />
+        )}
+
         <div className="tv-live">
-          <span className="tv-live-dot" />
-          {isMs ? "LANGSUNG" : "LIVE"}
+          <span className="tv-live-pill">
+            <span className="tv-live-dot" />
+            {isMs ? "LANGSUNG" : "LIVE"}
+          </span>
           {lastUpdated && (
             <span className="tv-updated">
               {isMs ? "Dikemas kini" : "Updated"}{" "}
