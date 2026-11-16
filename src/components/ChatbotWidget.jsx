@@ -5,7 +5,8 @@ import { AppContext } from "../context/AppContext";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export function ChatbotWidget() {
-  const { t } = useContext(LanguageContext);
+  const { lang } = useContext(LanguageContext);
+  const isMs = lang === "ms";
   const {
     user,
     isChatbotOpen: isOpen,
@@ -17,13 +18,32 @@ export function ChatbotWidget() {
     {
       id: 1,
       sender: "bot",
-      text: "Hai! Saya **AdtecBot** ✨. Ada apa-apa soalan tentang sistem ini?",
+      text:
+        lang === "ms"
+          ? "Hai! Saya **AdtecBot** ✨. Ada apa-apa soalan tentang sistem ini?"
+          : "Hi! I'm **AdtecBot** ✨. Do you have any questions about this system?",
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     },
   ]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === 1) {
+        return [
+          {
+            ...prev[0],
+            text: isMs
+              ? "Hai! Saya **AdtecBot** ✨. Ada apa-apa soalan tentang sistem ini?"
+              : "Hi! I'm **AdtecBot** ✨. Do you have any questions about this system?",
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [isMs]);
 
   const messagesEndRef = useRef(null);
 
@@ -47,7 +67,9 @@ export function ChatbotWidget() {
 
       if (!apiKey) {
         onUpdate(
-          "Sistem AI masih belum diaktifkan (API Key tiada). Sila masukkan API Key ke dalam fail .env ??",
+          isMs
+            ? "Sistem AI masih belum diaktifkan (API Key tiada). Sila masukkan API Key ke dalam fail .env"
+            : "AI system is not activated yet (missing API Key). Please add the API Key to the .env file.",
         );
         return;
       }
@@ -87,7 +109,11 @@ Maklumat Sistem & Institusi:
    - PENTING: Laman web rasmi institusi ini ialah https://www.adtecmlk.gov.my. JANGAN berikan domain lama "adtecmelaka.jtm.gov.my" (kerana sudah rosak/tidak wujud).
 
 Gaya bahasa:
-Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra. 
+${
+  isMs
+    ? "Gunakan Bahasa Melayu yang santai tapi profesional (seperti bercakap dengan rakan universiti). Boleh campur sikit singkatan biasa seperti 'nak', 'tak', 'boleh', tapi kekalkan adab. Gunakan emoji untuk nampak mesra."
+    : "Respond in friendly, natural, and professional English (unless the user explicitly writes in Bahasa Melayu). Use emojis to sound warm and helpful."
+}
 JANGAN beri jawapan terlalu panjang. Jawab dengan ringkas dan padat (maksimum 2-3 perenggan pendek).
 
 Sejarah Perbualan:
@@ -128,7 +154,9 @@ AdtecBot:`;
     } catch (error) {
       console.error("AI Error:", error);
       onUpdate(
-        "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: " +
+        (isMs
+          ? "Maaf, otak AI saya sedang mengalami masalah teknikal buat masa ini. Error: "
+          : "Sorry, my AI engine is experiencing a technical issue right now. Error: ") +
           error.message,
       );
     }
@@ -299,7 +327,7 @@ AdtecBot:`;
                     boxShadow: "0 0 5px #10B981",
                   }}
                 ></span>{" "}
-                Sentiasa Online (AI)
+                {isMs ? "Sentiasa Online (AI)" : "Always Online (AI)"}
               </span>
             </div>
           </div>
@@ -427,7 +455,9 @@ AdtecBot:`;
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Tanya sesuatu kepada AI..."
+            placeholder={
+              isMs ? "Tanya sesuatu kepada AI..." : "Ask AI anything..."
+            }
             className="chatbot-input"
           />
           <button
@@ -460,9 +490,9 @@ AdtecBot:`;
               gap: "0.25rem",
             }}
           >
-            Bot tidak dapat membantu?{" "}
+            {isMs ? "Bot tidak dapat membantu?" : "Bot couldn't help?"}{" "}
             <span style={{ color: "#818CF8", fontWeight: 600 }}>
-              Hubungi Admin (Gmail)
+              {isMs ? "Hubungi Admin (Gmail)" : "Contact Admin (Gmail)"}
             </span>
           </a>
         </div>

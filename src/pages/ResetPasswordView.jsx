@@ -4,7 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 
 export function ResetPasswordView({ onBackToLogin }) {
-  const { t } = useContext(LanguageContext);
+  const { lang, setLang, t } = useContext(LanguageContext);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -82,6 +82,32 @@ export function ResetPasswordView({ onBackToLogin }) {
         padding: "3.5rem 1rem 2rem",
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          top: "1.5rem",
+          right: "1.5rem",
+          zIndex: 100,
+        }}
+      >
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          style={{
+            padding: "0.4rem",
+            borderRadius: "0.5rem",
+            background: "var(--surface)",
+            color: "var(--text-main)",
+            border: "1px solid var(--border)",
+            outline: "none",
+            cursor: "pointer",
+            fontWeight: 500,
+          }}
+        >
+          <option value="ms">Bahasa Melayu</option>
+          <option value="en">English</option>
+        </select>
+      </div>
       <style>
         {`
           @keyframes slideUpFadeIn {

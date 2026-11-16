@@ -71,8 +71,14 @@ export default function App() {
   }, []);
 
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [lang, setLang] = useState("en");
-  const t = (key) => dict[lang][key] || key;
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem("appLang");
+    return saved === "ms" || saved === "en" ? saved : "ms";
+  });
+  useEffect(() => {
+    localStorage.setItem("appLang", lang);
+  }, [lang]);
+  const t = (key) => dict[lang]?.[key] || key;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [authMode, setAuthMode] = useState(() => {

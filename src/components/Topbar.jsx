@@ -128,6 +128,27 @@ export function Topbar({
         style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}
       >
         <button
+          onClick={() => setLang(lang === "ms" ? "en" : "ms")}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.3rem",
+            padding: "0.35rem 0.65rem",
+            borderRadius: "0.5rem",
+            background: "var(--surface)",
+            color: "var(--text-main)",
+            border: "1px solid var(--border)",
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+          title={t("languageSettings")}
+        >
+          <Globe size={14} style={{ color: "var(--primary)" }} />
+          <span>{lang === "ms" ? "BM" : "EN"}</span>
+        </button>
+
+        <button
           style={{
             color: "var(--text-muted)",
             display: "flex",
@@ -142,7 +163,7 @@ export function Topbar({
           }}
           onClick={toggleTheme}
           title={
-            theme === "dark" ? "Tukar ke Light Mode" : "Tukar ke Dark Mode"
+            theme === "dark" ? t("switchToLightMode") : t("switchToDarkMode")
           }
         >
           {theme === "dark" ? (
@@ -405,43 +426,20 @@ export function Topbar({
         </div>
           </>
         ) : (
-          <>
-            <button
-              onClick={() => setLang(lang === "ms" ? "en" : "ms")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.3rem",
-                padding: "0.35rem 0.65rem",
-                borderRadius: "0.5rem",
-                background: "var(--surface)",
-                color: "var(--text-main)",
-                border: "1px solid var(--border)",
-                fontSize: "0.78rem",
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-              title={t("languageSettings")}
-            >
-              <Globe size={14} style={{ color: "var(--primary)" }} />
-              <span>{lang === "ms" ? "MS" : "EN"}</span>
-            </button>
-
-            <button
-              className="btn-primary"
-              onClick={() => goToLogin && goToLogin()}
-              style={{
-                padding: "0.45rem 0.95rem",
-                fontSize: "0.82rem",
-                fontWeight: 600,
-                borderRadius: "0.55rem",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <LogIn size={16} />
-              <span>{t("loginBtn")}</span>
-            </button>
-          </>
+          <button
+            className="btn-primary"
+            onClick={() => goToLogin && goToLogin()}
+            style={{
+              padding: "0.45rem 0.95rem",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              borderRadius: "0.55rem",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <LogIn size={16} />
+            <span>{t("loginBtn")}</span>
+          </button>
         )}
       </div>
     </header>

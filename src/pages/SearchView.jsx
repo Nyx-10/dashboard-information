@@ -50,7 +50,11 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
   }
 
   const handleDelete = async (itemId) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
+    if (
+      window.confirm(
+        t("confirmDelete") || "Are you sure you want to delete this item?",
+      )
+    ) {
       try {
         const { error } = await supabase
           .from("items")

@@ -520,12 +520,12 @@ export const AdminAnalyticsView = ({ currentUser }) => {
             >
               (
               {chartFilter === "day"
-                ? "Last 7 Days"
+                ? t("last7Days")
                 : chartFilter === "week"
-                  ? "Last 4 Weeks"
+                  ? t("last4Weeks")
                   : chartFilter === "month"
-                    ? "Last 6 Months"
-                    : "Last 5 Years"}
+                    ? t("last6Months")
+                    : t("last5Years")}
               )
             </span>
           </h3>
@@ -542,10 +542,10 @@ export const AdminAnalyticsView = ({ currentUser }) => {
               cursor: "pointer",
             }}
           >
-            <option value="day">Day (Last 7 Days)</option>
-            <option value="week">Week (Last 4 Weeks)</option>
-            <option value="month">Month (Last 6 Months)</option>
-            <option value="year">Year (Last 5 Years)</option>
+            <option value="day">{t("filterDay")}</option>
+            <option value="week">{t("filterWeek")}</option>
+            <option value="month">{t("filterMonth")}</option>
+            <option value="year">{t("filterYear")}</option>
           </select>
         </div>
         <div style={{ width: "100%", height: "320px" }}>
@@ -572,13 +572,13 @@ export const AdminAnalyticsView = ({ currentUser }) => {
               />
               <Bar
                 dataKey="Lost"
-                name="Lost Items"
+                name={t("lostItems")}
                 fill="#EF4444"
                 radius={[4, 4, 0, 0]}
               />
               <Bar
                 dataKey="Found"
-                name="Found Items"
+                name={t("foundItems")}
                 fill="#10B981"
                 radius={[4, 4, 0, 0]}
               />

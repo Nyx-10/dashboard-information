@@ -627,7 +627,7 @@ export const AdminUsersView = ({ currentUser }) => {
                   fontSize: "0.875rem",
                 }}
               >
-                {t("email") || "Email"}
+                {t("emailLabel") || "Email"}
               </th>
               <th
                 style={{
@@ -763,7 +763,7 @@ export const AdminUsersView = ({ currentUser }) => {
                         color: "var(--text-main)",
                       }}
                     >
-                      {user.name} {currentUser?.id === user.id && "(You)"}
+                      {user.name} {currentUser?.id === user.id && t("youLabel")}
                     </td>
                     <td
                       style={{
@@ -966,7 +966,7 @@ export const AdminUsersView = ({ currentUser }) => {
                     marginBottom: "0.25rem",
                   }}
                 >
-                  Pengguna:
+                  {t("userLabel") || "Pengguna:"}
                 </p>
                 <p
                   style={{
@@ -1526,7 +1526,8 @@ export const AdminReportsView = ({ currentUser }) => {
                     fontWeight: 500,
                   }}
                 >
-                  <ExternalLink size={14} /> Open full size
+                  <ExternalLink size={14} />{" "}
+                  {t("openFullSize") || "Open full size"}
                 </a>
                 <button
                   onClick={() => setSelectedProofImage(null)}

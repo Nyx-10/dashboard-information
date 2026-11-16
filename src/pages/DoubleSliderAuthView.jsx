@@ -179,7 +179,9 @@ export function DoubleSliderAuthView({
     e.preventDefault();
     if (signupEmail === "adam.darwish.it@gmail.com") {
       setSignupError(
-        "Akaun Super Admin tidak perlu mendaftar. Sila Log Masuk terus.",
+        lang === "ms"
+          ? "Akaun Super Admin tidak perlu mendaftar. Sila Log Masuk terus."
+          : "Super Admin account does not need to register. Please Sign In directly.",
       );
       return;
     }
@@ -338,7 +340,7 @@ export function DoubleSliderAuthView({
             fontWeight: 500,
           }}
         >
-          <option value="ms">Melayu</option>
+          <option value="ms">Bahasa Melayu</option>
           <option value="en">English</option>
         </select>
       </div>

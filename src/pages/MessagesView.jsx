@@ -1337,7 +1337,9 @@ export function MessagesView({
                   type="text"
                   className="input-field"
                   placeholder={
-                    uploadingImage ? "Uploading image..." : "Type a message..."
+                    uploadingImage
+                      ? t("uploadingImagePlaceholder")
+                      : t("typeMessagePlaceholder")
                   }
                   style={{ flex: 1, borderRadius: "2rem" }}
                   value={newMessage}

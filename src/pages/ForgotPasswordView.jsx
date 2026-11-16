@@ -62,7 +62,7 @@ export function ForgotPasswordView({ onSwitchBack }) {
             fontWeight: 500,
           }}
         >
-          <option value="ms">Melayu</option>
+          <option value="ms">Bahasa Melayu</option>
           <option value="en">English</option>
         </select>
       </div>
