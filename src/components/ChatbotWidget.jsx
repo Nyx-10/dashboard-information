@@ -478,9 +478,20 @@ AdtecBot:`;
           }}
         >
           <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=adam.darwish.it@gmail.com&su=Bantuan%20Dashboard%20ADTEC%20Melaka"
+            href="https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=adam.darwish.it@gmail.com&su=Bantuan+Dashboard+ADTEC+Melaka"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                navigator.userAgent || "",
+              );
+              if (isMobile) {
+                e.preventDefault();
+                window.location.href =
+                  "mailto:adam.darwish.it@gmail.com?subject=Bantuan%20Dashboard%20ADTEC%20Melaka";
+              }
+            }}
+            title="adam.darwish.it@gmail.com"
             style={{
               color: "var(--text-muted)",
               textDecoration: "none",
