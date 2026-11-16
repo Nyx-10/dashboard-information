@@ -6,6 +6,10 @@ import {
   Upload,
   X,
   Check,
+  MessageSquare,
+  ArrowLeft,
+  Send,
+  ShieldCheck,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
 import { supabase } from "../supabaseClient";
@@ -234,7 +238,8 @@ export function MessagesView({
   onMessagesRead,
   onlineUsers = new Set(),
 }) {
-  const { t } = useContext(LanguageContext);
+  const { lang, t } = useContext(LanguageContext);
+  const isMs = lang === "ms";
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportType, setReportType] = useState("Spam");
   const [reportReason, setReportReason] = useState("");
@@ -782,33 +787,63 @@ export function MessagesView({
         <div
           className={`messages-sidebar ${activeChat ? "hidden-on-mobile" : ""}`}
           style={{
-            width: "320px",
+            width: "330px",
             borderRight: "1px solid var(--border)",
             display: "flex",
             flexDirection: "column",
+            background: "var(--surface)",
           }}
         >
           <div
             style={{
-              padding: "1.5rem",
+              padding: "1.1rem 1.15rem",
               borderBottom: "1px solid var(--border)",
             }}
           >
-            <h2
+            <div
               style={{
-                fontSize: "1.25rem",
-                fontWeight: 600,
-                marginBottom: "1rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "0.85rem",
               }}
             >
-              {t("messages")}
-            </h2>
+              <h2
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: 700,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <MessageSquare
+                  size={20}
+                  style={{ color: "var(--primary)", flexShrink: 0 }}
+                />
+                <span>{t("messages")}</span>
+              </h2>
+              <span
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  padding: "0.2rem 0.55rem",
+                  borderRadius: "999px",
+                  background: "rgba(99, 102, 241, 0.14)",
+                  color: "var(--primary)",
+                }}
+              >
+                {filteredChats.length}
+              </span>
+            </div>
+
             <div style={{ position: "relative" }}>
               <Search
                 size={16}
                 style={{
                   position: "absolute",
-                  left: "10px",
+                  left: "12px",
                   top: "50%",
                   transform: "translateY(-50%)",
                   color: "var(--text-muted)",
@@ -821,152 +856,206 @@ export function MessagesView({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
-                  paddingLeft: "32px",
-                  fontSize: "0.875rem",
-                  padding: "0.5rem 0.5rem 0.5rem 32px",
+                  fontSize: "0.85rem",
+                  padding: "0.55rem 0.85rem 0.55rem 36px",
+                  borderRadius: "999px",
+                  background: "var(--background)",
                 }}
               />
             </div>
           </div>
+
           <div style={{ overflowY: "auto", flex: 1 }}>
             {filteredChats.length === 0 ? (
               <div
                 style={{
-                  padding: "2rem",
+                  padding: "3rem 1.5rem",
                   textAlign: "center",
                   color: "var(--text-muted)",
-                  fontSize: "0.875rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.65rem",
                 }}
               >
-                {t("noConversations")}
-              </div>
-            ) : (
-              filteredChats.map((chat) => (
                 <div
-                  key={chat.id}
-                  onClick={() => setActiveChat(chat.id)}
                   style={{
-                    padding: "1rem",
-                    borderBottom: "1px solid var(--border)",
-                    background:
-                      activeChat === chat.id
-                        ? "rgba(99, 102, 241, 0.05)"
-                        : "transparent",
-                    cursor: "pointer",
+                    width: "52px",
+                    height: "52px",
+                    borderRadius: "50%",
+                    background: "rgba(99, 102, 241, 0.1)",
                     display: "flex",
-                    gap: "1rem",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--primary)",
                   }}
                 >
-                  <div style={{ position: "relative" }}>
-                    <img
-                      src={chat.avatar}
-                      alt={chat.name}
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setViewingProfile({
-                          id: chat.id,
-                          name: chat.name,
-                          avatar: chat.avatar,
-                        });
-                      }}
-                    />
-                    {onlineUsers.has(chat.id) && (
-                      <span
+                  <MessageSquare size={24} />
+                </div>
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: "var(--text-main)",
+                  }}
+                >
+                  {t("noConversations")}
+                </p>
+                <span style={{ fontSize: "0.78rem", lineHeight: 1.45 }}>
+                  {isMs
+                    ? "Tekan 'Hubungi Pelapor' pada mana-mana kad barang untuk memulakan sembang."
+                    : "Tap 'Contact Reporter' on any item card to start a conversation."}
+                </span>
+              </div>
+            ) : (
+              filteredChats.map((chat) => {
+                const isSelected = activeChat === chat.id;
+                const hasUnread = chat.unreadCount > 0 && !isSelected;
+                return (
+                  <div
+                    key={chat.id}
+                    onClick={() => setActiveChat(chat.id)}
+                    style={{
+                      padding: "0.85rem 1rem",
+                      borderBottom: "1px solid var(--glass-border)",
+                      borderLeft: isSelected
+                        ? "3px solid var(--primary)"
+                        : "3px solid transparent",
+                      background: isSelected
+                        ? "rgba(99, 102, 241, 0.1)"
+                        : hasUnread
+                          ? "rgba(99, 102, 241, 0.04)"
+                          : "transparent",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.85rem",
+                      transition: "background 0.2s ease",
+                    }}
+                  >
+                    <div style={{ position: "relative", flexShrink: 0 }}>
+                      <img
+                        src={chat.avatar}
+                        alt={chat.name}
                         style={{
-                          position: "absolute",
-                          bottom: 0,
-                          right: 0,
-                          width: "12px",
-                          height: "12px",
-                          background: "#10B981",
-                          border: "2px solid var(--surface)",
+                          width: "44px",
+                          height: "44px",
                           borderRadius: "50%",
+                          objectFit: "cover",
+                          border: "2px solid var(--border)",
                         }}
-                      ></span>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, overflow: "hidden" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "0.25rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{ fontWeight: 600, color: "var(--text-main)" }}
-                      >
-                        {chat.name}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "var(--text-muted)",
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewingProfile({
+                            id: chat.id,
+                            name: chat.name,
+                            avatar: chat.avatar,
+                          });
                         }}
-                      >
-                        {chat.time}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: "0.875rem",
-                          color:
-                            chat.unreadCount > 0 && chat.id !== activeChat
-                              ? "var(--text-main)"
-                              : "var(--text-muted)",
-                          fontWeight:
-                            chat.unreadCount > 0 && chat.id !== activeChat
-                              ? 600
-                              : 400,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          flex: 1,
-                        }}
-                      >
-                        {chat.preview?.startsWith("[IMAGE]")
-                          ? "📷 Image"
-                          : chat.preview}
-                      </p>
-                      {chat.unreadCount > 0 && chat.id !== activeChat && (
+                      />
+                      {onlineUsers.has(chat.id) && (
                         <span
-                          className="unread-badge-pulse"
                           style={{
-                            background: "#EF4444",
-                            color: "white",
-                            fontSize: "0.7rem",
-                            fontWeight: 700,
-                            minWidth: "18px",
-                            height: "18px",
-                            borderRadius: "9px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            padding: "0 5px",
-                            marginLeft: "8px",
+                            position: "absolute",
+                            bottom: 1,
+                            right: 1,
+                            width: "12px",
+                            height: "12px",
+                            background: "#10B981",
+                            border: "2px solid var(--surface)",
+                            borderRadius: "50%",
                           }}
-                        >
-                          {chat.unreadCount}
-                        </span>
+                        />
                       )}
                     </div>
+                    <div style={{ flex: 1, overflow: "hidden", minWidth: 0 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "0.2rem",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: hasUnread || isSelected ? 700 : 600,
+                            fontSize: "0.92rem",
+                            color: "var(--text-main)",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {chat.name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "0.7rem",
+                            color: hasUnread
+                              ? "var(--primary)"
+                              : "var(--text-muted)",
+                            fontWeight: hasUnread ? 600 : 400,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {chat.time}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "0.82rem",
+                            color: hasUnread
+                              ? "var(--text-main)"
+                              : "var(--text-muted)",
+                            fontWeight: hasUnread ? 600 : 400,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            flex: 1,
+                          }}
+                        >
+                          {chat.preview?.startsWith("[IMAGE]")
+                            ? isMs
+                              ? "📷 Gambar"
+                              : "📷 Image"
+                            : chat.preview}
+                        </p>
+                        {hasUnread && (
+                          <span
+                            className="unread-badge-pulse"
+                            style={{
+                              background: "#EF4444",
+                              color: "white",
+                              fontSize: "0.68rem",
+                              fontWeight: 700,
+                              minWidth: "18px",
+                              height: "18px",
+                              borderRadius: "9px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "0 5px",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {chat.unreadCount}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
@@ -978,7 +1067,8 @@ export function MessagesView({
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            background: "var(--bg-main)",
+            background: "var(--background)",
+            minWidth: 0,
           }}
         >
           {!activeChatData ? (
@@ -986,31 +1076,92 @@ export function MessagesView({
               style={{
                 flex: 1,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
+                padding: "2rem",
+                textAlign: "center",
                 color: "var(--text-muted)",
+                gap: "0.75rem",
               }}
             >
-              <p>{t("selectConversation")}</p>
+              <div
+                style={{
+                  width: "68px",
+                  height: "68px",
+                  borderRadius: "50%",
+                  background: "rgba(99, 102, 241, 0.12)",
+                  border: "1px solid rgba(99, 102, 241, 0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--primary)",
+                  marginBottom: "0.25rem",
+                }}
+              >
+                <MessageSquare size={30} />
+              </div>
+              <h3
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                  color: "var(--text-main)",
+                  margin: 0,
+                }}
+              >
+                {t("selectConversation")}
+              </h3>
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  maxWidth: "340px",
+                  lineHeight: 1.5,
+                }}
+              >
+                {isMs
+                  ? "Perbualan 1-ke-1 anda dilindungi secara peribadi di dalam sistem tanpa perlu berkongsi nombor telefon."
+                  : "Your 1-to-1 conversations are privately protected inside the platform without sharing phone numbers."}
+              </p>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  color: "#10B981",
+                  background: "rgba(16, 185, 129, 0.1)",
+                  padding: "0.3rem 0.75rem",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(16, 185, 129, 0.25)",
+                }}
+              >
+                <ShieldCheck size={14} />
+                {isMs ? "Sembang Selamat Kampus" : "Secure Campus Chat"}
+              </span>
             </div>
           ) : (
             <>
               {/* Chat Header */}
               <div
+                className="chat-header-bar"
                 style={{
-                  padding: "1.25rem 1.5rem",
+                  padding: "0.85rem 1.15rem",
                   borderBottom: "1px solid var(--border)",
                   background: "var(--surface)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  gap: "0.5rem",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.75rem",
+                    gap: "0.65rem",
+                    minWidth: 0,
+                    flex: 1,
                   }}
                 >
                   <button
@@ -1018,121 +1169,147 @@ export function MessagesView({
                     onClick={() => setActiveChat(null)}
                     aria-label="Kembali"
                     style={{
-                      background: "transparent",
-                      border: "none",
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
                       color: "var(--text-main)",
-                      fontSize: "1.5rem",
                       cursor: "pointer",
-                      width: "40px",
-                      height: "40px",
+                      width: "36px",
+                      height: "36px",
+                      minWidth: "36px",
+                      minHeight: "36px",
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "50%",
                       touchAction: "manipulation",
+                      flexShrink: 0,
                     }}
                   >
-                    &larr;
+                    <ArrowLeft size={18} />
                   </button>
-                  <img
-                    src={activeChatData.avatar}
-                    alt="Avatar"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      setViewingProfile({
-                        id: activeChatData.id,
-                        name: activeChatData.name,
-                        avatar: activeChatData.avatar,
-                      })
-                    }
-                  />
-                  <div>
-                    <h3 style={{ fontWeight: 600, color: "var(--text-main)" }}>
+                  <div style={{ position: "relative", flexShrink: 0 }}>
+                    <img
+                      src={activeChatData.avatar}
+                      alt="Avatar"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        cursor: "pointer",
+                        border: "2px solid var(--border)",
+                        display: "block",
+                      }}
+                      onClick={() =>
+                        setViewingProfile({
+                          id: activeChatData.id,
+                          name: activeChatData.name,
+                          avatar: activeChatData.avatar,
+                        })
+                      }
+                    />
+                    <span
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        right: 0,
+                        width: "11px",
+                        height: "11px",
+                        borderRadius: "50%",
+                        background: onlineUsers.has(activeChatData.id)
+                          ? "#10B981"
+                          : "#9CA3AF",
+                        border: "2px solid var(--surface)",
+                      }}
+                    />
+                  </div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <h3
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        color: "var(--text-main)",
+                        margin: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {activeChatData.name}
                     </h3>
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.25rem",
+                        gap: "0.3rem",
                       }}
                     >
                       <span
                         style={{
-                          width: "8px",
-                          height: "8px",
-                          borderRadius: "50%",
-                          background: onlineUsers.has(activeChatData.id)
-                            ? "#10B981"
-                            : "#9CA3AF",
-                        }}
-                      ></span>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
+                          fontSize: "0.72rem",
+                          fontWeight: 500,
                           color: onlineUsers.has(activeChatData.id)
                             ? "#10B981"
                             : "var(--text-muted)",
                         }}
                       >
                         {onlineUsers.has(activeChatData.id)
-                          ? t("online") === "online"
-                            ? "Online"
-                            : t("online")
-                          : t("offline") === "offline"
-                            ? "Offline"
-                            : t("offline")}
+                          ? t("online")
+                          : t("offline")}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div>
+                <div style={{ flexShrink: 0 }}>
                   <button
                     className="btn-primary"
                     onClick={() => setShowReportModal(true)}
                     style={{
-                      background: "transparent",
-                      border: "1px solid #EF4444",
+                      background: "rgba(239, 68, 68, 0.1)",
+                      border: "1px solid rgba(239, 68, 68, 0.35)",
                       color: "#EF4444",
-                      padding: "0.4rem 0.75rem",
+                      padding: "0.4rem 0.7rem",
+                      borderRadius: "0.55rem",
                       fontSize: "0.75rem",
+                      fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
                       gap: "0.35rem",
                       cursor: "pointer",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <AlertCircle size={14} /> {t("reportUser")}
+                    <AlertCircle size={14} />
+                    <span>{t("reportUser")}</span>
                   </button>
                 </div>
               </div>
 
               {/* Messages List */}
               <div
+                className="chat-messages-scroll"
                 style={{
                   flex: 1,
                   overflowY: "auto",
-                  padding: "1.5rem",
+                  padding: "1.1rem",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "1rem",
+                  gap: "0.85rem",
                 }}
               >
                 {messages.length === 0 ? (
                   <div
-                    style={{ display: "flex", gap: "1rem", maxWidth: "80%" }}
+                    style={{
+                      display: "flex",
+                      gap: "0.75rem",
+                      maxWidth: "84%",
+                    }}
                   >
                     <img
                       src={activeChatData.avatar}
                       alt="Avatar"
                       style={{
-                        width: "32px",
-                        height: "32px",
+                        width: "30px",
+                        height: "30px",
                         borderRadius: "50%",
                         flexShrink: 0,
                         objectFit: "cover",
@@ -1151,18 +1328,20 @@ export function MessagesView({
                         style={{
                           background: "var(--surface)",
                           border: "1px solid var(--border)",
-                          padding: "1rem",
-                          borderRadius: "0 1rem 1rem 1rem",
+                          padding: "0.75rem 1rem",
+                          borderRadius: "0.2rem 1rem 1rem 1rem",
                           color: "var(--text-main)",
+                          fontSize: "0.88rem",
+                          lineHeight: 1.45,
                         }}
                       >
                         {activeChatData.preview}
                       </div>
                       <span
                         style={{
-                          fontSize: "0.7rem",
+                          fontSize: "0.68rem",
                           color: "var(--text-muted)",
-                          marginTop: "0.25rem",
+                          marginTop: "0.2rem",
                           display: "block",
                         }}
                       >
@@ -1178,8 +1357,8 @@ export function MessagesView({
                         key={idx}
                         style={{
                           display: "flex",
-                          gap: "1rem",
-                          maxWidth: "80%",
+                          gap: "0.65rem",
+                          maxWidth: "82%",
                           alignSelf: isMe ? "flex-end" : "flex-start",
                           flexDirection: isMe ? "row-reverse" : "row",
                         }}
@@ -1193,12 +1372,13 @@ export function MessagesView({
                           }
                           alt="Avatar"
                           style={{
-                            width: "32px",
-                            height: "32px",
+                            width: "28px",
+                            height: "28px",
                             borderRadius: "50%",
                             flexShrink: 0,
                             objectFit: "cover",
                             cursor: isMe ? "default" : "pointer",
+                            marginTop: "0.15rem",
                           }}
                           onClick={() => {
                             if (!isMe)
@@ -1214,13 +1394,14 @@ export function MessagesView({
                             display: "flex",
                             flexDirection: "column",
                             alignItems: isMe ? "flex-end" : "flex-start",
+                            minWidth: 0,
                           }}
                         >
                           <div
                             style={{
                               background:
                                 isMe && !msg.content.startsWith("[IMAGE]")
-                                  ? "var(--primary)"
+                                  ? "linear-gradient(135deg, var(--primary), #4f46e5)"
                                   : "var(--surface)",
                               color: isMe ? "#fff" : "var(--text-main)",
                               border:
@@ -1229,12 +1410,17 @@ export function MessagesView({
                                   : "1px solid var(--border)",
                               padding: msg.content.startsWith("[IMAGE]")
                                 ? "0.25rem"
-                                : "0.75rem 1rem",
+                                : "0.65rem 0.95rem",
                               borderRadius: isMe
-                                ? "1rem 0 1rem 1rem"
-                                : "0 1rem 1rem 1rem",
+                                ? "1rem 0.25rem 1rem 1rem"
+                                : "0.25rem 1rem 1rem 1rem",
+                              fontSize: "0.88rem",
+                              lineHeight: 1.45,
                               wordBreak: "break-word",
                               overflow: "hidden",
+                              boxShadow: isMe
+                                ? "0 4px 12px rgba(99, 102, 241, 0.22)"
+                                : "0 2px 6px rgba(0, 0, 0, 0.08)",
                             }}
                           >
                             {msg.content.startsWith("[IMAGE]") ? (
@@ -1247,8 +1433,8 @@ export function MessagesView({
                                   src={msg.content.substring(7)}
                                   alt="Sent image"
                                   style={{
-                                    maxWidth: "200px",
-                                    maxHeight: "200px",
+                                    maxWidth: "210px",
+                                    maxHeight: "210px",
                                     borderRadius: "0.75rem",
                                     display: "block",
                                     cursor: "zoom-in",
@@ -1262,9 +1448,10 @@ export function MessagesView({
                           </div>
                           <span
                             style={{
-                              fontSize: "0.7rem",
+                              fontSize: "0.66rem",
                               color: "var(--text-muted)",
-                              marginTop: "0.25rem",
+                              marginTop: "0.2rem",
+                              padding: "0 0.2rem",
                             }}
                           >
                             {new Date(msg.created_at).toLocaleTimeString([], {
@@ -1287,7 +1474,7 @@ export function MessagesView({
               <form
                 onSubmit={handleSendMessage}
                 style={{
-                  padding: "clamp(0.75rem, 2vw, 1.25rem)",
+                  padding: "0.75rem 0.95rem",
                   background: "var(--surface)",
                   borderTop: "1px solid var(--border)",
                   display: "flex",
@@ -1295,7 +1482,7 @@ export function MessagesView({
                   alignItems: "center",
                 }}
               >
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative", flexShrink: 0 }}>
                   <input
                     type="file"
                     accept="image/*"
@@ -1309,7 +1496,7 @@ export function MessagesView({
                       document.getElementById("chat-image-upload").click()
                     }
                     style={{
-                      background: "var(--bg-main)",
+                      background: "var(--background)",
                       border: "1px solid var(--border)",
                       borderRadius: "50%",
                       width: "40px",
@@ -1322,6 +1509,7 @@ export function MessagesView({
                       touchAction: "manipulation",
                     }}
                     disabled={uploadingImage}
+                    title={isMs ? "Hantar Gambar" : "Send Image"}
                   >
                     {uploadingImage ? (
                       <span
@@ -1329,7 +1517,7 @@ export function MessagesView({
                         style={{ width: "16px", height: "16px" }}
                       />
                     ) : (
-                      <ImageIcon size={20} />
+                      <ImageIcon size={19} />
                     )}
                   </button>
                 </div>
@@ -1341,7 +1529,12 @@ export function MessagesView({
                       ? t("uploadingImagePlaceholder")
                       : t("typeMessagePlaceholder")
                   }
-                  style={{ flex: 1, borderRadius: "2rem" }}
+                  style={{
+                    flex: 1,
+                    borderRadius: "999px",
+                    padding: "0.65rem 1rem",
+                    background: "var(--background)",
+                  }}
                   value={newMessage}
                   onChange={(e) => {
                     setNewMessage(e.target.value);
@@ -1353,14 +1546,16 @@ export function MessagesView({
                   type="submit"
                   className="btn-primary"
                   style={{
-                    borderRadius: "2rem",
-                    padding: "0.6rem 1.25rem",
+                    borderRadius: "999px",
+                    padding: "0.65rem 1.1rem",
                     whiteSpace: "nowrap",
                     touchAction: "manipulation",
+                    flexShrink: 0,
                   }}
                   disabled={!newMessage.trim() || uploadingImage}
                 >
-                  {t("send")}
+                  <Send size={16} />
+                  <span className="hide-on-mobile">{t("send")}</span>
                 </button>
               </form>
             </>
