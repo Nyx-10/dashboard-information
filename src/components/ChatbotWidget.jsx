@@ -448,7 +448,9 @@ AdtecBot:`;
           }}
         >
           <a
-            href="mailto:adam.darwish.it@gmail.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=adam.darwish.it@gmail.com&su=Bantuan%20Dashboard%20ADTEC%20Melaka"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               color: "var(--text-muted)",
               textDecoration: "none",
@@ -460,7 +462,7 @@ AdtecBot:`;
           >
             Bot tidak dapat membantu?{" "}
             <span style={{ color: "#818CF8", fontWeight: 600 }}>
-              Hubungi Admin
+              Hubungi Admin (Gmail)
             </span>
           </a>
         </div>
