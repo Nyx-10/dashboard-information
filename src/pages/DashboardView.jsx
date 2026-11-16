@@ -235,7 +235,16 @@ export function DashboardView({ onContact, currentUser }) {
             </p>
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem" }}>
+          <div
+            className="dashboard-hero-actions"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.65rem",
+              width: "100%",
+              maxWidth: "420px",
+            }}
+          >
             <button
               className="btn-primary"
               onClick={() => {
@@ -248,7 +257,8 @@ export function DashboardView({ onContact, currentUser }) {
                 }
               }}
               style={{
-                padding: "0.6rem 1.1rem",
+                flex: "1 1 160px",
+                padding: "0.65rem 1rem",
                 fontSize: "0.85rem",
                 fontWeight: 600,
                 borderRadius: "0.65rem",
@@ -263,7 +273,8 @@ export function DashboardView({ onContact, currentUser }) {
               className="btn-primary"
               onClick={() => navigate("/search")}
               style={{
-                padding: "0.6rem 1.1rem",
+                flex: "1 1 130px",
+                padding: "0.65rem 1rem",
                 fontSize: "0.85rem",
                 fontWeight: 600,
                 borderRadius: "0.65rem",
@@ -628,7 +639,8 @@ export function DashboardView({ onContact, currentUser }) {
             style={{
               width: "100%",
               maxWidth: "520px",
-              overflow: "hidden",
+              maxHeight: "88dvh",
+              overflowY: "auto",
               border: "1px solid var(--border)",
             }}
           >

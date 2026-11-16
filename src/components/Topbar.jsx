@@ -72,14 +72,14 @@ export function Topbar({
           <Menu size={24} />
         </button>
         {location.pathname === "/home" && (
-          <div style={{ marginLeft: "0.5rem" }}>
+          <div style={{ marginLeft: "0.25rem", minWidth: 0 }}>
             <h1
               className="topbar-title"
               style={{
-                fontSize: "1.25rem",
+                fontSize: "1.15rem",
                 fontWeight: 700,
                 margin: 0,
-                lineHeight: 1,
+                lineHeight: 1.15,
                 color: "var(--text-main)",
               }}
             >
@@ -90,7 +90,7 @@ export function Topbar({
               style={{
                 color: "var(--text-muted)",
                 fontSize: "0.75rem",
-                margin: "0.25rem 0 0 0",
+                margin: "0.2rem 0 0 0",
               }}
             >
               {isAuthenticated && user ? t("welcomeBack") : t("guestTopbarSub")}
@@ -98,7 +98,10 @@ export function Topbar({
           </div>
         )}
         {isSearchActive ? (
-          <div className="topbar-search" style={{ position: "relative" }}>
+          <div
+            className="topbar-search hide-on-mobile"
+            style={{ position: "relative" }}
+          >
             <Search
               size={18}
               style={{

@@ -12,7 +12,8 @@ import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
 
 export function MobileBottomNav() {
-  const { t } = useContext(LanguageContext);
+  const { lang, t } = useContext(LanguageContext);
+  const isMs = lang === "ms";
   const {
     user,
     isAuthenticated,
@@ -57,8 +58,10 @@ export function MobileBottomNav() {
         className={`mobile-nav-item ${isActive("/home") ? "active" : ""}`}
         onClick={() => handleNav("/home")}
       >
-        <LayoutDashboard size={20} />
-        <span>{t("dashboard")}</span>
+        <div className="mobile-nav-icon-wrapper">
+          <LayoutDashboard size={20} />
+        </div>
+        <span>{isMs ? "Utama" : "Home"}</span>
       </button>
 
       <button
@@ -66,8 +69,10 @@ export function MobileBottomNav() {
         className={`mobile-nav-item ${isActive("/search") ? "active" : ""}`}
         onClick={() => handleNav("/search")}
       >
-        <Search size={20} />
-        <span>{t("searchItems")?.split(" ")[0] || "Cari"}</span>
+        <div className="mobile-nav-icon-wrapper">
+          <Search size={20} />
+        </div>
+        <span>{isMs ? "Cari" : "Search"}</span>
       </button>
 
       <button
@@ -78,7 +83,7 @@ export function MobileBottomNav() {
         <div className="mobile-nav-center-icon">
           <PlusCircle size={22} />
         </div>
-        <span>{t("missingItem")?.split(" ")[0] || "Tambah"}</span>
+        <span>{isMs ? "Lapor" : "Report"}</span>
       </button>
 
       <button
@@ -94,7 +99,7 @@ export function MobileBottomNav() {
             </span>
           )}
         </div>
-        <span>{t("messages")}</span>
+        <span>{isMs ? "Mesej" : "Chat"}</span>
       </button>
 
       {isAuthenticated && user ? (
@@ -103,8 +108,10 @@ export function MobileBottomNav() {
           className={`mobile-nav-item ${isActive("/profile") ? "active" : ""}`}
           onClick={() => handleNav("/profile")}
         >
-          <User size={20} />
-          <span>{t("profile")}</span>
+          <div className="mobile-nav-icon-wrapper">
+            <User size={20} />
+          </div>
+          <span>{isMs ? "Profil" : "Profile"}</span>
         </button>
       ) : (
         <button
@@ -112,8 +119,10 @@ export function MobileBottomNav() {
           className={`mobile-nav-item ${isActive("/login") ? "active" : ""}`}
           onClick={() => goToLogin && goToLogin()}
         >
-          <LogIn size={20} />
-          <span>{t("loginBtn")}</span>
+          <div className="mobile-nav-icon-wrapper">
+            <LogIn size={20} />
+          </div>
+          <span>{isMs ? "Masuk" : "Sign In"}</span>
         </button>
       )}
     </nav>

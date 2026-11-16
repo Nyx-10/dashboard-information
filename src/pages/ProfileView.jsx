@@ -521,9 +521,10 @@ export function ProfileView({ onContact, currentUser }) {
             )}
 
             <div
+              className="profile-actions-row"
               style={{
                 display: "flex",
-                gap: "1rem",
+                gap: "0.75rem",
                 position: "relative",
                 zIndex: 20,
                 flexWrap: "wrap",
@@ -763,10 +764,11 @@ export function ProfileView({ onContact, currentUser }) {
 
         {/* Activity Stats Dashboard */}
         <div
+          className="profile-stats-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "1.5rem",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "1rem",
             marginBottom: "2rem",
           }}
         >

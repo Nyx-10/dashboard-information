@@ -283,19 +283,23 @@ export function DoubleSliderAuthView({
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
+        minHeight: "100dvh",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        padding: "4.5rem 1rem 2rem",
+        padding: "1.25rem 1rem 2rem",
         gap: "1rem",
       }}
     >
-      {/* Top Controls */}
+      {/* Top Controls Bar (Responsive, no overlap on mobile) */}
       <div
         style={{
-          position: "absolute",
-          top: "1.5rem",
-          left: "1.5rem",
+          width: "100%",
+          maxWidth: "900px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.75rem",
           zIndex: 1000,
         }}
       >
@@ -304,40 +308,34 @@ export function DoubleSliderAuthView({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
+            gap: "0.45rem",
             background: "var(--surface)",
             color: "var(--text-main)",
             border: "1px solid var(--border)",
-            padding: "0.4rem 0.75rem",
-            borderRadius: "0.5rem",
+            padding: "0.45rem 0.85rem",
+            borderRadius: "0.6rem",
             cursor: "pointer",
-            fontWeight: 500,
+            fontWeight: 600,
+            fontSize: "0.85rem",
           }}
         >
           <ArrowLeft size={16} />{" "}
           {backLabel || (t ? t("backToHome") : "Back to Home")}
         </button>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "1.5rem",
-          right: "1.5rem",
-          zIndex: 1000,
-        }}
-      >
+
         <select
           value={lang}
           onChange={(e) => setLang(e.target.value)}
           style={{
-            padding: "0.4rem",
-            borderRadius: "0.5rem",
+            padding: "0.45rem 0.75rem",
+            borderRadius: "0.6rem",
             background: "var(--surface)",
             color: "var(--text-main)",
             border: "1px solid var(--border)",
             outline: "none",
             cursor: "pointer",
-            fontWeight: 500,
+            fontWeight: 600,
+            fontSize: "0.85rem",
           }}
         >
           <option value="ms">Bahasa Melayu</option>

@@ -73,7 +73,7 @@ export function ItemCardCompact({
 
     return (
       <div
-        className={`item-card item-card-wrapper ${isDeleting ? "item-delete-leave" : ""}`}
+        className={`item-card item-card-wrapper item-card-compact ${item.image ? "has-image" : "no-image"} ${isDeleting ? "item-delete-leave" : ""}`}
         onClick={() => onSelect && onSelect(item)}
         style={{
           flexDirection: "row",
@@ -81,7 +81,7 @@ export function ItemCardCompact({
           alignItems: "stretch",
           overflow: "hidden",
           borderLeft: `4px solid ${accentColor}`,
-          minHeight: "142px",
+          minHeight: "136px",
           cursor: onSelect ? "pointer" : "default",
         }}
       >
@@ -91,6 +91,7 @@ export function ItemCardCompact({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
+            className="item-card-compact-media"
             style={{
               display: "block",
               width: "118px",
@@ -113,8 +114,9 @@ export function ItemCardCompact({
           </a>
         ) : (
           <div
+            className="item-card-compact-placeholder"
             style={{
-              width: "84px",
+              width: "76px",
               flexShrink: 0,
               background: accentBg,
               display: "flex",
@@ -363,10 +365,10 @@ export function ItemCardCompact({
   // ==========================================================================
   return (
     <div
-      className={`item-card item-card-wrapper ${isDeleting ? "item-delete-leave" : ""}`}
+      className={`item-card item-card-wrapper item-card-compact ${item.image ? "has-image" : "no-image"} ${isDeleting ? "item-delete-leave" : ""}`}
       style={{
         flexDirection: "row",
-        borderRadius: "0.5rem",
+        borderRadius: "0.75rem",
         alignItems: "stretch",
         overflow: "hidden",
       }}
@@ -376,6 +378,7 @@ export function ItemCardCompact({
           href={item.image}
           target="_blank"
           rel="noopener noreferrer"
+          className="item-card-compact-media"
           style={{
             display: "block",
             width: "120px",

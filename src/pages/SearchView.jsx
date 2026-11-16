@@ -97,15 +97,52 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
 
   return (
     <div className="page-bg-common bg-search">
-      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1.5rem" }}>
+      <h1
+        style={{
+          fontSize: "clamp(1.4rem, 4vw, 2rem)",
+          fontWeight: 700,
+          marginBottom: "1rem",
+        }}
+      >
         {t("searchResults")}
       </h1>
 
+      {/* Mobile-friendly full-width search input */}
       <div
         style={{
+          position: "relative",
+          marginBottom: "1rem",
+        }}
+      >
+        <Search
+          size={18}
+          style={{
+            position: "absolute",
+            left: "14px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "var(--text-muted)",
+          }}
+        />
+        <input
+          type="text"
+          className="input-field"
+          placeholder={t("searchAnything")}
+          value={query || ""}
+          onChange={(e) => setQuery && setQuery(e.target.value)}
+          style={{
+            paddingLeft: "42px",
+            borderRadius: "0.75rem",
+          }}
+        />
+      </div>
+
+      <div
+        className="search-filter-bar"
+        style={{
           display: "flex",
-          gap: "1rem",
-          marginBottom: "2rem",
+          gap: "0.65rem",
+          marginBottom: "1.5rem",
           flexWrap: "wrap",
           alignItems: "center",
         }}
@@ -169,10 +206,11 @@ export function SearchView({ query, setQuery, onContact, currentUser }) {
 
         <input
           type="date"
+          className="search-date-input"
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
           style={{
-            padding: "0.5rem",
+            padding: "0.5rem 0.75rem",
             borderRadius: "0.5rem",
             border: "1px solid var(--border)",
             background: "var(--surface)",
