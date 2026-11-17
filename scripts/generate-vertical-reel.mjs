@@ -1093,7 +1093,7 @@ const html = `<!DOCTYPE html>
       <span class="badge-cifpec">CITEC / CIFPEC 2026</span>
       <div>
         <div style="font-size:14px; font-weight:800; color:#fff;">Vertical AI Pitch Reel (9:16)</div>
-        <div style="font-size:11px; color:var(--cyan);">Dashboard ADTEC Melaka • Inovasi TVET</div>
+        <div style="font-size:11px; color:var(--cyan);" data-en="Dashboard ADTEC Melaka • TVET Innovation">Dashboard ADTEC Melaka • Inovasi TVET</div>
       </div>
     </div>
 
@@ -1147,24 +1147,24 @@ const html = `<!DOCTYPE html>
     </div>
 
     <!-- ==========================================
-         SCENE 0: CINEMATIC INTRO (BM greeting)
+         SCENE 0: CINEMATIC INTRO (BM & EN)
          ========================================== -->
     <section class="scene-view active" id="scene-0">
       <div class="intro-ring"></div>
       <div class="intro-wrap">
-        <div class="reveal reveal-pop" style="--d:0.2s;">
+        <div class="reveal reveal-pop" data-d-bm="0.2" data-d-en="0.15" style="--d:0.2s;">
           <div class="intro-logo"><img src="${bannerLogoBase64}" alt="Logo Rasmi"></div>
         </div>
-        <div class="reveal" style="--d:0.8s;">
+        <div class="reveal" data-d-bm="0.8" data-d-en="0.5" style="--d:0.8s;">
           <div class="intro-kicker" data-en="CIFPEC 2026 • Proudly Presents">CIFPEC 2026 • Dengan Bangganya Mempersembahkan</div>
         </div>
-        <div class="reveal" style="--d:1.4s;">
+        <div class="reveal" data-d-bm="1.4" data-d-en="0.9" style="--d:1.4s;">
           <h1 class="intro-title">DASHBOARD<br>ADTEC MELAKA</h1>
         </div>
-        <div class="reveal" style="--d:2.2s;">
+        <div class="reveal" data-d-bm="2.2" data-d-en="1.4" style="--d:2.2s;">
           <p class="intro-sub" data-en="Smart Digital Campus Hub &amp; AI-Powered Lost &amp; Found">Hab Kampus Digital Pintar &amp; Lost-Found Berkuasa AI</p>
         </div>
-        <div class="reveal" style="--d:3.0s;">
+        <div class="reveal" data-d-bm="3.0" data-d-en="2.0" style="--d:3.0s;">
           <div class="intro-team">
             <div class="intro-member"><div class="ava"><img src="${member1Base64}" alt="Adam"></div><span>Adam Darwish</span></div>
             <div class="intro-member"><div class="ava"><img src="${member2Base64}" alt="Hazim"></div><span>Hazim Afiq</span></div>
@@ -1202,7 +1202,7 @@ const html = `<!DOCTYPE html>
           </div>
         </div>
 
-        <div class="noti-bubble reveal reveal-left sfx-pop" style="border-left-color:var(--rose);" data-d-bm="17" data-d-en="15">
+        <div class="noti-bubble reveal reveal-left sfx-pop" style="border-left-color:var(--rose);" data-d-bm="17" data-d-en="9">
           <div class="noti-avatar warn">📄</div>
           <div class="noti-content" style="flex:1;">
             <h4><span data-en="Damaged Paper Notice Boards">Papan Notis Kertas Rosak</span> <span style="font-size:9.5px; color:var(--rose);" data-en="WASTEFUL">MEMBAZIR</span></h4>
@@ -1210,7 +1210,7 @@ const html = `<!DOCTYPE html>
           </div>
         </div>
 
-        <div class="noti-bubble reveal reveal-left sfx-pop" style="border-left-color:var(--amber);" data-d-bm="23" data-d-en="17">
+        <div class="noti-bubble reveal reveal-left sfx-pop" style="border-left-color:var(--amber);" data-d-bm="23" data-d-en="11.5">
           <div class="noti-avatar priv">🔒</div>
           <div class="noti-content" style="flex:1;">
             <h4><span data-en="Phone Number Privacy Risk">Risiko Privasi Nombor Telefon</span> <span style="font-size:9.5px; color:var(--amber);" data-en="DANGER">BAHAYA</span></h4>
@@ -1220,7 +1220,7 @@ const html = `<!DOCTYPE html>
       </div>
 
       <!-- HERO CALLOUT BOX -->
-      <div class="reveal reveal-pop sfx-pop" data-d-bm="27" data-d-en="24">
+      <div class="reveal reveal-pop sfx-pop" data-d-bm="27" data-d-en="18">
         <div class="hero-callout-box">
           <span id="calloutTag" data-en="💡 SMART TVET SOLUTION">💡 PENYELESAIAN PINTAR TVET</span>
           <h3>DASHBOARD ADTEC MELAKA</h3>
@@ -1551,7 +1551,8 @@ const html = `<!DOCTYPE html>
 
     // TIMESTAMPS FOR ENGLISH (Durasi ~173s = 2m 53s)
     const scenesEN = [
-      { id: 'scene-1', start: 0, end: 33.2 },
+      { id: 'scene-0', start: 0, end: 6.0 },
+      { id: 'scene-1', start: 6.0, end: 33.2 },
       { id: 'scene-2', start: 33.2, end: 69.4 },
       { id: 'scene-3', start: 69.4, end: 117.0 },
       { id: 'scene-4', start: 117.0, end: 142.7 },
@@ -1748,6 +1749,8 @@ const html = `<!DOCTYPE html>
     }
 
     function playLabel() { return currentLang === 'bm' ? '▶️ Play Suara AI' : '▶️ Play AI Pitch'; }
+    function recLabel() { return currentLang === 'bm' ? '🎥 Rakam & Export Video' : '🎥 Record & Export Video'; }
+    function stopRecLabel() { return currentLang === 'bm' ? '⏹ Henti Rakaman' : '⏹ Stop Recording'; }
 
     audio.addEventListener('play', () => {
       playBtn.innerText = '⏸ Pause';
@@ -1780,7 +1783,7 @@ const html = `<!DOCTYPE html>
         ensureCtx();
         playSfx('ping');
         audio.play().catch(err => {
-          alert('Ralat memainkan audio: ' + err.message);
+          alert((currentLang === 'bm' ? 'Ralat memainkan audio: ' : 'Error playing audio: ') + err.message);
         });
       } else {
         audio.pause();
@@ -1805,13 +1808,22 @@ const html = `<!DOCTYPE html>
         audioTrackTitle.innerText = 'Suara AI: Bahasa Melayu (Aoede)';
         audioTrackSub.innerText = 'Master Pitch Audio • Durasi 3m 18s (Format CIFPEC Rasmi)';
         captionText.innerHTML = 'Tekan <span class="caption-highlight">▶️ Play Suara AI</span> untuk memulakan persembahan.';
+        document.getElementById('btnMusic').title = 'Muzik latar';
+        document.getElementById('musicVol').title = 'Kelantangan muzik latar';
       } else {
         audio.src = 'audio/full_citec_style_voiceover.wav';
         audioTrackTitle.innerText = 'AI Voiceover: English (Aoede)';
-        audioTrackSub.innerText = 'Master Pitch Audio • Durasi 2m 53s (CITEC Style)';
+        audioTrackSub.innerText = 'Master Pitch Audio • Duration 2m 53s (CITEC Style)';
         captionText.innerHTML = 'Press <span class="caption-highlight">▶️ Play AI Pitch</span> to start presentation.';
+        document.getElementById('btnMusic').title = 'Background music';
+        document.getElementById('musicVol').title = 'Background music volume';
       }
       playBtn.innerText = playLabel();
+      if (!mediaRecorder || mediaRecorder.state !== 'recording') {
+        recBtn.innerText = recLabel();
+      } else {
+        recBtn.innerText = stopRecLabel();
+      }
       timerTag.innerText = '0:00 / ' + fmtTime(DUR[lang]);
 
       applyLanguageTexts(lang);
@@ -2228,8 +2240,12 @@ const html = `<!DOCTYPE html>
       if (recStream) recStream.getTracks().forEach(t => t.stop());
       recStream = null;
       recBadge.classList.remove('active');
-      recBtn.innerText = '🎥 Rakam & Export Video';
-      alert('Tahniah! Rakaman video inovasi (.' + recExt + ') berjaya dimuat turun ke folder Downloads anda!');
+      recBtn.innerText = recLabel();
+      alert(
+        currentLang === 'bm'
+          ? 'Tahniah! Rakaman video inovasi (.' + recExt + ') berjaya dimuat turun ke folder Downloads anda!'
+          : 'Congratulations! Your innovation video recording (.' + recExt + ') has been downloaded to your Downloads folder!'
+      );
     }
 
     async function toggleRecordVideo() {
@@ -2260,7 +2276,11 @@ const html = `<!DOCTYPE html>
           vTrack.addEventListener('ended', () => stopRecording());
         }
         if (recStream.getAudioTracks().length === 0) {
-          alert('Nota: Audio tab tidak dikongsi. Pastikan pilihan \u0022Share tab audio\u0022 ditanda supaya suara AI & muzik turut dirakam.');
+          alert(
+            currentLang === 'bm'
+              ? 'Nota: Audio tab tidak dikongsi. Pastikan pilihan \u0022Share tab audio\u0022 ditanda supaya suara AI & muzik turut dirakam.'
+              : 'Note: Tab audio was not shared. Please enable \u0022Share tab audio\u0022 so the AI voiceover and background music are recorded.'
+          );
         }
 
         audio.pause();
@@ -2283,11 +2303,15 @@ const html = `<!DOCTYPE html>
         activateScene(0, 0, true);
         mediaRecorder.start(1000);
         recBadge.classList.add('active');
-        recBtn.innerText = '⏹ Henti Rakaman';
+        recBtn.innerText = stopRecLabel();
         if (!cropped) console.info('Tip: Gunakan Google Chrome terkini supaya rakaman dipotong tepat pada bingkai 9:16 sahaja.');
         await audio.play();
       } catch (err) {
-        alert('Untuk merakam secara manual tanpa perkongsian skrin, anda juga boleh menggunakan OBS Studio atau Xbox Game Bar (Win + G). Ralat: ' + err.message);
+        alert(
+          currentLang === 'bm'
+            ? 'Untuk merakam secara manual tanpa perkongsian skrin, anda juga boleh menggunakan OBS Studio atau Xbox Game Bar (Win + G). Ralat: ' + err.message
+            : 'To record manually without screen sharing, you can also use OBS Studio or Xbox Game Bar (Win + G). Error: ' + err.message
+        );
       }
     }
 
