@@ -1315,8 +1315,8 @@ const html = `<!DOCTYPE html>
           </div>
           <img src="${previewBase64}" alt="Preview Web">
           <div class="ticker-bar-mock">
-            <span class="ticker-tag">KIOSK TV</span>
-            <div class="ticker-text" data-en="📢 New Semester Registration • 🔍 Found: Yamaha Motorcycle Key at the Surau • ⏰ 12:45 PM">
+            <span class="ticker-tag" data-en="TV KIOSK">KIOSK TV</span>
+            <div class="ticker-text" data-en="📢 New Semester Registration • 🔍 Found: Yamaha Motorcycle Key at the Prayer Hall • ⏰ 12:45 PM">
               📢 Pendaftaran Semester Baharu • 🔍 Dijumpai: Kunci Motor Yamaha di Surau • ⏰ 12:45 PM
             </div>
           </div>
@@ -1326,22 +1326,22 @@ const html = `<!DOCTYPE html>
       <!-- FEATURE STEP RAIL (lights up in sync with narration) -->
       <div class="step-rail">
         <div class="step-chip" style="--d:1.0s;"><span class="sc-ic">📰</span><span class="sc-lb" data-en="Notices">Memo Rasmi</span></div>
-        <div class="step-chip" data-d-bm="10" data-d-en="10.6"><span class="sc-ic">📺</span><span class="sc-lb">Kiosk TV</span></div>
-        <div class="step-chip" data-d-bm="22" data-d-en="20.6"><span class="sc-ic">📸</span><span class="sc-lb" data-en="Report Item">Lapor Barang</span></div>
-        <div class="step-chip" data-d-bm="33" data-d-en="30.6"><span class="sc-ic">💬</span><span class="sc-lb" data-en="Private Chat">Sembang Sulit</span></div>
-        <div class="step-chip" data-d-bm="42" data-d-en="38.6"><span class="sc-ic">🤖</span><span class="sc-lb">AdtecBot AI</span></div>
+        <div class="step-chip" data-d-bm="10" data-d-en="10"><span class="sc-ic">📺</span><span class="sc-lb" data-en="TV Kiosk">Kiosk TV</span></div>
+        <div class="step-chip" data-d-bm="22" data-d-en="22"><span class="sc-ic">📸</span><span class="sc-lb" data-en="Report Item">Lapor Barang</span></div>
+        <div class="step-chip" data-d-bm="33" data-d-en="33"><span class="sc-ic">💬</span><span class="sc-lb" data-en="Private Chat">Sembang Sulit</span></div>
+        <div class="step-chip" data-d-bm="42" data-d-en="42"><span class="sc-ic">🤖</span><span class="sc-lb">AdtecBot AI</span></div>
       </div>
 
       <!-- IN-APP CHAT & AI DEMO -->
       <div class="chat-sim-box">
         <div class="chat-head" data-en="🔒 Built-in Private Chat">🔒 Sembang Sulit Dalam Aplikasi</div>
-        <div class="chat-bubble in reveal reveal-left sfx-pop" data-d-bm="33.5" data-d-en="31" data-en="&quot;Hi bro, I found this motorcycle key at the Surau.&quot;">
+        <div class="chat-bubble in reveal reveal-left sfx-pop" data-d-bm="33.5" data-d-en="33.5" data-en="&quot;Hi bro, I found this motorcycle key at the Prayer Hall.&quot;">
           "Salam bro, saya jumpa kunci motor ni dekat Surau."
         </div>
-        <div class="chat-bubble out reveal sfx-pop" data-d-bm="36" data-d-en="33.5" data-en="&quot;Alhamdulillah! Is it the red PROTON keychain, bro?&quot;">
+        <div class="chat-bubble out reveal sfx-pop" data-d-bm="36" data-d-en="36" data-en="&quot;Awesome, thank goodness! Is it the red PROTON keychain?&quot;">
           "Alhamdulillah! Keychain warna merah PROTON ke bro?"
         </div>
-        <div class="chat-bubble bot reveal reveal-pop sfx-pop" data-d-bm="42" data-d-en="38.6" data-en="🤖 AdtecBot: &quot;Protected by built-in private chat. Phone numbers stay hidden.&quot;">
+        <div class="chat-bubble bot reveal reveal-pop sfx-pop" data-d-bm="42" data-d-en="42" data-en="🤖 AdtecBot: &quot;Protected by built-in private chat. Phone numbers stay hidden.&quot;">
           🤖 AdtecBot: "Dilindungi Sembang Sulit Terbina. Nombor telefon tidak didedahkan."
         </div>
       </div>
@@ -1477,7 +1477,7 @@ const html = `<!DOCTYPE html>
       </div>
     </div>
 
-    <audio id="audioEl" src="audio/full_voiceover_bahasa_melayu.wav" preload="auto"></audio>
+    <audio id="audioEl" src="audio/full_voiceover_bahasa_melayu.wav?v=20261117b" preload="auto"></audio>
 
     <div style="display:flex; align-items:center; gap:8px;">
       <div class="music-ctrl">
@@ -1553,7 +1553,7 @@ const html = `<!DOCTYPE html>
     const scenesEN = scenesBM;
 
     const captionsEN = [
-      { start: 0, text: "Assalamualaikum and warm greetings to the <span class='caption-highlight'>honorable CIFPEC 2026 judging panel</span>." },
+      { start: 0, text: "Good day and warm greetings to the <span class='caption-highlight'>honorable CIFPEC 2026 judging panel</span>." },
       { start: 5, text: "We from ADTEC Melaka proudly present our innovation, <span class='caption-highlight'>Dashboard ADTEC Melaka</span>." },
       { start: 12, text: "Have you ever missed critical college announcements <span class='caption-highlight'>buried under hundreds of WhatsApp messages</span>?" },
       { start: 20, text: "Or have you ever lost your <span class='caption-highlight'>vehicle keys, matric card, or laptop</span> in college workshops?" },
@@ -1801,20 +1801,21 @@ const html = `<!DOCTYPE html>
       document.getElementById('btnEn').classList.toggle('active', lang === 'en');
 
       if (lang === 'bm') {
-        audio.src = 'audio/full_voiceover_bahasa_melayu.wav';
+        audio.src = 'audio/full_voiceover_bahasa_melayu.wav?v=20261117b';
         audioTrackTitle.innerText = 'Suara AI: Bahasa Melayu (Aoede)';
         audioTrackSub.innerText = 'Master Pitch Audio • Durasi 3m 18s (Format CIFPEC Rasmi)';
         captionText.innerHTML = 'Tekan <span class="caption-highlight">▶️ Play Suara AI</span> untuk memulakan persembahan.';
         document.getElementById('btnMusic').title = 'Muzik latar';
         document.getElementById('musicVol').title = 'Kelantangan muzik latar';
       } else {
-        audio.src = 'audio/full_citec_style_voiceover.wav';
+        audio.src = 'audio/full_citec_style_voiceover.wav?v=20261117b';
         audioTrackTitle.innerText = 'AI Voiceover: English (Aoede)';
         audioTrackSub.innerText = 'Master Pitch Audio • Duration 3m 18s (Official CIFPEC Format)';
         captionText.innerHTML = 'Press <span class="caption-highlight">▶️ Play AI Pitch</span> to start presentation.';
         document.getElementById('btnMusic').title = 'Background music';
         document.getElementById('musicVol').title = 'Background music volume';
       }
+      audio.load();
       playBtn.innerText = playLabel();
       if (!mediaRecorder || mediaRecorder.state !== 'recording') {
         recBtn.innerText = recLabel();

@@ -36,10 +36,11 @@ function wavToPcm(wavBuffer) {
 function matchDurationWithSentencePauses(enPcm, targetByteLen) {
   if (!targetByteLen || enPcm.length >= targetByteLen) return enPcm.subarray(0, targetByteLen || enPcm.length);
   const neededBytes = targetByteLen - enPcm.length;
-  const winBytes = 960;
+  // Detect only true sentence pauses (>= 360ms of consecutive silence = 18 windows of 20ms)
+  const winBytes = 960; // 20ms at 24kHz 16-bit mono
   const nWins = Math.floor(enPcm.length / winBytes);
-  const silentWins = [];
-  for (let w = 2; w < nWins - 2; w++) {
+  const isSilent = new Array(nWins).fill(false);
+  for (let w = 0; w < nWins; w++) {
     let sumSq = 0;
     const off = w * winBytes;
     for (let i = 0; i < winBytes; i += 2) {
@@ -47,19 +48,35 @@ function matchDurationWithSentencePauses(enPcm, targetByteLen) {
       sumSq += s * s;
     }
     const rms = Math.sqrt(sumSq / (winBytes / 2));
-    if (rms < 120) silentWins.push(w);
+    if (rms < 80) isSilent[w] = true;
   }
-  if (silentWins.length === 0) {
+  const pauseMidWins = [];
+  let runStart = -1;
+  for (let w = 5; w < nWins - 5; w++) {
+    if (isSilent[w]) {
+      if (runStart === -1) runStart = w;
+    } else if (runStart !== -1) {
+      const runLen = w - runStart;
+      if (runLen >= 18) {
+        pauseMidWins.push(Math.floor((runStart + w) / 2));
+      }
+      runStart = -1;
+    }
+  }
+  if (pauseMidWins.length === 0) {
     return Buffer.concat([enPcm, Buffer.alloc(neededBytes)]);
   }
-  const extraPerWin = Math.floor(neededBytes / silentWins.length / 2) * 2;
-  let rem = neededBytes - extraPerWin * silentWins.length;
-  const silentSet = new Set(silentWins);
+  // Distribute 80% of needed silence across sentence pauses, 20% at the end of the part
+  const endBytes = Math.floor((neededBytes * 0.2) / 2) * 2;
+  const pauseTotalBytes = neededBytes - endBytes;
+  const extraPerPause = Math.floor(pauseTotalBytes / pauseMidWins.length / 2) * 2;
+  let rem = pauseTotalBytes - extraPerPause * pauseMidWins.length;
+  const pauseSet = new Set(pauseMidWins);
   const chunks = [];
   for (let w = 0; w < nWins; w++) {
     chunks.push(enPcm.subarray(w * winBytes, (w + 1) * winBytes));
-    if (silentSet.has(w)) {
-      const add = extraPerWin + (rem > 0 ? 2 : 0);
+    if (pauseSet.has(w)) {
+      const add = extraPerPause + (rem > 0 ? 2 : 0);
       if (rem > 0) rem -= 2;
       if (add > 0) chunks.push(Buffer.alloc(add));
     }
@@ -67,7 +84,7 @@ function matchDurationWithSentencePauses(enPcm, targetByteLen) {
   if (nWins * winBytes < enPcm.length) {
     chunks.push(enPcm.subarray(nWins * winBytes));
   }
-  if (rem > 0) chunks.push(Buffer.alloc(rem));
+  if (endBytes + rem > 0) chunks.push(Buffer.alloc(endBytes + rem));
   return Buffer.concat(chunks);
 }
 
@@ -112,7 +129,7 @@ const scripts = [
   {
     filename: 'part1_hook_problem.wav',
     title: 'Part 1: The Hook & Campus Problems',
-    text: "Assalamualaikum and warm greetings to the honorable CIFPEC 2026 judging panel. We from ADTEC Melaka proudly present our innovation, Dashboard ADTEC Melaka. Have you ever missed critical campus announcements because they were buried under hundreds of daily WhatsApp messages? Or have you ever lost your vehicle keys, student matric card, or laptop in college workshops, with no centralized platform to trace them? Conventional methods rely on physical notice boards with damaged paper posters, while sharing your personal phone number in public chat groups exposes students to privacy risks and scams. That is why we developed this integrated smart solution."
+    text: "Good day and warm greetings to the honorable CIFPEC 2026 judging panel. We from ADTEC Melaka proudly present our innovation, Dashboard ADTEC Melaka. Have you ever missed critical campus announcements because they were buried under hundreds of daily WhatsApp messages? Or have you ever lost your vehicle keys, student matric card, or laptop in college workshops, with no centralized platform to trace them? Conventional methods rely on physical notice boards with damaged paper posters, while sharing your personal phone number in public chat groups exposes students to privacy risks and scams. That is why we developed this integrated smart solution."
   },
   {
     filename: 'part2_solution_architecture.wav',
@@ -122,7 +139,7 @@ const scripts = [
   {
     filename: 'part3_demo_walkthrough.wav',
     title: 'Part 3: Step-by-Step Live Demonstration',
-    text: "So, how does this system work? First, users access the centralized dashboard to view categorized administrative memos, sports activities, and academic announcements. Second, for campus-wide visibility, our TV Kiosk mode operates on television screens in lobbies and cafeterias, complete with real-time clocks and scrolling news tickers. Third, when a student finds a misplaced item, they simply upload a photo, select the discovery location such as the workshop or surau, and the report is displayed live to the entire college community in real time. Lastly, the owner can claim the item through a built-in private chat room without exposing personal WhatsApp numbers. In addition, our virtual assistant AdtecBot powered by Google Gemini is ready to answer campus inquiries 24 hours a day."
+    text: "So, how does this system work? First, users access the centralized dashboard to view categorized administrative memos, sports activities, and academic announcements. Second, for campus-wide visibility, our TV Kiosk mode operates on television screens in lobbies and cafeterias, complete with real-time clocks and scrolling news tickers. Third, when a student finds a misplaced item, they simply upload a photo, select the discovery location such as the workshop or prayer hall, and the report is displayed live to the entire college community in real time. Lastly, the owner can claim the item through a built-in private chat room without exposing personal WhatsApp numbers. In addition, our virtual assistant AdtecBot powered by Google Gemini is ready to answer campus inquiries 24 hours a day."
   },
   {
     filename: 'part4_novelty_advantages.wav',
