@@ -1507,9 +1507,9 @@ const html = `<!DOCTYPE html>
     const reelContainer = document.getElementById('reelContainer');
 
     let currentLang = 'bm';
-    const DUR = { bm: 197.5, en: 173.0 };
+    const DUR = { bm: 197.5, en: 197.5 };
 
-    // TIMESTAMPS FOR BAHASA MELAYU (Durasi ~197.5s = 3m 18s)
+    // TIMESTAMPS FOR BAHASA MELAYU & ENGLISH (Durasi ~197.5s = 3m 18s)
     const scenesBM = [
       { id: 'scene-0', start: 0, end: 12.0 },
       { id: 'scene-1', start: 12.0, end: 43.0 },
@@ -1549,40 +1549,37 @@ const html = `<!DOCTYPE html>
       { start: 190, text: "Sekian, <span class='caption-highlight'>terima kasih kepada barisan panel penilai CIFPEC 2026</span>!" }
     ];
 
-    // TIMESTAMPS FOR ENGLISH (Durasi ~173s = 2m 53s)
-    const scenesEN = [
-      { id: 'scene-0', start: 0, end: 6.0 },
-      { id: 'scene-1', start: 6.0, end: 33.2 },
-      { id: 'scene-2', start: 33.2, end: 69.4 },
-      { id: 'scene-3', start: 69.4, end: 117.0 },
-      { id: 'scene-4', start: 117.0, end: 142.7 },
-      { id: 'scene-5', start: 142.7, end: 173.0 }
-    ];
+    // TIMESTAMPS FOR ENGLISH — 100% IDENTICAL TO BAHASA MELAYU (Durasi ~197.5s = 3m 18s)
+    const scenesEN = scenesBM;
 
     const captionsEN = [
-      { start: 0, text: "Have you ever faced problems such as <span class='caption-highlight'>missing critical campus announcements</span>?" },
-      { start: 6, text: "Or have you ever lost your <span class='caption-highlight'>vehicle keys, matric card, or laptop</span> in college workshops?" },
-      { start: 15, text: "Traditional methods rely on <span class='caption-highlight'>damaged paper posters</span> or chat groups where sharing numbers leaks privacy." },
-      { start: 24, text: "That is why our team at ADTEC Melaka created <span class='caption-highlight'>Dashboard ADTEC Melaka</span>!" },
+      { start: 0, text: "Assalamualaikum and warm greetings to the <span class='caption-highlight'>honorable CIFPEC 2026 judging panel</span>." },
+      { start: 5, text: "We from ADTEC Melaka proudly present our innovation, <span class='caption-highlight'>Dashboard ADTEC Melaka</span>." },
+      { start: 12, text: "Have you ever missed critical college announcements <span class='caption-highlight'>buried under hundreds of WhatsApp messages</span>?" },
+      { start: 20, text: "Or have you ever lost your <span class='caption-highlight'>vehicle keys, matric card, or laptop</span> in college workshops?" },
+      { start: 29, text: "Conventional methods rely on <span class='caption-highlight'>easily damaged paper notice boards</span>..." },
+      { start: 35, text: "While sharing phone numbers in public groups <span class='caption-highlight'>exposes student privacy to scams</span>." },
+      { start: 39, text: "That is why we developed <span class='caption-highlight'>this integrated smart solution</span>!" },
 
-      { start: 33.2, text: "Dashboard ADTEC Melaka is an <span class='caption-highlight'>eco-friendly digital campus hub</span>." },
-      { start: 42, text: "Built with <span class='caption-highlight'>React 19, Supabase Realtime, and Google Gemini AI</span>." },
-      { start: 52, text: "Delivering instant live data without requiring any page refreshes!" },
-      { start: 60, text: "With <span class='caption-highlight'>Progressive Web App (PWA)</span> support, install directly on Android and iOS." },
+      { start: 43, text: "Dashboard ADTEC Melaka is an <span class='caption-highlight'>eco-friendly digital campus hub</span>." },
+      { start: 51, text: "Uniting official college notices, <span class='caption-highlight'>digital TV Kiosks</span>, and AI-powered Lost &amp; Found tracking." },
+      { start: 61, text: "Built with <span class='caption-highlight'>React 19, Supabase Realtime, and Google Gemini AI</span>." },
+      { start: 72, text: "<span class='caption-highlight'>Progressive Web App (PWA)</span> support allows direct installation on smartphones!" },
 
-      { start: 69.4, text: "So, <span class='caption-highlight'>how does it work?</span> First, access categorized administrative notices &amp; events." },
-      { start: 80, text: "Second, our <span class='caption-highlight'>TV Kiosk mode</span> runs on displays with automated news tickers." },
-      { start: 90, text: "Third, report misplaced items instantly with <span class='caption-highlight'>photos &amp; location tags</span>." },
-      { start: 100, text: "Lastly, claim items through <span class='caption-highlight'>built-in private chat</span> without exposing phone numbers!" },
-      { start: 108, text: "Plus, our 24/7 AI virtual assistant <span class='caption-highlight'>AdtecBot</span> guides students on campus procedures." },
+      { start: 81, text: "So, how does this system work? First, browse the dashboard for <span class='caption-highlight'>official memos and college activities</span>." },
+      { start: 91, text: "Second, <span class='caption-highlight'>TV Kiosk Mode</span> runs in lobbies and cafeterias with real-time clocks and scrolling news." },
+      { start: 103, text: "Third, upload photos and locations of misplaced items <span class='caption-highlight'>live to the entire college community</span>." },
+      { start: 114, text: "Lastly, claim items through a <span class='caption-highlight'>built-in private chat without exposing phone numbers</span>!" },
+      { start: 123, text: "Our virtual assistant <span class='caption-highlight'>AdtecBot AI (Gemini)</span> is ready to answer campus inquiries 24/7." },
 
-      { start: 117.0, text: "Not only does it eliminate communication delays with <span class='caption-highlight'>100% realtime sync</span>..." },
-      { start: 125, text: "It champions the <span class='caption-highlight'>Green Campus initiative</span>, cutting paper waste by up to 90%!" },
-      { start: 133, text: "Security is safeguarded by <span class='caption-highlight'>email OTP verification</span> and Supabase Row Level Security." },
+      { start: 132.6, text: "This innovation champions the <span class='caption-highlight'>Green Campus initiative</span> by reducing paper notice printing by 90%!" },
+      { start: 142, text: "Data security is safeguarded with <span class='caption-highlight'>official email OTP and Supabase Row Level Security</span>." },
+      { start: 152, text: "Misplaced item recovery time is shortened from <span class='caption-highlight'>weeks down to just a few hours</span>!" },
 
-      { start: 142.7, text: "Its modular design enables seamless replication across <span class='caption-highlight'>all 33 ILJTM institutes</span> nationwide!" },
-      { start: 154, text: "Dashboard ADTEC Melaka transforms campus administration into a <span class='caption-highlight'>smart TVET environment</span>." },
-      { start: 162, text: "<span class='caption-highlight'>Scan the QR code now</span> to test the live portal. Thank you to the CIFPEC judging panel!" }
+      { start: 162.8, text: "Its modular architecture is ready to be replicated across <span class='caption-highlight'>all 33 JTM training institutes &amp; polytechnics</span>!" },
+      { start: 173, text: "Transforming campus governance towards a <span class='caption-highlight'>smart, secure, and sustainable TVET ecosystem</span>." },
+      { start: 182, text: "<span class='caption-highlight'>Scan the QR code on your screen</span> now to test our live system!" },
+      { start: 190, text: "Thank you to the <span class='caption-highlight'>honorable CIFPEC 2026 judging panel</span>!" }
     ];
 
     function getScenes() { return currentLang === 'bm' ? scenesBM : scenesEN; }
@@ -1607,7 +1604,7 @@ const html = `<!DOCTYPE html>
         el.innerHTML = (lang === 'en') ? el.dataset.en : el.dataset.bm;
       });
       document.querySelectorAll('[data-d-bm]').forEach(el => {
-        const d = (lang === 'en') ? el.dataset.dEn : el.dataset.dBm;
+        const d = el.dataset.dBm;
         el.style.setProperty('--d', d + 's');
       });
       document.querySelectorAll('.count-up').forEach(el => {
@@ -1813,7 +1810,7 @@ const html = `<!DOCTYPE html>
       } else {
         audio.src = 'audio/full_citec_style_voiceover.wav';
         audioTrackTitle.innerText = 'AI Voiceover: English (Aoede)';
-        audioTrackSub.innerText = 'Master Pitch Audio • Duration 2m 53s (CITEC Style)';
+        audioTrackSub.innerText = 'Master Pitch Audio • Duration 3m 18s (Official CIFPEC Format)';
         captionText.innerHTML = 'Press <span class="caption-highlight">▶️ Play AI Pitch</span> to start presentation.';
         document.getElementById('btnMusic').title = 'Background music';
         document.getElementById('musicVol').title = 'Background music volume';

@@ -33,6 +33,44 @@ function wavToPcm(wavBuffer) {
   return wavBuffer.subarray(44);
 }
 
+function matchDurationWithSentencePauses(enPcm, targetByteLen) {
+  if (!targetByteLen || enPcm.length >= targetByteLen) return enPcm.subarray(0, targetByteLen || enPcm.length);
+  const neededBytes = targetByteLen - enPcm.length;
+  const winBytes = 960;
+  const nWins = Math.floor(enPcm.length / winBytes);
+  const silentWins = [];
+  for (let w = 2; w < nWins - 2; w++) {
+    let sumSq = 0;
+    const off = w * winBytes;
+    for (let i = 0; i < winBytes; i += 2) {
+      const s = enPcm.readInt16LE(off + i);
+      sumSq += s * s;
+    }
+    const rms = Math.sqrt(sumSq / (winBytes / 2));
+    if (rms < 120) silentWins.push(w);
+  }
+  if (silentWins.length === 0) {
+    return Buffer.concat([enPcm, Buffer.alloc(neededBytes)]);
+  }
+  const extraPerWin = Math.floor(neededBytes / silentWins.length / 2) * 2;
+  let rem = neededBytes - extraPerWin * silentWins.length;
+  const silentSet = new Set(silentWins);
+  const chunks = [];
+  for (let w = 0; w < nWins; w++) {
+    chunks.push(enPcm.subarray(w * winBytes, (w + 1) * winBytes));
+    if (silentSet.has(w)) {
+      const add = extraPerWin + (rem > 0 ? 2 : 0);
+      if (rem > 0) rem -= 2;
+      if (add > 0) chunks.push(Buffer.alloc(add));
+    }
+  }
+  if (nWins * winBytes < enPcm.length) {
+    chunks.push(enPcm.subarray(nWins * winBytes));
+  }
+  if (rem > 0) chunks.push(Buffer.alloc(rem));
+  return Buffer.concat(chunks);
+}
+
 async function generateTTSWithTimeout(text, voiceName = 'Aoede', timeoutMs = 45000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -44,7 +82,7 @@ async function generateTTSWithTimeout(text, voiceName = 'Aoede', timeoutMs = 450
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `Please read aloud clearly: ${text}` }] }],
+        contents: [{ parts: [{ text: text }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: {
@@ -68,51 +106,53 @@ async function generateTTSWithTimeout(text, voiceName = 'Aoede', timeoutMs = 450
   }
 }
 
+const publicAudioDir = path.join(workspaceDir, 'public', 'audio');
+
 const scripts = [
   {
     filename: 'part1_hook_problem.wav',
     title: 'Part 1: The Hook & Campus Problems',
-    text: "Have you ever faced problems such as missing critical campus announcements because they are buried under hundreds of daily WhatsApp messages? Or have you ever lost your vehicle keys, student matric card, or laptop in college workshops, with no centralized platform to trace them? Traditional methods rely on physical notice boards with damaged paper posters, or public chat groups where sharing your personal phone number exposes you to scams and privacy risks. That is why our team at ADTEC Melaka came up with an intelligent solution called Dashboard ADTEC Melaka."
+    text: "Assalamualaikum and warm greetings to the honorable CIFPEC 2026 judging panel. We from ADTEC Melaka proudly present our innovation, Dashboard ADTEC Melaka. Have you ever missed critical campus announcements because they were buried under hundreds of daily WhatsApp messages? Or have you ever lost your vehicle keys, student matric card, or laptop in college workshops, with no centralized platform to trace them? Conventional methods rely on physical notice boards with damaged paper posters, while sharing your personal phone number in public chat groups exposes students to privacy risks and scams. That is why we developed this integrated smart solution."
   },
   {
     filename: 'part2_solution_architecture.wav',
     title: 'Part 2: The Solution & Technical Architecture',
-    text: "Dashboard ADTEC Melaka is a modern, eco-friendly digital campus hub that unites official announcements, digital TV kiosk signage, and an AI-powered lost and found tracking system into a single unified platform. Developed using modern web architecture including React 19, Supabase Realtime WebSockets, and Google Gemini AI, it delivers instant live updates without requiring any page refreshes. Furthermore, with Progressive Web App support, students and staff can install it directly on Android and iOS devices without third-party app stores."
+    text: "Dashboard ADTEC Melaka is an eco-friendly digital campus hub that unites official college announcements, digital TV kiosk signage, and an AI-powered lost and found tracking system into a single unified platform. Developed using modern web architecture including React 19, Supabase Realtime WebSockets, and Google Gemini AI, it delivers instant live updates without requiring any page refreshes. Furthermore, with Progressive Web App support, students and staff can install it directly on Android and iOS smartphones like a native app without third-party app stores."
   },
   {
     filename: 'part3_demo_walkthrough.wav',
     title: 'Part 3: Step-by-Step Live Demonstration',
-    text: "So, how does it work? First, users access the centralized campus dashboard to view categorized administrative notices, academic schedules, and club activities. Second, for campus-wide visibility, our TV Kiosk mode runs on displays in lobbies and cafeterias, featuring real-time clocks and automated news tickers. Third, when a student finds a misplaced item, they snap a photo, tag the campus location, and submit a report. The item is published instantly across the entire network. Lastly, the owner can claim the item through our built-in private chat, allowing safe verification without revealing personal WhatsApp numbers. In addition, our 24/7 virtual assistant, AdtecBot powered by Google Gemini, is always ready to guide students on campus procedures."
+    text: "So, how does this system work? First, users access the centralized dashboard to view categorized administrative memos, sports activities, and academic announcements. Second, for campus-wide visibility, our TV Kiosk mode operates on television screens in lobbies and cafeterias, complete with real-time clocks and scrolling news tickers. Third, when a student finds a misplaced item, they simply upload a photo, select the discovery location such as the workshop or surau, and the report is displayed live to the entire college community in real time. Lastly, the owner can claim the item through a built-in private chat room without exposing personal WhatsApp numbers. In addition, our virtual assistant AdtecBot powered by Google Gemini is ready to answer campus inquiries 24 hours a day."
   },
   {
     filename: 'part4_novelty_advantages.wav',
     title: 'Part 4: Key Novelty & Sustainability',
-    text: "Not only does Dashboard ADTEC Melaka eliminate communication delays with 100% realtime cloud synchronization, but it also champions the Green Campus initiative by reducing physical paper waste by up to 90%. Security and privacy are strictly safeguarded using official email OTP verification and Supabase Row Level Security. Lost item recovery time is shortened from weeks to just a few hours."
+    text: "Beyond solving communication delays through 100 percent real-time cloud synchronization, this innovation also champions the Green Campus initiative by reducing physical paper notice printing waste by up to 90 percent. Student data security and privacy are fully safeguarded using official email OTP verification and Supabase Row Level Security policies. Misplaced item recovery time is also shortened from weeks to just a few hours."
   },
   {
     filename: 'part5_impact_conclusion.wav',
     title: 'Part 5: Scalability & Conclusion',
-    text: "From a commercialization and deployment perspective, its modular design enables seamless replication across all 33 ILJTM training institutes and polytechnics nationwide. In conclusion, Dashboard ADTEC Melaka transforms campus administration into a modern, sustainable, and smart TVET environment. Scan the QR code on your screen now to test the live portal at dashboard-information-nu.vercel.app. Thank you to the CIFPEC judging panel!"
+    text: "From a marketability and deployment perspective, its modular architecture enables this system to be easily replicated across all 33 JTM training institutes and polytechnics nationwide. In conclusion, Dashboard ADTEC Melaka transforms campus governance towards a smart, secure, and sustainable TVET ecosystem. Scan the QR code on your screen now to test our live system at dashboard-information-nu.vercel.app. Thank you to the honorable CIFPEC 2026 judging panel!"
   }
 ];
 
 async function main() {
-  console.log('Menyemak fail suara AI yang belum siap...');
+  console.log('Menjana semula suara AI Bahasa Inggeris (5 bahagian, sepadan 1:1 dengan Bahasa Melayu)...');
   for (let i = 0; i < scripts.length; i++) {
     const item = scripts[i];
     const targetFile = path.join(audioDir, item.filename);
-    if (fs.existsSync(targetFile) && fs.statSync(targetFile).size > 100000) {
-      console.log(`[${i+1}/${scripts.length}] Fail sedia ada: ${item.filename}`);
-      continue;
-    }
     console.log(`[${i+1}/${scripts.length}] Menjana: ${item.title}...`);
     let success = false;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const pcm = await generateTTSWithTimeout(item.text, 'Aoede', 15000);
+        const rawPcm = await generateTTSWithTimeout(item.text, 'Aoede', 45000);
+        const bmFile = path.join(audioDir, item.filename.replace('.wav', '_bm.wav'));
+        const targetByteLen = fs.existsSync(bmFile) ? wavToPcm(fs.readFileSync(bmFile)).length : rawPcm.length;
+        const pcm = matchDurationWithSentencePauses(rawPcm, targetByteLen);
         const wav = pcmToWav(pcm, 24000, 1);
         fs.writeFileSync(targetFile, wav);
-        console.log(`  -> Berjaya cubaan ${attempt}: ${item.filename} (${(wav.length / 1024).toFixed(1)} KB)`);
+        fs.writeFileSync(path.join(publicAudioDir, item.filename), wav);
+        console.log(`  -> Berjaya cubaan ${attempt}: ${item.filename} (${(wav.length / 1024).toFixed(1)} KB, ~${(pcm.length / 48000).toFixed(2)}s)`);
         success = true;
         break;
       } catch (err) {
@@ -142,7 +182,8 @@ async function main() {
     const masterWav = pcmToWav(masterPcm, 24000, 1);
     const masterPath = path.join(audioDir, 'full_citec_style_voiceover.wav');
     fs.writeFileSync(masterPath, masterWav);
-    console.log(`MASTER AUDIO BERJAYA DISIMPAN: full_citec_style_voiceover.wav (${(masterWav.length / 1024 / 1024).toFixed(2)} MB, durasi ~${(masterPcm.length / 48000).toFixed(0)} saat)`);
+    fs.writeFileSync(path.join(publicAudioDir, 'full_citec_style_voiceover.wav'), masterWav);
+    console.log(`MASTER AUDIO BERJAYA DISIMPAN: full_citec_style_voiceover.wav (${(masterWav.length / 1024 / 1024).toFixed(2)} MB, durasi ~${(masterPcm.length / 48000).toFixed(2)} saat)`);
   }
 }
 
