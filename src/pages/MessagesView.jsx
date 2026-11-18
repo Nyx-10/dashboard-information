@@ -12,7 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { LanguageContext } from "../context/LanguageContext";
-import { supabase } from "../supabaseClient";
+import { supabase, uploadImageToStorage } from "../supabaseClient";
 import { ItemCardCompact } from "../components/ItemCardCompact";
 
 function UserProfileModal({ profile, onClose, t }) {
@@ -576,15 +576,13 @@ export function MessagesView({
       const fileExt = reportFile.name.split(".").pop();
       const fileName = `report-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("item-images")
-        .upload(fileName, reportFile);
+      const { publicUrl, error: uploadError } = await uploadImageToStorage(
+        fileName,
+        reportFile,
+        "item-images",
+      );
 
       if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("item-images").getPublicUrl(fileName);
 
       imageUrl = publicUrl;
 
@@ -639,15 +637,13 @@ export function MessagesView({
       const fileExt = file.name.split(".").pop();
       const fileName = `chat-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("item-images")
-        .upload(fileName, file);
+      const { publicUrl, error: uploadError } = await uploadImageToStorage(
+        fileName,
+        file,
+        "item-images",
+      );
 
       if (uploadError) throw new Error(uploadError.message);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("item-images").getPublicUrl(fileName);
 
       const messageContent = `[IMAGE]${publicUrl}`;
 

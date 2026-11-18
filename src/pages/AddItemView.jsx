@@ -1,9 +1,15 @@
 import React, { useState, useContext } from "react";
 import { LanguageContext } from "../context/LanguageContext";
-import { supabase } from "../supabaseClient";
+import { AppContext } from "../context/AppContext";
+import {
+  supabase,
+  uploadImageToStorage,
+  insertItemWithFallback,
+} from "../supabaseClient";
 
 export function AddItemView({ onSuccess }) {
   const { t } = useContext(LanguageContext);
+  const { user: contextUser } = useContext(AppContext);
 
   const [type, setType] = useState("lost");
   const [title, setTitle] = useState("");
@@ -77,39 +83,39 @@ export function AddItemView({ onSuccess }) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      const activeUser = user || contextUser;
 
       let imageUrl = null;
       if (photo) {
         const fileExt = photo.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from("item-images")
-          .upload(fileName, photo);
+        const { publicUrl, error: uploadError } = await uploadImageToStorage(
+          fileName,
+          photo,
+          "item-images",
+        );
 
         if (uploadError) {
-          throw new Error("Gagal memuat naik gambar: " + uploadError.message);
+          throw new Error(
+            (t("alertFailedUpload") || "Gagal memuat naik gambar: ") +
+              uploadError.message,
+          );
         }
-
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("item-images").getPublicUrl(fileName);
 
         imageUrl = publicUrl;
       }
 
-      const { error } = await supabase.from("items").insert([
-        {
-          title: finalTitle,
-          type,
-          location: finalLocation,
-          date,
-          description,
-          image: imageUrl,
-          status: "open",
-          created_by: user ? user.id : null,
-        },
-      ]);
+      const { error } = await insertItemWithFallback({
+        title: finalTitle,
+        type,
+        location: finalLocation,
+        date,
+        description,
+        image: imageUrl,
+        status: "open",
+        created_by: activeUser ? activeUser.id : null,
+      });
 
       if (error) throw error;
 
@@ -125,7 +131,7 @@ export function AddItemView({ onSuccess }) {
             location: finalLocation,
             date,
             description,
-            reporterEmail: user?.email,
+            reporterEmail: activeUser?.email,
             origin: window.location.origin,
           }),
         });

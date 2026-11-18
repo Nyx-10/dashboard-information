@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 const PORT = 5000;
 
@@ -749,6 +749,112 @@ Jawab dengan ringkas dan padat (maksimum 2-3 perenggan pendek).`;
       message: isMs
         ? "Maaf, sistem AI sedang sibuk buat masa ini. Sila cuba sebentar lagi."
         : "Sorry, the AI system is currently busy. Please try again shortly.",
+    });
+  }
+});
+
+// ============================================================================
+// MUAT NAIK GAMBAR & TAMBAH LAPORAN (Fallback Service Role untuk elak ralat RLS)
+// ============================================================================
+app.post("/api/upload-image", async (req, res) => {
+  try {
+    const {
+      fileName,
+      fileBase64,
+      contentType,
+      bucket = "item-images",
+    } = req.body || {};
+
+    if (!fileName || !fileBase64) {
+      return res
+        .status(400)
+        .json({ message: "Maklumat fail gambar tidak lengkap." });
+    }
+
+    const allowedBuckets = ["item-images"];
+    const targetBucket = allowedBuckets.includes(bucket)
+      ? bucket
+      : "item-images";
+
+    const cleanBase64 = String(fileBase64).replace(/^data:[^;]+;base64,/, "");
+    const buffer = Buffer.from(cleanBase64, "base64");
+
+    if (buffer.length > 5 * 1024 * 1024) {
+      return res
+        .status(400)
+        .json({ message: "Saiz fail melebihi had maksimum 5MB." });
+    }
+
+    const safePath = String(fileName)
+      .replace(/\.\./g, "")
+      .replace(/^\/+/, "");
+
+    const { error: uploadError } = await supabase.storage
+      .from(targetBucket)
+      .upload(safePath, buffer, {
+        contentType: contentType || "image/png",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(targetBucket).getPublicUrl(safePath);
+
+    return res.status(200).json({ success: true, publicUrl });
+  } catch (error) {
+    console.error("Ralat /api/upload-image:", error);
+    return res.status(500).json({
+      message: error.message || "Gagal memuat naik gambar.",
+    });
+  }
+});
+
+app.post("/api/create-item", async (req, res) => {
+  try {
+    const {
+      title,
+      type,
+      location,
+      date,
+      description,
+      image,
+      status = "open",
+      created_by = null,
+    } = req.body || {};
+
+    if (!title || !type || !date) {
+      return res
+        .status(400)
+        .json({ message: "Maklumat laporan tidak lengkap." });
+    }
+
+    const { data, error } = await supabase
+      .from("items")
+      .insert([
+        {
+          title,
+          type,
+          location: location || "-",
+          date,
+          description: description || "",
+          image: image || null,
+          status,
+          created_by: created_by || null,
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error("Ralat /api/create-item:", error);
+    return res.status(500).json({
+      message: error.message || "Gagal menambah rekod laporan.",
     });
   }
 });

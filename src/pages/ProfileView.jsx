@@ -21,7 +21,7 @@ import { LanguageContext } from "../context/LanguageContext";
 import { AppContext } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 import { ItemCardCompact } from "../components/ItemCardCompact";
-import { supabase } from "../supabaseClient";
+import { supabase, uploadImageToStorage } from "../supabaseClient";
 
 // Senarai rasmi kursus & jabatan di Institut Teknologi Automotif Termaju PROTON (ADTEC Melaka)
 const PROTON_INSTITUTE_COURSE_GROUPS = [
@@ -245,29 +245,29 @@ export function ProfileView({ onContact, currentUser }) {
       const {
         data: { user: supabaseUser },
       } = await supabase.auth.getUser();
-      if (!supabaseUser)
+      const activeUser = supabaseUser || currentUser;
+      if (!activeUser?.id)
         throw new Error(t("pleaseLoginAgain") || "Sila log masuk semula.");
 
       const fileExt = file.name.split(".").pop();
-      const fileName = `avatar_${supabaseUser.id}_${Date.now()}.${fileExt}`;
+      const fileName = `avatar_${activeUser.id}_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("item-images")
-        .upload(`avatars/${fileName}`, file);
+      const { publicUrl, error: uploadError } = await uploadImageToStorage(
+        `avatars/${fileName}`,
+        file,
+        "item-images",
+      );
 
       if (uploadError)
-        throw new Error("Gagal memuat naik gambar: " + uploadError.message);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage
-        .from("item-images")
-        .getPublicUrl(`avatars/${fileName}`);
+        throw new Error(
+          (t("alertFailedUpload") || "Gagal memuat naik gambar: ") +
+            uploadError.message,
+        );
 
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ avatar_url: publicUrl })
-        .eq("id", supabaseUser.id);
+        .eq("id", activeUser.id);
 
       if (updateError) throw updateError;
 

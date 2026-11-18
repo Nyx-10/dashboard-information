@@ -381,19 +381,12 @@ export default function App() {
         setIsMaintenance(true);
       }
 
-      const rememberMe = localStorage.getItem("rememberMe");
-      const tempSession = sessionStorage.getItem("tempSession");
-
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (session?.user) {
-        if (rememberMe === "false" && tempSession !== "true") {
-          await supabase.auth.signOut();
-          localStorage.removeItem("rememberMe");
-          return;
-        }
+        sessionStorage.setItem("tempSession", "true");
 
         const { data: profile } = await supabase
           .from("profiles")
